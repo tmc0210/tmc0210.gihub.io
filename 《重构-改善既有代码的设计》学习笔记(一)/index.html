@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《重构-改善既有代码的设计》学习笔记(一)">
+<meta property="og:url" content="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)/index.html">
+<meta property="og:site_name" content="tmc&#39;s blogs">
+<meta property="og:description" content="关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。">
+<meta property="article:published_time" content="2020-05-11T09:55:38.000Z">
+<meta property="article:modified_time" content="2020-05-12T18:34:09.726Z">
+<meta property="article:author" content="tmc">
+<meta property="article:tag" content="java">
+<meta property="article:tag" content="重构">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>《重构-改善既有代码的设计》学习笔记(一) | tmc's blogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tmc's blogs</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="tmc">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tmc's blogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《重构-改善既有代码的设计》学习笔记(一)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-05-11 17:55:38" itemprop="dateCreated datePublished" datetime="2020-05-11T17:55:38+08:00">2020-05-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-13 02:34:09" itemprop="dateModified" datetime="2020-05-13T02:34:09+08:00">2020-05-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
+<a id="more"></a>
+
+<h2 id="重构，第一个案例"><a href="#重构，第一个案例" class="headerlink" title="重构，第一个案例"></a>重构，第一个案例</h2><p>重构即为不改变代码外在行为的前提下，对代码做出修改，以改进程序的内部结构。</p>
+<p>本章节以一个影片出租店用程序作为案例示范了重构的过程。主要部分没有什么特别的，值得注意的有以下两处</p>
+<ul>
+<li>某处重构中不使用临时变量储存函数值而改用两次调用外部函数。代码看起来更可读不过似乎影响效率，之后大概会解释重构与效率的取舍吧。</li>
+<li>更改代码结构加入状态模式。不同影片的价格计算方式不同，但是由于类型可修改，不能简单使用继承。于是采用状态模式。此处影片的类型为可修改的状态，获取影片价格为状态对应的行为，虽然我看着更像策略模式。。  </li>
+</ul>
+<blockquote>
+<p>重构之前，首先检查自己是否有一套可靠的测试机制，这些测试必须有自我检验能力</p>
+</blockquote>
+<blockquote>
+<p>重构技术就是以微小的步伐修改程序，如果你犯下错误，很容易便可发现它</p>
+</blockquote>
+<blockquote>
+<p>如果你发现自己需要为程序添加一个特性，而代码结构使你无法很方便地达成目的，那就先重构那个程序，使特性的添加比较容易进行，然后再添加特性。</p>
+</blockquote>
+<h2 id="重构原则"><a href="#重构原则" class="headerlink" title="重构原则"></a>重构原则</h2><blockquote>
+<p><strong>重构:</strong> 对软件内部结构的一种调整，目的是在不改变软件可观察行为的前提下，提高其可理解性，降低其修改成本。 或是使用一系列重构手法，在不改变软件可观察行为的前提下调整其结构。  </p>
+</blockquote>
+<h3 id="为何重构"><a href="#为何重构" class="headerlink" title="为何重构"></a>为何重构</h3><ul>
+<li>重构改进软件设计</li>
+<li>重构使软件更容易理解</li>
+<li>重构帮助找到bug</li>
+<li>重构提高编程速度</li>
+</ul>
+<h3 id="何时重构"><a href="#何时重构" class="headerlink" title="何时重构"></a>何时重构</h3><blockquote>
+<p>事不过三，三则重构 </p>
+</blockquote>
+<ul>
+<li>添加功能时重构</li>
+<li>修补错误时重构</li>
+<li>复审代码时重构</li>
+</ul>
+<h3 id="重构的难题"><a href="#重构的难题" class="headerlink" title="重构的难题"></a>重构的难题</h3><h4 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h4><ol>
+<li>大多数商用程序都与数据库高度耦合  </li>
+<li>容易导致数据迁移  </li>
+</ol>
+<ul>
+<li>对于非对象数据库，可以通过加入分隔层隔离两个模型各自的变化。这会增加系统复杂度但是可以带来很大的灵活度。  </li>
+<li>无需一开始就插入分隔层，可以等对象模型不稳定时再产生。</li>
+</ul>
+<h4 id="修改接口"><a href="#修改接口" class="headerlink" title="修改接口"></a>修改接口</h4><p>对于已发布接口，可能会出现比公开接口更严重的问题。<br>这时需要同时维护新旧两个接口，直到所有用户都有时间对这个变化做出反应。让旧接口调用新接口，而非复制函数实现。对于java，可以使用deprecation(不建议使用)标记旧接口。<br>另一方面，若无必要，不要发布接口。可能意味着需要改变代码所有权观念，让每个人都可以修改别人的代码，以适应接口的改动。</p>
+<blockquote>
+<p>不要过早发布接口，请修改你的代码所有权政策，使重构更顺畅。</p>
+</blockquote>
+<h4 id="难以通过重构手法完成的设计改动"><a href="#难以通过重构手法完成的设计改动" class="headerlink" title="难以通过重构手法完成的设计改动"></a>难以通过重构手法完成的设计改动</h4><p>很难将不考虑安全性需求时构造起来的系统重构为具备良好安全性系统</p>
+<h4 id="何时不该重构"><a href="#何时不该重构" class="headerlink" title="何时不该重构"></a>何时不该重构</h4><ul>
+<li>当代码实在太混乱，重构它还不如重新写一个来得简单。</li>
+<li>当代码满是错误。</li>
+<li>如果项目已近最后期限</li>
+</ul>
+<h3 id="重构与性能"><a href="#重构与性能" class="headerlink" title="重构与性能"></a>重构与性能</h3><p>重构可能使软件运行更慢，但它也使软件的优化更容易。除了对性能有要求的实时系统，其他任何情况下都应写出可调的软件，然后调整它以求获得足够速度。</p>
+<h4 id="编写快速软件的方法"><a href="#编写快速软件的方法" class="headerlink" title="编写快速软件的方法"></a>编写快速软件的方法</h4><ul>
+<li>时间预算法<br>从分解设计开始做好时间预算，适用于心律调节器等高度重视性能的系统</li>
+<li>持续关注法<br>要求程序员做任何事时设法保持高性能</li>
+<li>性能提升法<br>不关注性能直到性能优化阶段(通常在开发后期)</li>
+</ul>
+<h2 id="代码的坏味道"><a href="#代码的坏味道" class="headerlink" title="代码的坏味道"></a>代码的坏味道</h2><h3 id="Duplicated-Code-重复代码"><a href="#Duplicated-Code-重复代码" class="headerlink" title="Duplicated Code (重复代码)"></a>Duplicated Code (重复代码)</h3><ul>
+<li><p>同一个类的两个函数含有相同的表达式  </p>
+<p>  采用Extract Method(110)提炼出重复代码，然后让这两个地点都调用被提炼出来的那一段代码</p>
+</li>
+<li><p>同一个互为兄弟的子类内出现  </p>
+<ul>
+<li>如果含有相同表达式。对两个类使用 Extract Method ，再对被提炼出来的代码使用 Pull Up Method ,将它推入超类中。</li>
+<li>如果两个代码只是相似，运用 Extract Method 将相似部分和差异部分割开，构成单独一个函数。然后可能可以运用Form Template Method 获得模版方法设计模式。</li>
+<li>如果以不同的算法做相同的事，选择较清晰的一个，用Substitute Algorithm将其他函数的算法替换掉</li>
+</ul>
+</li>
+<li><p>两个毫不相关的类<br>  对其中一个使用Extra Class，将重复代码提炼到一个独立类中。注意考虑原有类与新类的关系。</p>
+<h3 id="Long-Method-过长函数"><a href="#Long-Method-过长函数" class="headerlink" title="Long Method (过长函数)"></a>Long Method (过长函数)</h3></li>
+<li><p>每当需要使用注释说明时，便将需要说明的东西写进独立函数中，并以其用途命名。关键不在于函数长度，而在于函数 “What” 和 “How” 之间的距离。</p>
+<ul>
+<li>大多情况只需要Extract Method。</li>
+<li>如果有大量参数和临时变量。运用 Replace Temp with Query 来消除临时元素。Introduce Parameter Object 和 Preserve Whole Object 则可以简化参数列表  </li>
+<li>如果仍有太多临时变量和参数，使用 Replace Method with Method Object  </li>
+</ul>
+</li>
+<li><p>注意条件表达式和循环。可以使用Decompose Conditional 处理条件表达式。循环和其内代码则应提炼到独立函数中</p>
+</li>
+</ul>
+<h3 id="Large-Class-过大的类"><a href="#Large-Class-过大的类" class="headerlink" title="Large Class (过大的类)"></a>Large Class (过大的类)</h3><ul>
+<li>如果类中有太多实例变量，通常可以使用 Extract Class 或 Extract Subclass</li>
+<li>如果类中有太多代码，还可以使用 Extract Interface 为客户端对于类的每一种使用方式提炼出一个接口</li>
+<li>如果是一个GUI类，可能需要把数据和行为移到一个独立的领域对象去。可能需要各保留一些重复数据，并保持两边同步。可以使用 Duplicate Observed Data</li>
+</ul>
+<h3 id="Long-Parameter-List-过长参数列"><a href="#Long-Parameter-List-过长参数列" class="headerlink" title="Long Parameter List (过长参数列)"></a>Long Parameter List (过长参数列)</h3><ul>
+<li>如果向已有的对象发出一条请求就可以取代一个参数，那么你应该激活重构手法 Replace Parameter with Method 。  </li>
+<li>还可以用 Preserve Whole Object 将来自同一对象的一堆数据收集起来，并以该对象替换他们。  </li>
+<li>如果某些数据缺乏合理的对象归属，可使用 Introduce Parameter Object为它们制造出一个参数对象。  </li>
+<li>例外情况，如果明显不希望产生某种依赖关系，将数据单独拆分成参数也合情合理。</li>
+</ul>
+<h3 id="Divergent-Change-发散式变化"><a href="#Divergent-Change-发散式变化" class="headerlink" title="Divergent Change (发散式变化)"></a>Divergent Change (发散式变化)</h3><p>如果某个类经常因为不同的原因在不同的方向上变化，应该找出某种特定原因而造成的所有变化，然后运用 Extract Class 将它们提炼到另一个类中</p>
+<h3 id="Shotgun-Surgery-霰弹式修改"><a href="#Shotgun-Surgery-霰弹式修改" class="headerlink" title="Shotgun Surgery (霰弹式修改)"></a>Shotgun Surgery (霰弹式修改)</h3><p>与上一条相反，如果每遇到一种变化，你都必须在许多不同类中作出小修改，应该使用 Move Method 和 Move Field 把需要修改的代码放进同一个类。通常可以运用 Inline Class，这可能会导致少量的上一条中的发散式变化，但可以轻易地被处理</p>
+<h3 id="Feature-Envy-依恋情节"><a href="#Feature-Envy-依恋情节" class="headerlink" title="Feature Envy (依恋情节)"></a>Feature Envy (依恋情节)</h3><p>函数对某个类的兴趣高过自己所处的类。</p>
+<ul>
+<li>通常关注的焦点是某个其他的类中的某些数据。通常使用 Move Method 即可</li>
+<li>有时函数会用到几个类的功能。这时可以判断哪个类拥有最多被此函数使用的数据，也可以先以 Extract Method 将这个函数分解并放在不同地点</li>
+<li>也有几个复杂的设计模式破坏了这一条。例如Strategy策略模式和Visitor访问者模式和自委托(啥玩意)。这些模式用于对抗前面的发散式变化。</li>
+</ul>
+<h3 id="Data-Clumps-数据泥团"><a href="#Data-Clumps-数据泥团" class="headerlink" title="Data Clumps (数据泥团)"></a>Data Clumps (数据泥团)</h3><p>在很多地方看到相同的三四项数据，例如两个类中相同的字段或是许多函数签名中相同的参数。  </p>
+<ul>
+<li>首先找出数据以字段形式出现的地方，运用 Extract Class 将它们提炼到独立的对象中，然后运用 Introduce Prarameter Object 或 Preserve Whole Object 缩减参数列表。 </li>
+<li>一个评判方法 删掉众多数据中的一项，如果有数据失去类意义，意味着需要产生新对象。</li>
+</ul>
+<h3 id="Primitive-Obsession-基本类型偏执"><a href="#Primitive-Obsession-基本类型偏执" class="headerlink" title="Primitive Obsession (基本类型偏执)"></a>Primitive Obsession (基本类型偏执)</h3><p>新手通常不愿意在小任务上运用小对象。</p>
+<ul>
+<li>可以运用 Repalce Data Value with Object 将原本单独存在的数据值替换为对象</li>
+<li>如果想要替换的数据值是类型码而它不影响行为。可以用 Replace Type Code with Class 将它替换掉。</li>
+<li>如果有与类型码相关的条件表达式。可以用Replace Type Code with Subclass 或 Replace Type Code with State/Strategy 加以处理</li>
+<li>如果有一组总被放在一起的字段，可运用 Extract Class </li>
+<li>如果在参数列表中看到基本类型数据，可运用 Introduce Parameter Object</li>
+<li>如果正在从数组中挑选数据，可运用 Replace Array with Object</li>
+</ul>
+<h3 id="Switch-Statements-switch-惊悚现身"><a href="#Switch-Statements-switch-惊悚现身" class="headerlink" title="Switch Statements ( switch 惊悚现身 )"></a>Switch Statements ( switch 惊悚现身 )</h3><ul>
+<li>一般考虑使用多态替换它</li>
+<li>如果只是在单一函数中有些选择事例，可以用Replace Parameter with Explicit Methods</li>
+<li>如果选择条件之一是 null ，可以使用 Introduce Null Object</li>
+</ul>
+<h3 id="Parallel-Inheritance-Hierachies-平行继承体系"><a href="#Parallel-Inheritance-Hierachies-平行继承体系" class="headerlink" title="Parallel Inheritance Hierachies (平行继承体系)"></a>Parallel Inheritance Hierachies (平行继承体系)</h3><p>每当你为某个类新增一个子类时，如果你必须为另一个类也增加一个类。<br>一般让一个继承体系的实例引用另一个继承体系的实例。也可以使用 Move Methods 和 Move Field</p>
+<h3 id="Lazy-Class-冗赘类"><a href="#Lazy-Class-冗赘类" class="headerlink" title="Lazy Class (冗赘类)"></a>Lazy Class (冗赘类)</h3><p>去除无用的类。</p>
+<ul>
+<li>如果某些子类没有做足够的工作，使用 Collapse Hierachy </li>
+<li>对于几乎没用的组件，使用 Inline Class</li>
+</ul>
+<h3 id="Speculative-Generality-夸夸其谈未来性"><a href="#Speculative-Generality-夸夸其谈未来性" class="headerlink" title="Speculative Generality (夸夸其谈未来性)"></a>Speculative Generality (夸夸其谈未来性)</h3><p>过度设想未来以企图处理一些非必要的事情。例如函数或类的唯一用户是测试用例。</p>
+<ul>
+<li>无用的抽象类，请运用 Collapse Hierarchy</li>
+<li>不必要的委托，运用 Inline Class</li>
+<li>函数有无用参数，实施 Remove Parameter</li>
+<li>函数名带有多余的抽象，实施 Rename Method</li>
+</ul>
+<h3 id="Temporary-Field-令人迷惑的暂时字段"><a href="#Temporary-Field-令人迷惑的暂时字段" class="headerlink" title="Temporary Field (令人迷惑的暂时字段)"></a>Temporary Field (令人迷惑的暂时字段)</h3><ul>
+<li>有时会看到某个实例变量仅为某种特定情况而设。<br>一般可以使用 Extract class，也许可以使用 Introduce Null Object 在变量不合法的情况下创建一个空对象，从而避免条件式代码</li>
+<li>如果类中有一个复杂算法，需要好几个变量，也有可能出现这种情况。<br>可以利用 Extract Class 提炼到独立类中，成为新的函数对象</li>
+</ul>
+<h3 id="Message-Chains-过度耦合的消息链"><a href="#Message-Chains-过度耦合的消息链" class="headerlink" title="Message Chains (过度耦合的消息链)"></a>Message Chains (过度耦合的消息链)</h3><p>对象之间相互请求的链过长。意味着客户代码将与查找过程中的导航紧密耦合。<br>可以使用 Hide Delegate 。或是先观察消息链的最终对象，用 Extract Method 提炼到独立函数中，再使用 Move Method 推入消息链。  </p>
+<h3 id="Middle-Man-中间人"><a href="#Middle-Man-中间人" class="headerlink" title="Middle Man (中间人)"></a>Middle Man (中间人)</h3><p>过度使用委托。</p>
+<ul>
+<li>如果只有少数几个不干实事的函数，使用 InlineMethod 把它们放进调用端</li>
+<li>如果还有其他行为，运用 Replace Delegation with Inheritance 变为实责对象的子类</li>
+</ul>
+<h3 id="Inappropriate-Intimacy-狎昵关系"><a href="#Inappropriate-Intimacy-狎昵关系" class="headerlink" title="Inappropriate Intimacy (狎昵关系)"></a>Inappropriate Intimacy (狎昵关系)</h3><p>两个类过多关注彼此的私有部分。</p>
+<ul>
+<li>可以采用 Move Method 和 Move Field 划清界限</li>
+<li>可以运用 Extra Class 将共同点提炼到一个新的类</li>
+<li>可以运用 Hide Delegate 传递这些信息</li>
+<li>继承也会导致这一问题。可以使用 Replace Inheritance with Delegation 使其离开继承体系</li>
+</ul>
+<h3 id="Alternative-Classes-with-Different-Interfaces-异曲同工的类"><a href="#Alternative-Classes-with-Different-Interfaces-异曲同工的类" class="headerlink" title="Alternative Classes with Different Interfaces (异曲同工的类)"></a>Alternative Classes with Different Interfaces (异曲同工的类)</h3><p>两个函数做同一件事缺有不同的签名。</p>
+<ul>
+<li>可以运用 Rename Method 重命名。</li>
+<li>还需要反复运用 Move Method 将某些行为移入类，直到两者的协议一致为止</li>
+<li>如果移动方法过于重复累赘，可以运用 Extract Superclass</li>
+</ul>
+<h3 id="Incomplete-Library-Class-不完美的库类"><a href="#Incomplete-Library-Class-不完美的库类" class="headerlink" title="Incomplete Library Class (不完美的库类)"></a>Incomplete Library Class (不完美的库类)</h3><p>关于程序库的一些问题。  </p>
+<ul>
+<li>如果你只想修改库类的一两个函数，可以运用 Introduce Foreign Method </li>
+<li>如果想要添加大量额外行为，运用 Introduce Local Extension</li>
+</ul>
+<h3 id="Data-Class-纯稚的数据类"><a href="#Data-Class-纯稚的数据类" class="headerlink" title="Data Class (纯稚的数据类)"></a>Data Class (纯稚的数据类)</h3><p>一些纯粹的数据类，需要考虑是否得到了恰当的封装。尝试将其他地方对该类的调用搬移过来。</p>
+<h3 id="Refused-Bequest-被拒绝的馈赠"><a href="#Refused-Bequest-被拒绝的馈赠" class="headerlink" title="Refused Bequest (被拒绝的馈赠)"></a>Refused Bequest (被拒绝的馈赠)</h3><p>子类可能不需要继承超类所有的东西。<br>一般而言意味着继承体系设计错误。传统说法中，所有的超类都应该是抽象的<br>当然这一问题并不经常引起困惑和问题，大多数情况无需在意</p>
+<h3 id="Comments-过多的注释"><a href="#Comments-过多的注释" class="headerlink" title="Comments (过多的注释)"></a>Comments (过多的注释)</h3><p>当感觉需要撰写注释时，先尝试重构，试着让所有注释变得多余</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/java/" rel="tag"><i class="fa fa-tag"></i> java</a>
+            <a href="/tags/%E9%87%8D%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 重构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/" rel="prev" title="Mac的终端美化">
+      <i class="fa fa-chevron-left"></i> Mac的终端美化
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#重构，第一个案例"><span class="nav-number">1.</span> <span class="nav-text">重构，第一个案例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重构原则"><span class="nav-number">2.</span> <span class="nav-text">重构原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为何重构"><span class="nav-number">2.1.</span> <span class="nav-text">为何重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#何时重构"><span class="nav-number">2.2.</span> <span class="nav-text">何时重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构的难题"><span class="nav-number">2.3.</span> <span class="nav-text">重构的难题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库"><span class="nav-number">2.3.1.</span> <span class="nav-text">数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改接口"><span class="nav-number">2.3.2.</span> <span class="nav-text">修改接口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#难以通过重构手法完成的设计改动"><span class="nav-number">2.3.3.</span> <span class="nav-text">难以通过重构手法完成的设计改动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#何时不该重构"><span class="nav-number">2.3.4.</span> <span class="nav-text">何时不该重构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重构与性能"><span class="nav-number">2.4.</span> <span class="nav-text">重构与性能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#编写快速软件的方法"><span class="nav-number">2.4.1.</span> <span class="nav-text">编写快速软件的方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码的坏味道"><span class="nav-number">3.</span> <span class="nav-text">代码的坏味道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Duplicated-Code-重复代码"><span class="nav-number">3.1.</span> <span class="nav-text">Duplicated Code (重复代码)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Long-Method-过长函数"><span class="nav-number">3.2.</span> <span class="nav-text">Long Method (过长函数)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Large-Class-过大的类"><span class="nav-number">3.3.</span> <span class="nav-text">Large Class (过大的类)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Long-Parameter-List-过长参数列"><span class="nav-number">3.4.</span> <span class="nav-text">Long Parameter List (过长参数列)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Divergent-Change-发散式变化"><span class="nav-number">3.5.</span> <span class="nav-text">Divergent Change (发散式变化)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shotgun-Surgery-霰弹式修改"><span class="nav-number">3.6.</span> <span class="nav-text">Shotgun Surgery (霰弹式修改)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Feature-Envy-依恋情节"><span class="nav-number">3.7.</span> <span class="nav-text">Feature Envy (依恋情节)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Clumps-数据泥团"><span class="nav-number">3.8.</span> <span class="nav-text">Data Clumps (数据泥团)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Primitive-Obsession-基本类型偏执"><span class="nav-number">3.9.</span> <span class="nav-text">Primitive Obsession (基本类型偏执)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Switch-Statements-switch-惊悚现身"><span class="nav-number">3.10.</span> <span class="nav-text">Switch Statements ( switch 惊悚现身 )</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Parallel-Inheritance-Hierachies-平行继承体系"><span class="nav-number">3.11.</span> <span class="nav-text">Parallel Inheritance Hierachies (平行继承体系)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lazy-Class-冗赘类"><span class="nav-number">3.12.</span> <span class="nav-text">Lazy Class (冗赘类)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Speculative-Generality-夸夸其谈未来性"><span class="nav-number">3.13.</span> <span class="nav-text">Speculative Generality (夸夸其谈未来性)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Temporary-Field-令人迷惑的暂时字段"><span class="nav-number">3.14.</span> <span class="nav-text">Temporary Field (令人迷惑的暂时字段)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Message-Chains-过度耦合的消息链"><span class="nav-number">3.15.</span> <span class="nav-text">Message Chains (过度耦合的消息链)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Middle-Man-中间人"><span class="nav-number">3.16.</span> <span class="nav-text">Middle Man (中间人)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inappropriate-Intimacy-狎昵关系"><span class="nav-number">3.17.</span> <span class="nav-text">Inappropriate Intimacy (狎昵关系)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Alternative-Classes-with-Different-Interfaces-异曲同工的类"><span class="nav-number">3.18.</span> <span class="nav-text">Alternative Classes with Different Interfaces (异曲同工的类)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Incomplete-Library-Class-不完美的库类"><span class="nav-number">3.19.</span> <span class="nav-text">Incomplete Library Class (不完美的库类)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Data-Class-纯稚的数据类"><span class="nav-number">3.20.</span> <span class="nav-text">Data Class (纯稚的数据类)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Refused-Bequest-被拒绝的馈赠"><span class="nav-number">3.21.</span> <span class="nav-text">Refused Bequest (被拒绝的馈赠)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Comments-过多的注释"><span class="nav-number">3.22.</span> <span class="nav-text">Comments (过多的注释)</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="tmc"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">tmc</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/tmc0210" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tmc0210" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:494521535@qq.com" title="E-Mail → mailto:494521535@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.holdice.club/" title="https:&#x2F;&#x2F;blog.holdice.club&#x2F;" rel="noopener" target="_blank">holdice's blogs</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://shiraha.cn/" title="https:&#x2F;&#x2F;shiraha.cn&#x2F;" rel="noopener" target="_blank">七海の参考書</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/qq_39119496/article/details/103372437" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_39119496&#x2F;article&#x2F;details&#x2F;103372437" rel="noopener" target="_blank">Ashmore</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=1&id=3190522&auto=0&height=32"></iframe>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tmc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
