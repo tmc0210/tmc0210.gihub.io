@@ -174,7 +174,7 @@
 <li>对于非对象数据库，可以通过加入分隔层隔离两个模型各自的变化。这会增加系统复杂度但是可以带来很大的灵活度。  </li>
 <li>无需一开始就插入分隔层，可以等对象模型不稳定时再产生。</li>
 </ul>
-<h4 id="修改接口"><a href="#修改接口" class="headerlink" title="修改接口"></a>修改接口</h4><p>对于已发布接口，可能会出现比公开接口更严重的问题。<br>这时需要同时维护新旧两个接口，直到所有用户都有时间对这个变化做出反应。让旧接口调用新接口，而非复制函数实现。对于java，可以使用deprecation(不建议使用)标记旧接口。<br>另一方面，若无必要，不要发布接口。可能意味着需要改变代码所有权观念，让每个人都可以修改别人的代码，以适应接口的改动。</p>
+<h4 id="修改接口"><a href="#修改接口" class="headerlink" title="修改接口"></a>修改接口</h4><p>对于已发布接口，可能会出现比公开接口更严重的问题。<br>这时需要同时维护新旧两个接口，直到所有用户都有时间对这个变化做出反应。让旧接口调用新接口，而非复制函数实现。对于java，可以使用 deprecation (意为不建议使用) 标记旧接口。<br>另一方面，若无必要，不要发布接口。可能意味着需要改变代码所有权观念，让每个人都可以修改别人的代码，以适应接口的改动。</p>
 <blockquote>
 <p>不要过早发布接口，请修改你的代码所有权政策，使重构更顺畅。</p>
 </blockquote>
@@ -192,26 +192,26 @@
 </ul>
 <h2 id="代码的坏味道"><a href="#代码的坏味道" class="headerlink" title="代码的坏味道"></a>代码的坏味道</h2><h3 id="Duplicated-Code-重复代码"><a href="#Duplicated-Code-重复代码" class="headerlink" title="Duplicated Code (重复代码)"></a>Duplicated Code (重复代码)</h3><ul>
 <li><p>同一个类的两个函数含有相同的表达式  </p>
-<p>  采用Extract Method(110)提炼出重复代码，然后让这两个地点都调用被提炼出来的那一段代码</p>
+<p>  采用 Extract Method 提炼出重复代码，然后让这两个地点都调用被提炼出来的那一段代码</p>
 </li>
 <li><p>同一个互为兄弟的子类内出现  </p>
 <ul>
 <li>如果含有相同表达式。对两个类使用 Extract Method ，再对被提炼出来的代码使用 Pull Up Method ,将它推入超类中。</li>
-<li>如果两个代码只是相似，运用 Extract Method 将相似部分和差异部分割开，构成单独一个函数。然后可能可以运用Form Template Method 获得模版方法设计模式。</li>
-<li>如果以不同的算法做相同的事，选择较清晰的一个，用Substitute Algorithm将其他函数的算法替换掉</li>
+<li>如果两个代码只是相似，运用 Extract Method 将相似部分和差异部分割开，构成单独一个函数。然后可能可以运用 Form Template Method 获得模版方法设计模式。</li>
+<li>如果以不同的算法做相同的事，选择较清晰的一个，用 Substitute Algorithm 将其他函数的算法替换掉</li>
 </ul>
 </li>
-<li><p>两个毫不相关的类<br>  对其中一个使用Extra Class，将重复代码提炼到一个独立类中。注意考虑原有类与新类的关系。</p>
-<h3 id="Long-Method-过长函数"><a href="#Long-Method-过长函数" class="headerlink" title="Long Method (过长函数)"></a>Long Method (过长函数)</h3></li>
-<li><p>每当需要使用注释说明时，便将需要说明的东西写进独立函数中，并以其用途命名。关键不在于函数长度，而在于函数 “What” 和 “How” 之间的距离。</p>
-<ul>
-<li>大多情况只需要Extract Method。</li>
+<li><p>两个毫不相关的类<br>  对其中一个使用 Extra Class，将重复代码提炼到一个独立类中。注意考虑原有类与新类的关系。  </p>
+</li>
+</ul>
+<h3 id="Long-Method-过长函数"><a href="#Long-Method-过长函数" class="headerlink" title="Long Method (过长函数)"></a>Long Method (过长函数)</h3><ul>
+<li>每当需要使用注释说明时，便将需要说明的东西写进独立函数中，并以其用途命名。关键不在于函数长度，而在于函数 “What” 和 “How” 之间的距离。<ul>
+<li>大多情况只需要 Extract Method。</li>
 <li>如果有大量参数和临时变量。运用 Replace Temp with Query 来消除临时元素。Introduce Parameter Object 和 Preserve Whole Object 则可以简化参数列表  </li>
 <li>如果仍有太多临时变量和参数，使用 Replace Method with Method Object  </li>
 </ul>
 </li>
-<li><p>注意条件表达式和循环。可以使用Decompose Conditional 处理条件表达式。循环和其内代码则应提炼到独立函数中</p>
-</li>
+<li>注意条件表达式和循环。可以使用 Decompose Conditional 处理条件表达式。循环和其内代码则应提炼到独立函数中</li>
 </ul>
 <h3 id="Large-Class-过大的类"><a href="#Large-Class-过大的类" class="headerlink" title="Large Class (过大的类)"></a>Large Class (过大的类)</h3><ul>
 <li>如果类中有太多实例变量，通常可以使用 Extract Class 或 Extract Subclass</li>
@@ -281,7 +281,7 @@
 <li>可以运用 Hide Delegate 传递这些信息</li>
 <li>继承也会导致这一问题。可以使用 Replace Inheritance with Delegation 使其离开继承体系</li>
 </ul>
-<h3 id="Alternative-Classes-with-Different-Interfaces-异曲同工的类"><a href="#Alternative-Classes-with-Different-Interfaces-异曲同工的类" class="headerlink" title="Alternative Classes with Different Interfaces (异曲同工的类)"></a>Alternative Classes with Different Interfaces (异曲同工的类)</h3><p>两个函数做同一件事缺有不同的签名。</p>
+<h3 id="Alternative-Classes-with-Different-Interfaces-异曲同工的类"><a href="#Alternative-Classes-with-Different-Interfaces-异曲同工的类" class="headerlink" title="Alternative Classes with Different Interfaces (异曲同工的类)"></a>Alternative Classes with Different Interfaces (异曲同工的类)</h3><p>两个类做同一件事却有不同的签名。</p>
 <ul>
 <li>可以运用 Rename Method 重命名。</li>
 <li>还需要反复运用 Move Method 将某些行为移入类，直到两者的协议一致为止</li>
@@ -295,6 +295,10 @@
 <h3 id="Data-Class-纯稚的数据类"><a href="#Data-Class-纯稚的数据类" class="headerlink" title="Data Class (纯稚的数据类)"></a>Data Class (纯稚的数据类)</h3><p>一些纯粹的数据类，需要考虑是否得到了恰当的封装。尝试将其他地方对该类的调用搬移过来。</p>
 <h3 id="Refused-Bequest-被拒绝的馈赠"><a href="#Refused-Bequest-被拒绝的馈赠" class="headerlink" title="Refused Bequest (被拒绝的馈赠)"></a>Refused Bequest (被拒绝的馈赠)</h3><p>子类可能不需要继承超类所有的东西。<br>一般而言意味着继承体系设计错误。传统说法中，所有的超类都应该是抽象的<br>当然这一问题并不经常引起困惑和问题，大多数情况无需在意</p>
 <h3 id="Comments-过多的注释"><a href="#Comments-过多的注释" class="headerlink" title="Comments (过多的注释)"></a>Comments (过多的注释)</h3><p>当感觉需要撰写注释时，先尝试重构，试着让所有注释变得多余</p>
+<h2 id="构筑测试体系"><a href="#构筑测试体系" class="headerlink" title="构筑测试体系"></a>构筑测试体系</h2><blockquote>
+<p>确保所有测试都完全自动化，让它们检查自己的测试结果<br>需要添加特性时，先写相应测试代码。 </p>
+</blockquote>
+<p>Java中</p>
 ]]></content>
       <categories>
         <category>学习</category>
