@@ -298,7 +298,6 @@
 <h2 id="构筑测试体系"><a href="#构筑测试体系" class="headerlink" title="构筑测试体系"></a>构筑测试体系</h2><blockquote>
 <p>确保所有测试都完全自动化，让它们检查自己的测试结果<br>需要添加特性时，先写相应测试代码。 </p>
 </blockquote>
-<p>Java中</p>
 ]]></content>
       <categories>
         <category>学习</category>
