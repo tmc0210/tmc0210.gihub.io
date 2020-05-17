@@ -1,134 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>3月营地战棋项目总结</title>
-    <url>/3%E6%9C%88%E8%90%A5%E5%9C%B0%E6%88%98%E6%A3%8B%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。</p>
-<a id="more"></a>
-
-<h3 id="游戏流程概述"><a href="#游戏流程概述" class="headerlink" title="游戏流程概述"></a>游戏流程概述</h3><p>这次项目的玩法大致是炉石冒险+炉石酒馆战棋+炉石竞技场的神奇结合。开局选择英雄并进行若干次竞技场式选牌以确定牌池，之后依次与数个boss进行完整的1v1酒馆战棋战斗。每次战斗失败则游戏结束，胜利则获得一个宝藏并继续挑战。游戏的主体流程实现没有难点，主要难点集中在战棋模式战斗，操作的结算。</p>
-<h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p><em>以下名词解释基于读者对于炉石或类似卡牌游戏有充分了解，如读者对此类卡牌游戏毫无涉猎，接下来的内容可能难以阅读，请出门左转官网下载游戏一起成为无敌的恶魔猎手（此</em></p>
-<p><strong>扳机</strong> : 一张卡牌触发效果的时机，例如:<br>        钴制卫士 3星6/3 机械 每当你召唤一个机械，便获得圣盾<br>        此处 “每当你召唤一个机械”，便是一个召唤时扳机，表示每当玩家召唤一个机械，就会触发场上的钴制卫士的效果，使钴制卫士获得圣盾。游戏中存在大量的其他扳机机制，例如回收机器人的随从死亡时扳机，钢铁武道家的回合结束扳机等。扳机在此次项目中的实现<del>本应</del>是基于观察者模式。每当一个扳机入场便注册为游戏结算事件的观察者，离场时反之。当游戏发生事件时便通知所有的观察者，例如对于钴制卫士，召唤随从时便被通知，判断召唤的是机械后便执行之后的获得圣盾语句。</p>
-<h3 id="技术总结"><a href="#技术总结" class="headerlink" title="技术总结"></a>技术总结</h3><p>接下来的内容是一些技术相关的收获和教训总结</p>
-<h4 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h4><p>由于本次项目是和他人合作，我和合作者早期的交流也不很适应，所以框架的设计讨论并不充分，采取的方案可能不是最优解，仅供抛砖引玉。<br>因为在早期分工中制定了一人负责游戏逻辑，一人负责UI与动画的分工，也考虑到项目的实用性及可移植性，采用了模仿web开发的前后端信息交互模式。对于战棋模式中的一场战斗，在战斗开始时战斗过程与结果便由后端即游戏逻辑部分代码计算完毕并将战斗过程按照一定格式传递给前端。前端得到信息后，根据信息让随从互相撞击，播放对应动画等。另一方面，对于玩家的操作，例如选择了随从并购买，则由前端传递给后端进行处理。后端会在玩家手牌中添加该随从并减少对应铸币。当然，后端也会再次返回信息告知前端操作的后续影响，例如将酒馆中的该随从移动到手牌里，或者触发了购买时扳机等。这样的优点自然是降低耦合度，避免逻辑运算和动画处理混杂，同时因为后端代码是纯C#，也可以方便移植至服务器，甚至改造成多人游戏<del>做梦</del>。<br>当然这样也导致了一些问题，比如本次的合作者闲的没事手写UI写了7000行，我完全没能及时阻止。。<br>在后续的开发过程中，这几千行的UI代码大约要被简洁明了的UGUI替代吧。</p>
-<h4 id="卡牌效果的定义"><a href="#卡牌效果的定义" class="headerlink" title="卡牌效果的定义"></a>卡牌效果的定义</h4><p>首先，我们进行一下简单的设想，如果游戏中存在一些有着复杂描述信息的卡牌，简单的实现思路是什么？<br>最容易想到的实现就是定义一个抽象卡牌基类，然后在其中为每个扳机定义抽象方法，在具体卡牌子类中实现。这样做的缺点简直数不胜数。例如如果有200张卡牌，便要写200个不同的卡牌类，简直离谱。作为一个懒惰的程序员，必然不能这样写。<br>稍显高级的思路是使用策略模式，不定义200个卡牌，而是对于每种行为定义策略，在卡牌中通过对策略的引用来实现不同的行为，当然也可以随时更换策略。在这个项目中，我便参考了此思路。使用了委托结合策略模式的思路实现卡牌的复杂效果。   </p>
-<p>我们以上文中的钴制卫士为例，钴制卫士的效果是 召唤时扳机，如果召唤的是机械，就获得圣盾<br>事实上这段描述分为扳机和实际效果两部分，当扳机被通知时，扳机便将扳机得到的一些信息（例如此处的召唤的随从）传递给实际效果，实际效果部分判断这个随从是不是机械，如果是，则使钴制卫士获得圣盾。在理清了这个效果的本质后，一个 扳机-效果 的具体实现也就呼之欲出了。<br>显然，这里的效果事实上是一个委托，它的参数是扳机所要传递的信息（触发扳机的事件也即召唤的随从，扳机的所属者也即钴制卫士），内容则是使扳机的所属者钴制卫士获得圣盾。<br>结合上诉的策略模式思维，我们便可以将委托包装成卡牌的策略，使用枚举表示各种不同的扳机，得到包装后的扳机-委托对来实现复杂的卡牌描述<br>此处为委托对应的函数（已省略无关内容）</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public static bool GainDivineShieldWhenSummonMech(GameEvent gameEvent)</span><br><span class="line">&#123;</span><br><span class="line">    if (gameEvent.targetCard.IsMinionType(MinionType.Mechs))</span><br><span class="line">    &#123;</span><br><span class="line">        gameEvent.hostCard.effectsStay.Add(</span><br><span class="line">        new KeyWordEffect(Keyword.DivineShield));&#x2F;&#x2F;获得圣盾</span><br><span class="line">        return true;            </span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>此处GameEvent为封装的游戏信息传递类，hostCard即钴制卫士，targetCard即召唤的随从<br>当游戏中发生了召唤随从事件时，钴制卫士就会被系统通知，调用上述函数并传入携带该事件具体信息的gameEvent参数，函数执行判断传入的随从是机械后即获得圣盾。<br>所以，只要将扳机与委托相互绑定并挂载在卡牌上，就能实现卡牌的复杂描述。  </p>
-<h4 id="csv与反射机制的结合"><a href="#csv与反射机制的结合" class="headerlink" title="csv与反射机制的结合"></a>csv与反射机制的结合</h4><p>在框架设计中，采用了csv这一文件格式来存储卡牌并生成。在游戏的resource文件夹中的chess.csv存储了所有棋子的攻击力，生命值，描述，关键词等信息。当游戏初始化时，后端会读取csv中的所有棋子信息并生成一系列卡牌原型，之后战斗中生成的新卡牌实例生成均采用工厂模式在卡牌工厂中由卡牌原型生成，这样能够在不增加过多运行时开销的前提下将卡牌的数据与代码分离，方便策划的修改。策划只需要知道unity的界面使用而不需掌握代码知识，就能简单使用excel等工具修改csv并在unity中测试游戏。<br>当然，csv能读取的信息属实有限，我们显然无法将刚才提到的扳机-委托对直接存储在csv中。于是，便可以借助反射机制的帮助。我们可以使用特定的格式在csv中记录卡牌的扳机-委托对中的扳机信息与委托的函数名，同样在初始化时读取并绑定在对应的卡牌原型上。  </p>
-<p><strong>例如</strong>：<br>钴制卫士在csv中的记录如下（已略去无关项）<br>钴制卫士,WhenMinionSummon:GainDivineShieldWhenSummonMech;,  </p>
-<p>此处WhenMinionSummon即为扳机名，后续的即为刚才的委托的函数名。这里表示的效果即为上文所述钴制卫士的效果描述。读取的实现也较为简单，从csv中读到字符串后进行分割，使用反射机制分别以字符串的内容得到对应的信息，赋值给对应的卡牌原型即可。<br>当然在后续的开发过程中，为了支持mod，我们对csv的结构作出了重大调整。同时创造了一种脚本语言用于mod制作者的开发过程。所以这里的csv语法与格式已经是过去式了，新的格式可能会在下一阶段的总结博文（如果有的话）中介绍一下吧。</p>
-<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>这次项目中自己的程序/策划水平和社会经验都有了一定的提升，也算是获得了一小群玩家的认可，总体还算是收获颇丰。<br>当然，上线将近一个月后的现在来看，早期的设计也有许多不足之处，等以后有时间再重构吧。</p>
-]]></content>
-      <categories>
-        <category>营地战棋</category>
-      </categories>
-      <tags>
-        <tag>Unity</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>问题与优化汇总</title>
-    <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
-    <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
-<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
-<a id="more"></a>
-
-<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化，不过其中有一些出了点问题。。正在解决中</p>
-<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
-
-<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
-]]></content>
-      <categories>
-        <category>博客相关</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Mac的终端美化</title>
-    <url>/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/</url>
-    <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
-<a id="more"></a>
-<p>废话不多说先上成品  </p>
-<p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
-<p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
-<p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。</p>
-<p>接下来的内容就是打造这一花里胡哨终端的步骤。</p>
-<ul>
-<li>环境: MacOS 10.15.4  </li>
-<li>工具: 自带Terminal oh-my-zsh iTerm2 powerlevel10k 主题<br>其中，oh-my-zsh为终端优化工具，iTerm2为终端替代品，而powerlevel10k为oh-my-zsh的一个优质第三方主题   </li>
-<li>一些其他可能用到的工具/环境: curl/wget，git等<h2 id="oh-my-zsh的安装与使用"><a href="#oh-my-zsh的安装与使用" class="headerlink" title="oh-my-zsh的安装与使用"></a>oh-my-zsh的安装与使用</h2></li>
-</ul>
-<h3 id="oh-my-zsh的下载"><a href="#oh-my-zsh的下载" class="headerlink" title="oh-my-zsh的下载"></a>oh-my-zsh的下载</h3><p><a href="https://ohmyz.sh/" target="_blank" rel="noopener">oh-my-zsh</a>是非常优秀的终端优化工具，它是基于zsh命令行的一个扩展工具集，提供了丰富的扩展功能。但它和Iterm2不同，并不提供命令行窗口，更不是一个独立的APP。<br>其在官网给出的下载方式有如下两个  </p>
-<ul>
-<li><p>使用 curl</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh -c &quot;$(curl -fsSL https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh)&quot;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用 wget</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre></td></tr></table></figure>
-<p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是 <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a> 这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。  </p>
-</li>
-<li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
-<li><p>按 i 键(英文输入法)进入编辑模式</p>
-</li>
-<li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
-<li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
-</li>
-<li><p>重启终端重复下载步骤，dns污染的问题就解决了！  </p>
-</li>
-</ul>
-<p>下载成功界面大致如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure>
-<h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题</h3><p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank" rel="noopener">官方主题</a>和<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank" rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑) ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png" alt="agnoster.png"></p>
-<ul>
-<li>首先，vim打开配置文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure></li>
-<li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre></td></tr></table></figure></li>
-<li>再使用以下命令使刚才更改的配置生效<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure>
-重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，  </li>
-</ul>
-<p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </p>
-<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure>
-<p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure>
-<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure>
-<p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
-<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure>
-<p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
-<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在<del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure>
-<p>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
-<p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
-<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装  </p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
-<p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
-<ul>
-<li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。  </li>
-<li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
-<li>Profiles -&gt; Text -&gt; Font -&gt; Chanage Font，选择刚才安装的合适字体。  </li>
-</ul>
-<p>另一个问题是IDE的终端并不能使用iTerm2，所以它会和自带终端一样出现乱码。当然这个问题也很好解决，搜索一下你的IDE的命令行修改字体方法，类似的改成合适字体即可。效果如下图所示。</p>
-<p><img src="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png" alt="截屏2020-05-11 上午2.18.06.png"><br>这样就能在iTerm2中使用花里胡哨的powerlevel10k了。虽然原本的终端里还是用不了，不过问题不大。<del>大不了不用了</del><br>iTerm2中还有许多其他的个性化选项。其中外观相关主要在 Profiles -&gt; Colors 和 Profiles -&gt; Window中。字体/背景/光标的颜色，窗口毛玻璃效果/窗口背景图片等都在这两个选项卡中调整。其他的功能拓展就不赘述了。值得一提的是可以在Profiles -&gt; Keys -&gt; Hotkey左下角设置快速打开/隐藏终端的快捷键。</p>
-<h2 id="我的配置"><a href="#我的配置" class="headerlink" title="我的配置"></a>我的配置</h2><p>这是我本人目前使用的配置，有兴趣的可以参考一下。要提醒一下iTerm2背景图的缩放不算自由，寻找背景图时建议注意一下比例和背景颜色，必要时可以使用PS等工具进行处理。比如我这张就把白色部分更改成了灰色。</p>
-<p><img src="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png" alt="截屏2020-05-11 上午2.06.36.png"></p>
-<p><img src="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png" alt="截屏2020-05-11 上午2.06.21.png"></p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>虽然是看起来简单的美化，不过也有一大堆乱七八糟的坑，一晚上才搞好。花里胡哨的代价还是挺大的。</p>
-]]></content>
-      <categories>
-        <category>花里胡哨</category>
-      </categories>
-      <tags>
-        <tag>zsh</tag>
-        <tag>oh-my-zsh</tag>
-        <tag>iTerm2</tag>
-        <tag>Mac</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>《重构-改善既有代码的设计》学习笔记</title>
     <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
@@ -464,5 +336,133 @@
         <tag>java</tag>
         <tag>重构</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>3月营地战棋项目总结</title>
+    <url>/3%E6%9C%88%E8%90%A5%E5%9C%B0%E6%88%98%E6%A3%8B%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。</p>
+<a id="more"></a>
+
+<h3 id="游戏流程概述"><a href="#游戏流程概述" class="headerlink" title="游戏流程概述"></a>游戏流程概述</h3><p>这次项目的玩法大致是炉石冒险+炉石酒馆战棋+炉石竞技场的神奇结合。开局选择英雄并进行若干次竞技场式选牌以确定牌池，之后依次与数个boss进行完整的1v1酒馆战棋战斗。每次战斗失败则游戏结束，胜利则获得一个宝藏并继续挑战。游戏的主体流程实现没有难点，主要难点集中在战棋模式战斗，操作的结算。</p>
+<h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p><em>以下名词解释基于读者对于炉石或类似卡牌游戏有充分了解，如读者对此类卡牌游戏毫无涉猎，接下来的内容可能难以阅读，请出门左转官网下载游戏一起成为无敌的恶魔猎手（此</em></p>
+<p><strong>扳机</strong> : 一张卡牌触发效果的时机，例如:<br>        钴制卫士 3星6/3 机械 每当你召唤一个机械，便获得圣盾<br>        此处 “每当你召唤一个机械”，便是一个召唤时扳机，表示每当玩家召唤一个机械，就会触发场上的钴制卫士的效果，使钴制卫士获得圣盾。游戏中存在大量的其他扳机机制，例如回收机器人的随从死亡时扳机，钢铁武道家的回合结束扳机等。扳机在此次项目中的实现<del>本应</del>是基于观察者模式。每当一个扳机入场便注册为游戏结算事件的观察者，离场时反之。当游戏发生事件时便通知所有的观察者，例如对于钴制卫士，召唤随从时便被通知，判断召唤的是机械后便执行之后的获得圣盾语句。</p>
+<h3 id="技术总结"><a href="#技术总结" class="headerlink" title="技术总结"></a>技术总结</h3><p>接下来的内容是一些技术相关的收获和教训总结</p>
+<h4 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h4><p>由于本次项目是和他人合作，我和合作者早期的交流也不很适应，所以框架的设计讨论并不充分，采取的方案可能不是最优解，仅供抛砖引玉。<br>因为在早期分工中制定了一人负责游戏逻辑，一人负责UI与动画的分工，也考虑到项目的实用性及可移植性，采用了模仿web开发的前后端信息交互模式。对于战棋模式中的一场战斗，在战斗开始时战斗过程与结果便由后端即游戏逻辑部分代码计算完毕并将战斗过程按照一定格式传递给前端。前端得到信息后，根据信息让随从互相撞击，播放对应动画等。另一方面，对于玩家的操作，例如选择了随从并购买，则由前端传递给后端进行处理。后端会在玩家手牌中添加该随从并减少对应铸币。当然，后端也会再次返回信息告知前端操作的后续影响，例如将酒馆中的该随从移动到手牌里，或者触发了购买时扳机等。这样的优点自然是降低耦合度，避免逻辑运算和动画处理混杂，同时因为后端代码是纯C#，也可以方便移植至服务器，甚至改造成多人游戏<del>做梦</del>。<br>当然这样也导致了一些问题，比如本次的合作者闲的没事手写UI写了7000行，我完全没能及时阻止。。<br>在后续的开发过程中，这几千行的UI代码大约要被简洁明了的UGUI替代吧。</p>
+<h4 id="卡牌效果的定义"><a href="#卡牌效果的定义" class="headerlink" title="卡牌效果的定义"></a>卡牌效果的定义</h4><p>首先，我们进行一下简单的设想，如果游戏中存在一些有着复杂描述信息的卡牌，简单的实现思路是什么？<br>最容易想到的实现就是定义一个抽象卡牌基类，然后在其中为每个扳机定义抽象方法，在具体卡牌子类中实现。这样做的缺点简直数不胜数。例如如果有200张卡牌，便要写200个不同的卡牌类，简直离谱。作为一个懒惰的程序员，必然不能这样写。<br>稍显高级的思路是使用策略模式，不定义200个卡牌，而是对于每种行为定义策略，在卡牌中通过对策略的引用来实现不同的行为，当然也可以随时更换策略。在这个项目中，我便参考了此思路。使用了委托结合策略模式的思路实现卡牌的复杂效果。   </p>
+<p>我们以上文中的钴制卫士为例，钴制卫士的效果是 召唤时扳机，如果召唤的是机械，就获得圣盾<br>事实上这段描述分为扳机和实际效果两部分，当扳机被通知时，扳机便将扳机得到的一些信息（例如此处的召唤的随从）传递给实际效果，实际效果部分判断这个随从是不是机械，如果是，则使钴制卫士获得圣盾。在理清了这个效果的本质后，一个 扳机-效果 的具体实现也就呼之欲出了。<br>显然，这里的效果事实上是一个委托，它的参数是扳机所要传递的信息（触发扳机的事件也即召唤的随从，扳机的所属者也即钴制卫士），内容则是使扳机的所属者钴制卫士获得圣盾。<br>结合上诉的策略模式思维，我们便可以将委托包装成卡牌的策略，使用枚举表示各种不同的扳机，得到包装后的扳机-委托对来实现复杂的卡牌描述<br>此处为委托对应的函数（已省略无关内容）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public static bool GainDivineShieldWhenSummonMech(GameEvent gameEvent)</span><br><span class="line">&#123;</span><br><span class="line">    if (gameEvent.targetCard.IsMinionType(MinionType.Mechs))</span><br><span class="line">    &#123;</span><br><span class="line">        gameEvent.hostCard.effectsStay.Add(</span><br><span class="line">        new KeyWordEffect(Keyword.DivineShield));&#x2F;&#x2F;获得圣盾</span><br><span class="line">        return true;            </span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处GameEvent为封装的游戏信息传递类，hostCard即钴制卫士，targetCard即召唤的随从<br>当游戏中发生了召唤随从事件时，钴制卫士就会被系统通知，调用上述函数并传入携带该事件具体信息的gameEvent参数，函数执行判断传入的随从是机械后即获得圣盾。<br>所以，只要将扳机与委托相互绑定并挂载在卡牌上，就能实现卡牌的复杂描述。  </p>
+<h4 id="csv与反射机制的结合"><a href="#csv与反射机制的结合" class="headerlink" title="csv与反射机制的结合"></a>csv与反射机制的结合</h4><p>在框架设计中，采用了csv这一文件格式来存储卡牌并生成。在游戏的resource文件夹中的chess.csv存储了所有棋子的攻击力，生命值，描述，关键词等信息。当游戏初始化时，后端会读取csv中的所有棋子信息并生成一系列卡牌原型，之后战斗中生成的新卡牌实例生成均采用工厂模式在卡牌工厂中由卡牌原型生成，这样能够在不增加过多运行时开销的前提下将卡牌的数据与代码分离，方便策划的修改。策划只需要知道unity的界面使用而不需掌握代码知识，就能简单使用excel等工具修改csv并在unity中测试游戏。<br>当然，csv能读取的信息属实有限，我们显然无法将刚才提到的扳机-委托对直接存储在csv中。于是，便可以借助反射机制的帮助。我们可以使用特定的格式在csv中记录卡牌的扳机-委托对中的扳机信息与委托的函数名，同样在初始化时读取并绑定在对应的卡牌原型上。  </p>
+<p><strong>例如</strong>：<br>钴制卫士在csv中的记录如下（已略去无关项）<br>钴制卫士,WhenMinionSummon:GainDivineShieldWhenSummonMech;,  </p>
+<p>此处WhenMinionSummon即为扳机名，后续的即为刚才的委托的函数名。这里表示的效果即为上文所述钴制卫士的效果描述。读取的实现也较为简单，从csv中读到字符串后进行分割，使用反射机制分别以字符串的内容得到对应的信息，赋值给对应的卡牌原型即可。<br>当然在后续的开发过程中，为了支持mod，我们对csv的结构作出了重大调整。同时创造了一种脚本语言用于mod制作者的开发过程。所以这里的csv语法与格式已经是过去式了，新的格式可能会在下一阶段的总结博文（如果有的话）中介绍一下吧。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>这次项目中自己的程序/策划水平和社会经验都有了一定的提升，也算是获得了一小群玩家的认可，总体还算是收获颇丰。<br>当然，上线将近一个月后的现在来看，早期的设计也有许多不足之处，等以后有时间再重构吧。</p>
+]]></content>
+      <categories>
+        <category>营地战棋</category>
+      </categories>
+      <tags>
+        <tag>Unity</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Mac的终端美化</title>
+    <url>/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/</url>
+    <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
+<a id="more"></a>
+<p>废话不多说先上成品  </p>
+<p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
+<p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
+<p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。</p>
+<p>接下来的内容就是打造这一花里胡哨终端的步骤。</p>
+<ul>
+<li>环境: MacOS 10.15.4  </li>
+<li>工具: 自带Terminal oh-my-zsh iTerm2 powerlevel10k 主题<br>其中，oh-my-zsh为终端优化工具，iTerm2为终端替代品，而powerlevel10k为oh-my-zsh的一个优质第三方主题   </li>
+<li>一些其他可能用到的工具/环境: curl/wget，git等<h2 id="oh-my-zsh的安装与使用"><a href="#oh-my-zsh的安装与使用" class="headerlink" title="oh-my-zsh的安装与使用"></a>oh-my-zsh的安装与使用</h2></li>
+</ul>
+<h3 id="oh-my-zsh的下载"><a href="#oh-my-zsh的下载" class="headerlink" title="oh-my-zsh的下载"></a>oh-my-zsh的下载</h3><p><a href="https://ohmyz.sh/" target="_blank" rel="noopener">oh-my-zsh</a>是非常优秀的终端优化工具，它是基于zsh命令行的一个扩展工具集，提供了丰富的扩展功能。但它和Iterm2不同，并不提供命令行窗口，更不是一个独立的APP。<br>其在官网给出的下载方式有如下两个  </p>
+<ul>
+<li><p>使用 curl</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh -c &quot;$(curl -fsSL https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh)&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 wget</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre></td></tr></table></figure>
+<p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是 <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a> 这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。  </p>
+</li>
+<li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
+<li><p>按 i 键(英文输入法)进入编辑模式</p>
+</li>
+<li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
+<li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
+</li>
+<li><p>重启终端重复下载步骤，dns污染的问题就解决了！  </p>
+</li>
+</ul>
+<p>下载成功界面大致如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure>
+<h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题</h3><p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank" rel="noopener">官方主题</a>和<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank" rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑) ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png" alt="agnoster.png"></p>
+<ul>
+<li>首先，vim打开配置文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure></li>
+<li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre></td></tr></table></figure></li>
+<li>再使用以下命令使刚才更改的配置生效<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure>
+重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，  </li>
+</ul>
+<p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </p>
+<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure>
+<p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure>
+<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure>
+<p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
+<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure>
+<p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
+<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在<del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure>
+<p>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
+<p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
+<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装  </p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
+<p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
+<ul>
+<li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。  </li>
+<li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
+<li>Profiles -&gt; Text -&gt; Font -&gt; Chanage Font，选择刚才安装的合适字体。  </li>
+</ul>
+<p>另一个问题是IDE的终端并不能使用iTerm2，所以它会和自带终端一样出现乱码。当然这个问题也很好解决，搜索一下你的IDE的命令行修改字体方法，类似的改成合适字体即可。效果如下图所示。</p>
+<p><img src="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png" alt="截屏2020-05-11 上午2.18.06.png"><br>这样就能在iTerm2中使用花里胡哨的powerlevel10k了。虽然原本的终端里还是用不了，不过问题不大。<del>大不了不用了</del><br>iTerm2中还有许多其他的个性化选项。其中外观相关主要在 Profiles -&gt; Colors 和 Profiles -&gt; Window中。字体/背景/光标的颜色，窗口毛玻璃效果/窗口背景图片等都在这两个选项卡中调整。其他的功能拓展就不赘述了。值得一提的是可以在Profiles -&gt; Keys -&gt; Hotkey左下角设置快速打开/隐藏终端的快捷键。</p>
+<h2 id="我的配置"><a href="#我的配置" class="headerlink" title="我的配置"></a>我的配置</h2><p>这是我本人目前使用的配置，有兴趣的可以参考一下。要提醒一下iTerm2背景图的缩放不算自由，寻找背景图时建议注意一下比例和背景颜色，必要时可以使用PS等工具进行处理。比如我这张就把白色部分更改成了灰色。</p>
+<p><img src="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png" alt="截屏2020-05-11 上午2.06.36.png"></p>
+<p><img src="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png" alt="截屏2020-05-11 上午2.06.21.png"></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>虽然是看起来简单的美化，不过也有一大堆乱七八糟的坑，一晚上才搞好。花里胡哨的代价还是挺大的。</p>
+]]></content>
+      <categories>
+        <category>花里胡哨</category>
+      </categories>
+      <tags>
+        <tag>zsh</tag>
+        <tag>oh-my-zsh</tag>
+        <tag>iTerm2</tag>
+        <tag>Mac</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>问题与优化汇总</title>
+    <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
+    <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
+<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
+<a id="more"></a>
+
+<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化，不过其中有一些出了点问题。。正在解决中</p>
+<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
+
+<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
+]]></content>
+      <categories>
+        <category>博客相关</category>
+      </categories>
   </entry>
 </search>
