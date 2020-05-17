@@ -138,7 +138,7 @@
 <p>本章节以一个影片出租店用程序作为案例示范了重构的过程。主要部分没有什么特别的，值得注意的有以下两处</p>
 <ul>
 <li>某处重构中不使用临时变量储存函数值而改用两次调用外部函数。代码看起来更可读不过似乎影响效率，之后大概会解释重构与效率的取舍吧。</li>
-<li>更改代码结构加入状态模式。不同影片的价格计算方式不同，但是由于类型可修改，不能简单使用继承。于是采用状态模式。此处影片的类型为可修改的状态，获取影片价格为状态对应的行为，虽然我看着更像策略模式。。  </li>
+<li>更改代码结构加入状态模式。不同影片的价格计算方式不同，但是由于类型可修改，不能简单使用继承。于是采用状态模式。此处影片的类型为可修改的状态，获取影片价格为状态对应的行为，虽然我看着更像策略模式…  </li>
 </ul>
 <blockquote>
 <p>重构之前，首先检查自己是否有一套可靠的测试机制，这些测试必须有自我检验能力</p>
@@ -313,7 +313,7 @@
 <li>一个函数的本体和名称同样清楚易懂  </li>
 <li>在函数调用点插入函数本体，然后移除该函数  </li>
 </ul>
-<p>与上一条完全相反，这里是去除不必要的间接性。另一种情况是需要整理大量不甚合理的小函数时，先全部内联到一个大函数中，再重新进行提炼。</p>
+<p>与上一条完全相反，这里是去除不必要的间接性。另一种情况是需要整理大量不甚合理的小函数时，先全部内联到一个大函数中，再重新进行提炼。  </p>
 <h4 id="Inline-Temp-内联临时变量"><a href="#Inline-Temp-内联临时变量" class="headerlink" title="Inline Temp (内联临时变量)"></a>Inline Temp (内联临时变量)</h4><ul>
 <li>你有一个临时变量，只被一个简单表达式赋值一次，而妨碍了其他重构手法</li>
 <li>将所有对该变量的引用动作，替换为对它赋值的那个表达式自身</li>
@@ -371,6 +371,89 @@
 <h4 id="Hide-Delegate-隐藏“委托关系”"><a href="#Hide-Delegate-隐藏“委托关系”" class="headerlink" title="Hide Delegate (隐藏“委托关系”)"></a>Hide Delegate (隐藏“委托关系”)</h4><ul>
 <li>客户通过一个委托类来调用另一个对象</li>
 <li>在服务类上建立客户所需的所有函数，用以隐藏委托关系</li>
+</ul>
+<p>可以在服务器对象上放置一个简单的委托函数，将委托关系隐藏起来，从而去除一些依赖关系。这样即使发生委托关系上的方法，变化也将被限制在服务对象中，不会波及客户。</p>
+<h4 id="Remove-Middle-Man-中间人"><a href="#Remove-Middle-Man-中间人" class="headerlink" title="Remove Middle Man (中间人)"></a>Remove Middle Man (中间人)</h4><ul>
+<li>某个类做了过多的简单委托动作</li>
+<li>让客户直接调用受托类</li>
+</ul>
+<p>与上一条相反，随着受托类的特性和功能越来越多，服务类会完全变成“中间人”，此时你就应该让客户直接调用受托类。使用这一条和上一条可以保证隐藏的程度是合适。</p>
+<h4 id="Introduce-Foreign-Method-引入外加函数"><a href="#Introduce-Foreign-Method-引入外加函数" class="headerlink" title="Introduce Foreign Method (引入外加函数)"></a>Introduce Foreign Method (引入外加函数)</h4><ul>
+<li>你需要为提供服务的类增加一个函数，但你无法修改这个类</li>
+<li>在客户类中建立一个函数，并以第一参数形式传入一个服务类实例</li>
+</ul>
+<p>正在使用一个类时，如果你需要一项服务而类无法供应，此时如果你能修改源码，可以自行添加一个新函数，如果不能，就要在客户端编码，补足所需的函数。明确信号是这个函数本应在服务类中实现，如果有可能，这些函数仍然应该放回到服务类。</p>
+<h4 id="Introduce-Local-Extension-引入本地扩展"><a href="#Introduce-Local-Extension-引入本地扩展" class="headerlink" title="Introduce Local Extension (引入本地扩展)"></a>Introduce Local Extension (引入本地扩展)</h4><ul>
+<li>你需要为服务类提供一些额外函数，但你无法修改这个类</li>
+<li>建立一个新类，使它包含这些额外函数。让这个扩展品成为源类的子类或包装类。</li>
+</ul>
+<p>和上一条的情况类似，如果你需要少数函数，你可以使用上一条的方法，而如果你需要加入多个函数，就可以使用本地扩展。例如子类化和包装。作者通常采取子类。</p>
+<h3 id="重新组织数据"><a href="#重新组织数据" class="headerlink" title="重新组织数据"></a>重新组织数据</h3><h4 id="Self-Encapsulate-Field-自封装字段"><a href="#Self-Encapsulate-Field-自封装字段" class="headerlink" title="Self Encapsulate Field (自封装字段)"></a>Self Encapsulate Field (自封装字段)</h4><ul>
+<li>你直接访问一个字段，但与字段之间的耦合关系逐渐变得笨拙</li>
+<li>为这个字段建立取值/设值函数，并且只以这些函数来访问字段</li>
+</ul>
+<p>如果一个类中有private字段，是否可以自由访问，还是应该使用访问函数间接访问，有两个说法。间接访问变量的函数的好处是，子类可以通过覆写一个函数而改变获取数据的途径；它还支持更灵活的数据管理方式，例如延迟初始化。<br>直接访问变量的好处则是，代码比较容易阅读。<br>如果你想要访问超类中的一个字段，却又想在子类中将对这个变量的访问改为一个计算后的值，就应该使用这一方法。</p>
+<h4 id="Replace-Data-Value-with-Object-以对象取代数据值"><a href="#Replace-Data-Value-with-Object-以对象取代数据值" class="headerlink" title="Replace Data Value with Object (以对象取代数据值)"></a>Replace Data Value with Object (以对象取代数据值)</h4><ul>
+<li>你有一个数据项，需要与其他数据和行为一起使用才有意义</li>
+<li>将数据项变成对象</li>
+</ul>
+<p>开发初期，对于电话号码一类的数据可能会出现，早期使用字符串表示，但后来发现需要抽取区号等行为。如果这样的数据项只有一两个，你可以把相关函数放进数据项所属的对象里；但是 Duplicate Code 和 Feature Envy bad smell就可能会出现，这时就需要把数据值变成对象。</p>
+<h4 id="Change-Value-to-Reference-将值对象改为引用对象"><a href="#Change-Value-to-Reference-将值对象改为引用对象" class="headerlink" title="Change Value to Reference (将值对象改为引用对象)"></a>Change Value to Reference (将值对象改为引用对象)</h4><ul>
+<li>你从一个类衍生出许多彼此相等的实例，希望将它们替换为同一个对象</li>
+</ul>
+<h4 id="Change-Reference-to-Value-将引用对象改为值对象"><a href="#Change-Reference-to-Value-将引用对象改为值对象" class="headerlink" title="Change Reference to Value (将引用对象改为值对象)"></a>Change Reference to Value (将引用对象改为值对象)</h4><ul>
+<li>你有一个引用对象，很小且不可变，而且不易管理</li>
+</ul>
+<p>和上一条相反。如果引用对象开始难以使用，就可能需要改为值对象。<br>值对象的重要特性是不可变(immutable)的。例如如果用Money类表示钱的概念，那Money类通常是一个不可变的值对象，这不意味着你的薪资不能改变，而是说改变薪资需要使用新的Money类对象代替而非修改现有的Money类。  </p>
+<h4 id="Replace-Array-with-Object-以对象取代数组"><a href="#Replace-Array-with-Object-以对象取代数组" class="headerlink" title="Replace Array with Object (以对象取代数组)"></a>Replace Array with Object (以对象取代数组)</h4><ul>
+<li>你有一个数组，其中的元素各自代表不同的东西</li>
+<li>以对象替换数组。对于数组中的每个元素，以一个字段来表示</li>
+</ul>
+<h4 id="Duplicate-Observed-Data-复制-“被监视数据”"><a href="#Duplicate-Observed-Data-复制-“被监视数据”" class="headerlink" title="Duplicate Observed Data (复制 “被监视数据”)"></a>Duplicate Observed Data (复制 “被监视数据”)</h4><ul>
+<li>你有一些领域置身于GUI控件中，而领域函数需要访问这些数据</li>
+<li>将该数据复制到一个领域对象中。建立一个Observer模式，用以同步领域对象和GUI对象内的重复数据</li>
+</ul>
+<h4 id="Change-Unidirectional-Association-to-Bidirectional-将单向关联改为双向关联"><a href="#Change-Unidirectional-Association-to-Bidirectional-将单向关联改为双向关联" class="headerlink" title="Change Unidirectional Association to Bidirectional (将单向关联改为双向关联)"></a>Change Unidirectional Association to Bidirectional (将单向关联改为双向关联)</h4><ul>
+<li>两个类都需要使用对方特性，但其间只有一条单向连接</li>
+<li>添加一个反向指针，并使修改函数能够同时更新两条连接</li>
+</ul>
+<h4 id="Change-Bidirectional-Association-to-Unidirectional-将双向关联改为单向关联"><a href="#Change-Bidirectional-Association-to-Unidirectional-将双向关联改为单向关联" class="headerlink" title="Change Bidirectional Association to Unidirectional (将双向关联改为单向关联)"></a>Change Bidirectional Association to Unidirectional (将双向关联改为单向关联)</h4><ul>
+<li>两个类之间有双向关联，但其中一个类如今不再需要另一个类的特性</li>
+<li>去除不必要的关联</li>
+</ul>
+<h4 id="Replace-Magic-Number-with-Symbolic-Constant-以字面常量取代魔法数"><a href="#Replace-Magic-Number-with-Symbolic-Constant-以字面常量取代魔法数" class="headerlink" title="Replace Magic Number with Symbolic Constant (以字面常量取代魔法数)"></a>Replace Magic Number with Symbolic Constant (以字面常量取代魔法数)</h4><ul>
+<li>你有一个字面数值，带有特别含义</li>
+<li>创造一个常量，根据其意义为它命名，并将上述的字面数值替换为这个常量</li>
+</ul>
+<h4 id="Encapsulated-Field-封装字段"><a href="#Encapsulated-Field-封装字段" class="headerlink" title="Encapsulated Field (封装字段)"></a>Encapsulated Field (封装字段)</h4><ul>
+<li>你的类中存在一个public字段</li>
+<li>将它声明为private，并提供相应的访问函数</li>
+</ul>
+<h4 id="Encapsulate-Collection-封装集合"><a href="#Encapsulate-Collection-封装集合" class="headerlink" title="Encapsulate Collection (封装集合)"></a>Encapsulate Collection (封装集合)</h4><ul>
+<li>有个函数返回一个集合</li>
+<li>让这个函数返回该集合的一个只读副本，并在这个类中提供添加/移除集合元素的函数</li>
+</ul>
+<h4 id="Replace-Record-with-Data-Class-以数据类取代记录"><a href="#Replace-Record-with-Data-Class-以数据类取代记录" class="headerlink" title="Replace Record with Data Class (以数据类取代记录)"></a>Replace Record with Data Class (以数据类取代记录)</h4><ul>
+<li>你需要面对传统编程环境中的记录结构</li>
+<li>为该记录创建一个“哑”数据对象</li>
+</ul>
+<p>创建一个接口类以处理外来的记录型结构(所以记录式结构是什么)</p>
+<h4 id="Replace-Type-Code-with-Class-以类取代类型码"><a href="#Replace-Type-Code-with-Class-以类取代类型码" class="headerlink" title="Replace Type Code with Class (以类取代类型码)"></a>Replace Type Code with Class (以类取代类型码)</h4><ul>
+<li>类之中有一个数值类型码，但它并不影响类的行为</li>
+<li>以一个新的类替换该数值类型码</li>
+</ul>
+<h4 id="Replace-Type-Code-with-Subclasses-以子类取代类型码）"><a href="#Replace-Type-Code-with-Subclasses-以子类取代类型码）" class="headerlink" title="Replace Type Code with Subclasses (以子类取代类型码）"></a>Replace Type Code with Subclasses (以子类取代类型码）</h4><ul>
+<li>你有一个不可变的类型码，它会影响类的行为</li>
+<li>以子类取代这个类型码</li>
+</ul>
+<h4 id="Replace-Type-Code-with-State-Strategy-以-State-Strategy-取代类型码"><a href="#Replace-Type-Code-with-State-Strategy-以-State-Strategy-取代类型码" class="headerlink" title="Replace Type Code with State/Strategy (以 State/Strategy 取代类型码)"></a>Replace Type Code with State/Strategy (以 State/Strategy 取代类型码)</h4><ul>
+<li>你有一个类型码，它会影响类的行为，但你无法通过继承手法消除它</li>
+<li>以状态对象取代类型码</li>
+</ul>
+<p>如果类型码的值在对象生命周期中发生变化或其他原因使得宿主类不能被继承，可以使用本重构</p>
+<h4 id="Replace-Subclass-with-Fields-以字段取代子类"><a href="#Replace-Subclass-with-Fields-以字段取代子类" class="headerlink" title="Replace Subclass with Fields (以字段取代子类)"></a>Replace Subclass with Fields (以字段取代子类)</h4><ul>
+<li>你的各个子类的唯一差别只在“返回常量数据”的函数上</li>
+<li>修改这个函数，使他们返回超类中的某个(新增)字段，然后销毁子类</li>
 </ul>
 <p>TBC</p>
 ]]></content>
