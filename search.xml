@@ -180,6 +180,10 @@
 <li>你有一段代码可以被组织在一起并独立出来  </li>
 <li>将这段代码放进一个独立函数中，并让函数名称解释该函数的用途  </li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; print details</span><br><span class="line">    System.out.println(&quot;name:&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + _amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line">    printDetails(amount);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void printDetails(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    System.out.println(&quot;name&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>注意目标代码中的局部变量。如果需要对局部变量进行再次赋值并使用，提炼出的函数可以使用参数以及返回值。</p>
 <h4 id="Inline-Method-内联函数"><a href="#Inline-Method-内联函数" class="headerlink" title="Inline Method (内联函数)"></a>Inline Method (内联函数)</h4><ul>
 <li>一个函数的本体和名称同样清楚易懂  </li>
@@ -195,6 +199,9 @@
 <li>你的程序以一个临时变量保存某一表达式的运算结果</li>
 <li>将这个表达式提炼到一个独立函数中。将这个临时变量的所有引用点替换为对新函数的调用。此后，新函数就可以被其他函数使用。  </li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">    if (basePrice &gt; 1000)</span><br><span class="line">        return basePrice * 0.95;</span><br><span class="line">    else</span><br><span class="line">        return basePrice * 0.95</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">if (basePrice() &gt; 1000)</span><br><span class="line">    return basePrice() * 0.95;</span><br><span class="line">else</span><br><span class="line">    return basePrice() * 0.95</span><br><span class="line">...</span><br><span class="line">double basePrice()</span><br><span class="line">&#123;</span><br><span class="line">    return _quantity * _itemPrice;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>也就是让一个函数中的表达式计算可以被其他函数使用。通常是 Extra Method 前的步骤。运用此手法可能会产生性能问题，但是通常可以忽略不计，或是可以在性能优化阶段解决。</p>
 <h4 id="Introduce-Explaining-Variable-引入解释性变量"><a href="#Introduce-Explaining-Variable-引入解释性变量" class="headerlink" title="Introduce Explaining Variable (引入解释性变量)"></a>Introduce Explaining Variable (引入解释性变量)</h4><ul>
 <li>你有一个复杂的表达式</li>
@@ -238,8 +245,7 @@
 <li>某个类没有做太多事情</li>
 <li>将这个类的所有特性搬移到另一个类中，然后移除原类</li>
 </ul>
-<p><del>看起来我需要被内联</del></p>
-<p>这与上一条相反，当类不再有单独存在的理由时，应当将该类移入它的最频繁用户中。</p>
+<p><del>看起来我需要被内联</del><br>这与上一条相反，当类不再有单独存在的理由时，应当将该类移入它的最频繁用户中。</p>
 <h4 id="Hide-Delegate-隐藏“委托关系”"><a href="#Hide-Delegate-隐藏“委托关系”" class="headerlink" title="Hide Delegate (隐藏“委托关系”)"></a>Hide Delegate (隐藏“委托关系”)</h4><ul>
 <li>客户通过一个委托类来调用另一个对象</li>
 <li>在服务类上建立客户所需的所有函数，用以隐藏委托关系</li>
@@ -254,6 +260,9 @@
 <li>你需要为提供服务的类增加一个函数，但你无法修改这个类</li>
 <li>在客户类中建立一个函数，并以第一参数形式传入一个服务类实例</li>
 </ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Date newStart &#x3D; new Date(previousEnd.getYear(),previousEnd.getMonth(),previousEnd.getDate() + 1);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Date newStart &#x3D; nextDay(previousEnd)</span><br></pre></td></tr></table></figure>
+
 <p>正在使用一个类时，如果你需要一项服务而类无法供应，此时如果你能修改源码，可以自行添加一个新函数，如果不能，就要在客户端编码，补足所需的函数。明确信号是这个函数本应在服务类中实现，如果有可能，这些函数仍然应该放回到服务类。</p>
 <h4 id="Introduce-Local-Extension-引入本地扩展"><a href="#Introduce-Local-Extension-引入本地扩展" class="headerlink" title="Introduce Local Extension (引入本地扩展)"></a>Introduce Local Extension (引入本地扩展)</h4><ul>
 <li>你需要为服务类提供一些额外函数，但你无法修改这个类</li>
@@ -327,6 +336,109 @@
 <li>你的各个子类的唯一差别只在“返回常量数据”的函数上</li>
 <li>修改这个函数，使他们返回超类中的某个(新增)字段，然后销毁子类</li>
 </ul>
+<h3 id="简化条件表达式"><a href="#简化条件表达式" class="headerlink" title="简化条件表达式"></a>简化条件表达式</h3><h4 id="Decompose-Conditional-分解条件表达式"><a href="#Decompose-Conditional-分解条件表达式" class="headerlink" title="Decompose Conditional (分解条件表达式)"></a>Decompose Conditional (分解条件表达式)</h4><ul>
+<li>你有一个复杂的条件 (if - then - else)</li>
+<li>从 if，then，else 三个段落中分别提炼出独立函数</li>
+</ul>
+<h4 id="Consolidate-Conditional-Expression-合并条件表达式"><a href="#Consolidate-Conditional-Expression-合并条件表达式" class="headerlink" title="Consolidate Conditional Expression (合并条件表达式)"></a>Consolidate Conditional Expression (合并条件表达式)</h4><ul>
+<li>你有一系列条件测试，都得到相同结果</li>
+<li>将这些测试合并为一个条件表达式，并将这个条件式提炼成为一个独立函数<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_seniority &lt; 2) return 0;</span><br><span class="line">    if (_monthsDisabled &lt; 12) return 0;</span><br><span class="line">    if (_isPartTime) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (isNotEligableForDisability()) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段"><a href="#Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段" class="headerlink" title="Consolidate Duplicate Conditional Fragments (合并重复的条件片段)"></a>Consolidate Duplicate Conditional Fragments (合并重复的条件片段)</h4><ul>
+<li>在条件表达式的每个分支上有着相同的一段代码</li>
+<li>将这段重复代码搬移到条件表达式之外</li>
+</ul>
+<h4 id="Remove-Control-Flag-移除控制标记"><a href="#Remove-Control-Flag-移除控制标记" class="headerlink" title="Remove Control Flag (移除控制标记)"></a>Remove Control Flag (移除控制标记)</h4><ul>
+<li>在一系列布尔表达式中，某个变量带有”控制标记”(control flag)的作用</li>
+<li>以 break 语句或 return 语句取代控制标记<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void checkSecurity(String people)</span><br><span class="line">&#123;</span><br><span class="line">    boolean found &#x3D; false;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (!found)</span><br><span class="line">        &#123;</span><br><span class="line">            if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">            if (people(i).equals(&quot;John&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void checkSecurity(String[] people)</span><br><span class="line">&#123;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        if (people(i).equals(&quot;John&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两段书中示例的代码在同时满足两个条件时的输出是不一致的，不过对于示例中检测两个嫌疑人名字的情形应该不会出现这种情况。<br>如果这里的found同时用于输出结果，可以使用 return 重构</p>
+<h4 id="Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式"><a href="#Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式" class="headerlink" title="Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)"></a>Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)</h4><ul>
+<li>函数中的条件逻辑使人难以看清正常的执行路径</li>
+<li>使用卫语句表现所有特殊情况<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    double result;</span><br><span class="line">    if (_isDead)</span><br><span class="line">    &#123;</span><br><span class="line">        result &#x3D; deadAmount();</span><br><span class="line">    &#125;</span><br><span class="line">    else </span><br><span class="line">    &#123;</span><br><span class="line">        if (_isSeparted) </span><br><span class="line">        &#123;</span><br><span class="line">            result &#x3D; separatedAmount();</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            if (_isRetired) result &#x3D; retiredAmount();</span><br><span class="line">            else result &#x3D; normalPayAmount();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_isDead) return deadAmount();</span><br><span class="line">    if (_isSeparated) return separatedAmount();</span><br><span class="line">    if (_isRetired) return retiredAmount();</span><br><span class="line">    return normalPayAmount();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>条件表达式通常有两种表现形式，一种是所有分支都是正常行为，另一种是只有一种是正常行为，其他都是特殊情况。<br>对于第一种就应该使用if-else语句，而对于第二种就应当使用卫语句。卫语句通常从函数中返回或抛异常。</p>
+<h4 id="Replace-Conditional-with-Polymorphism-以多态取代条件表达式"><a href="#Replace-Conditional-with-Polymorphism-以多态取代条件表达式" class="headerlink" title="Replace Conditional with Polymorphism (以多态取代条件表达式)"></a>Replace Conditional with Polymorphism (以多态取代条件表达式)</h4><ul>
+<li>你手上有个条件表达式，它根据对象类型的不同而选择不同的行为</li>
+<li>将这个条件表达式的每个分支放进一个子类内的覆写函数中，然后将原始函数声明为抽象函数</li>
+</ul>
+<h4 id="Introduce-Null-Object-引入Null对象"><a href="#Introduce-Null-Object-引入Null对象" class="headerlink" title="Introduce Null Object (引入Null对象)"></a>Introduce Null Object (引入Null对象)</h4><ul>
+<li>你需要再三检查某对象是否为null</li>
+<li>将null值替换为null对象</li>
+</ul>
+<p>也即引入 Null Object 设计模式。<br>例如对于 Customer 对象和持有的 getPlan 方法，可以建立空对象类 Null Customer 继承 Customer 类，并用空对象对应行为替换 Null Customer 类的 getPlan 方法。<br>实际使用时，注意在源类和子类中加入 isNull() 函数,前者返回 false ，后者的 isNull() 返回true。也可以建立 nullable 接口将 isNull() 放在其中。之后所有将源对象与 null 比较的地方就可以调用 isNull() 函数。<br>是没见过但看起来很实用的设计模式。</p>
+<h4 id="Introduce-Assertion-引入断言"><a href="#Introduce-Assertion-引入断言" class="headerlink" title="Introduce Assertion (引入断言)"></a>Introduce Assertion (引入断言)</h4><ul>
+<li>某一段代码需要对程序状态做出某种假设</li>
+<li>以断言明确表现这种假设<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F; should have either expense limit or a primary project</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    Assert.isTure(_expenseLimit !&#x3D; NULL_EXPENSE || _primaryProject !&#x3D; null)</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="简化函数调用"><a href="#简化函数调用" class="headerlink" title="简化函数调用"></a>简化函数调用</h3><h4 id="Rename-Method-函数改名"><a href="#Rename-Method-函数改名" class="headerlink" title="Rename Method (函数改名)"></a>Rename Method (函数改名)</h4><ul>
+<li>函数的名称未能揭示函数的用途</li>
+<li>修改函数名称</li>
+</ul>
+<p>作者提倡的好方法是先考虑给这个函数写上一句怎样的注释，再想办法将注释变成函数名称。</p>
+<h4 id="Add-Parameter-添加参数"><a href="#Add-Parameter-添加参数" class="headerlink" title="Add Parameter (添加参数)"></a>Add Parameter (添加参数)</h4><ul>
+<li>某个函数需要从调用端得到更多信息</li>
+<li>为此函数添加一个对象参数，让该对象带进函数所需信息</li>
+</ul>
+<h4 id="Remove-Parameter-移除参数"><a href="#Remove-Parameter-移除参数" class="headerlink" title="Remove Parameter (移除参数)"></a>Remove Parameter (移除参数)</h4><ul>
+<li>函数本体不再需要某个参数</li>
+<li>将该参数去除</li>
+</ul>
+<h4 id="Separate-Query-from-Modifier-将查询函数和修改函数分离"><a href="#Separate-Query-from-Modifier-将查询函数和修改函数分离" class="headerlink" title="Separate Query from Modifier (将查询函数和修改函数分离)"></a>Separate Query from Modifier (将查询函数和修改函数分离)</h4><ul>
+<li>某个函数既返回对象状态值，又修改对象状态</li>
+<li>建立两个不同的函数，其中一个负责查询，另一个负责修改</li>
+</ul>
+<p>也即分离 getter setter</p>
+<h4 id="Parameterize-Method-令函数携带参数"><a href="#Parameterize-Method-令函数携带参数" class="headerlink" title="Parameterize Method (令函数携带参数)"></a>Parameterize Method (令函数携带参数)</h4><ul>
+<li>若干函数做了类似的工作，但在函数本体中却包括了不同的值</li>
+<li>建立单一函数，以参数表达那些不同的值</li>
+</ul>
+<h4 id="Replace-Parameter-with-Explicit-Methods-以明确函数取代参数"><a href="#Replace-Parameter-with-Explicit-Methods-以明确函数取代参数" class="headerlink" title="Replace Parameter with Explicit Methods (以明确函数取代参数)"></a>Replace Parameter with Explicit Methods (以明确函数取代参数)</h4><ul>
+<li>你有一个函数，其中完全取决于参数值而采取不同行为</li>
+<li>针对该参数的每一个可能值，建立一个独立函数</li>
+</ul>
+<h4 id="Preserve-Whole-Object-保持对象完整"><a href="#Preserve-Whole-Object-保持对象完整" class="headerlink" title="Preserve Whole Object (保持对象完整)"></a>Preserve Whole Object (保持对象完整)</h4><ul>
+<li>你从某个对象中取出若干值，将它们作为某一次函数调用时的参数</li>
+<li>改为传递整个对象</li>
+</ul>
+<h4 id="Replace-Parameter-with-Methods-以函数取代参数"><a href="#Replace-Parameter-with-Methods-以函数取代参数" class="headerlink" title="Replace Parameter with Methods (以函数取代参数)"></a>Replace Parameter with Methods (以函数取代参数)</h4><ul>
+<li>对象调用某个函数，并将所得结果作为参数，传递给另一个函数。而接受该参数的函数本身也能够调用前一个函数</li>
+<li>让参数接受者去除该项参数，并直接调用前一个函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">discountLevel &#x3D; getDiscountLevel();</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice,discountLevel);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice);</span><br></pre></td></tr></table></figure>
+
+<h4 id="Introduce-Parameter-Object-引入参数对象"><a href="#Introduce-Parameter-Object-引入参数对象" class="headerlink" title="Introduce Parameter Object (引入参数对象)"></a>Introduce Parameter Object (引入参数对象)</h4><ul>
+<li>某些参数总是很自然地同时出现</li>
+<li>以一个对象取代这些参数</li>
+</ul>
+<h4 id="Remove-Setting-Method-移除设值函数"><a href="#Remove-Setting-Method-移除设值函数" class="headerlink" title="Remove Setting Method (移除设值函数)"></a>Remove Setting Method (移除设值函数)</h4><ul>
+<li>类中的某个字段应该在对象创建时被设值，然后就不再改变</li>
+<li>去掉该字段的所有设值函数</li>
+</ul>
+<h4 id="Hide-Method-隐藏函数"><a href="#Hide-Method-隐藏函数" class="headerlink" title="Hide Method (隐藏函数)"></a>Hide Method (隐藏函数)</h4><ul>
+<li>有一个函数，从来没有被其他任何类用到</li>
+<li>将这个函数修改为 private</li>
+</ul>
+<h4 id="Replace-Constructor-with-Factory-Method-以工厂函数取代构造函数"><a href="#Replace-Constructor-with-Factory-Method-以工厂函数取代构造函数" class="headerlink" title="Replace Constructor with Factory Method (以工厂函数取代构造函数)"></a>Replace Constructor with Factory Method (以工厂函数取代构造函数)</h4><ul>
+<li>你希望在创建对象时不仅仅是做简单的建构动作</li>
+<li>将构造函数替换为工厂函数</li>
+</ul>
+<p>最显而易见的用途是在派生子类的过程中以工厂函数取代类型码，或者构造函数的功能不能满足你的需要，也可以用工厂函数替代它。</p>
 <p>TBC</p>
 ]]></content>
       <categories>
