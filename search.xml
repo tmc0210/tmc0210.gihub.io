@@ -143,10 +143,10 @@
 <p>三维空间中，类似地替换为圆柱体即可  </p>
 </blockquote>
 <p><img src="https://i.loli.net/2020/07/02/yCZXrxYl872eAuK.png" alt="避开障碍"></p>
-<h4 id="Wall-Avoidance（避开墙）"><a href="#Wall-Avoidance（避开墙）" class="headerlink" title="Wall Avoidance（避开墙）"></a>Wall Avoidance（避开墙）</h4><p>控制智能体避开近似为线段的墙。思路与上面类似，向前方伸出一个更为狭窄的长方形碰撞器检测是否撞到墙。不同的是可以向侧前方另外伸出两个较短的长方形碰撞器检测是否侧前方撞到墙，这取决于最后需要的行为精度。</p>
+<h4 id="Wall-Avoidance（避开墙）"><a href="#Wall-Avoidance（避开墙）" class="headerlink" title="Wall Avoidance（避开墙）"></a>Wall Avoidance（避开墙）</h4><p>控制智能体避开近似为线段的墙。思路与上面类似，向前方伸出一个更为狭窄的长方形碰撞器检测是否撞到墙。可能的优化是可以向侧前方另外伸出两个较短的长方形碰撞器检测是否侧前方撞到墙，这取决于最后需要的行为精度。</p>
 <h4 id="Interpose（插入）"><a href="#Interpose（插入）" class="headerlink" title="Interpose（插入）"></a>Interpose（插入）</h4><p>操控智能体移动到两个智能体或空间中点的中点，例如运动员截球。类似pursuit，需要估算两个目标在一段时间后的中点位置，朝向该位置arrive。这里的关键同样在于时间的预计。书中介绍的时间取值为智能体到当前两个目标的中点所需的时间，以这个时间估算未来的位置（芝诺悖论既视感  </p>
 <p><img src="https://i.loli.net/2020/07/02/JLQTvokCIa7K2yW.png" alt="插入"></p>
-<h4 id="Hide（隐藏）"><a href="#Hide（隐藏）" class="headerlink" title="Hide（隐藏）"></a>Hide（隐藏）</h4><p>hide行为旨在找到一个位置使得障碍物始终位于它和它想要躲避的另一智能体之间。适用于npc在开火时寻找掩体。具体实现可以先为附近的每个障碍物依据追逐者与障碍物的位置关系得到一个合适的隐藏点。例如圆形障碍物的隐藏点就位于追逐者与圆心的连线延长线上。再使用arrive抵达最近的隐藏点。如果附近没有合适的障碍物，退化为evade。如果需要实现智能体看见追逐者才会隐藏，可以在简单实现的基础上加入记忆功能，例如如果目标可见或在最近几秒看到过目标，智能体将隐藏，从而使行为更合理。  </p>
+<h4 id="Hide（隐藏）"><a href="#Hide（隐藏）" class="headerlink" title="Hide（隐藏）"></a>Hide（隐藏）</h4><p>hide行为旨在找到一个位置使得障碍物始终位于它和它想要躲避的另一智能体之间。适用于npc在开火时寻找掩体。具体实现可以先为附近的每个障碍物依据追逐者与障碍物的位置关系得到一个合适的隐藏点。例如圆形障碍物的隐藏点就位于追逐者与圆心的连线延长线上。再使用arrive抵达最近的隐藏点。如果附近没有合适的障碍物，退化为evade。如果需要实现智能体看见追逐者才会隐藏，可以在简单实现的基础上加入记忆功能。例如如果智能体可以看到目标或在最近几秒看到过目标，智能体将隐藏。  </p>
 <p><img src="https://i.loli.net/2020/07/03/uU7bx3PdtcDZjMN.png" alt="隐藏"></p>
 <h4 id="Path-Following（路径跟随）"><a href="#Path-Following（路径跟随）" class="headerlink" title="Path Following（路径跟随）"></a>Path Following（路径跟随）</h4><p>使智能体沿着预先设置的一系列路点移动。实现思路较为简单，略。</p>
 <h4 id="Offset-Pursuit（保持一定偏移的追逐）"><a href="#Offset-Pursuit（保持一定偏移的追逐）" class="headerlink" title="Offset Pursuit（保持一定偏移的追逐）"></a>Offset Pursuit（保持一定偏移的追逐）</h4><p>保持与领队相对位置不变的情况下追逐领队，实现类似大雁列队飞行、战斗组队的效果。首先得到要求的相对位置偏移，之后计算追逐时不直接追逐领队，而是追逐领队偏移后的相对位置。注意使用arrive而非seek使编队有序。</p>
@@ -159,8 +159,8 @@
 <h4 id="带优先级的加权截断累计"><a href="#带优先级的加权截断累计" class="headerlink" title="带优先级的加权截断累计"></a>带优先级的加权截断累计</h4><p>计算出一个带优先级的加权的累计，再进行截断。这里不再为行为设定权值，而是设定优先级，例如避开障碍物比保持队形重要。这个方法迭代每一个可行的行为，计算力的总和。每次计算合力的累计后如果还有剩余的可操纵力，继续计算下一个优先级的力，如果没有剩余或已超出最大可操纵力，截断。</p>
 <h4 id="带优先级的抖动"><a href="#带优先级的抖动" class="headerlink" title="带优先级的抖动"></a>带优先级的抖动</h4><p>来自Reynolds的方法。该方法检查优先级的方法不固定，而是根据预设的概率，例如优先级较高的行为的力有0.9的概率被计算，而优先级较低的只有0.5。这一方案消耗较少但是会损失精确度。</p>
 <h3 id="平滑"><a href="#平滑" class="headerlink" title="平滑"></a>平滑</h3><p>当智能体的不同行为有冲突时，可能会发生一些抖动，这里有一个方案是分离朝向向量和速度向量，通过若干次更新变量步骤得到朝向向量的平均值。</p>
-<h2 id="图"><a href="#图" class="headerlink" title="图"></a>图</h2><h3 id="盲目搜索"><a href="#盲目搜索" class="headerlink" title="盲目搜索"></a>盲目搜索</h3><p>盲目搜索在搜索一个图时不考虑相关的边的开销，但是它们能区分不同的节点和边。为了遍历一个图或是找到两个点之间的路径，可以使用这些方法。例如dfs和bfs</p>
-<h3 id="基于开销的图搜索"><a href="#基于开销的图搜索" class="headerlink" title="基于开销的图搜索"></a>基于开销的图搜索</h3><p>考虑到边的权值的搜索。可以采用Dijkstra或是A*算法。 </p>
+<h2 id="图"><a href="#图" class="headerlink" title="图"></a>图</h2><h3 id="盲目搜索"><a href="#盲目搜索" class="headerlink" title="盲目搜索"></a>盲目搜索</h3><p>盲目搜索在搜索一个图时不考虑相关的边的开销，但是它们能区分不同的节点和边。为了遍历一个图或是找到两个点之间的路径，可以使用这些方法，例如大家熟知的DFS和BFS。</p>
+<h3 id="基于开销的图搜索"><a href="#基于开销的图搜索" class="headerlink" title="基于开销的图搜索"></a>基于开销的图搜索</h3><p>考虑到边的权值的搜索。可以采用Dijkstra或是A*算法。<del>因为我不怎么会所以不展开</del> </p>
 <h4 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h4><p>Dijkstra算法每次构建SPT（最短路径树）的一条边，简要介绍思路如下  </p>
 <ul>
 <li>源节点加入SPT</li>
