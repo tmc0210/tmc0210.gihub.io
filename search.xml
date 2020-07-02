@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
-  <entry>
-    <title>《重构-改善既有代码的设计》学习笔记</title>
-    <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
+    <entry>
+        <title>《重构-改善既有代码的设计》学习笔记</title>
+        <url>
+            /%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/
+        </url>
+        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
 <a id="more"></a>
 
 <h2 id="重构，第一个案例"><a href="#重构，第一个案例" class="headerlink" title="重构，第一个案例"></a>重构，第一个案例</h2><p>重构即为不改变代码外在行为的前提下，对代码做出修改，以改进程序的内部结构。</p>
@@ -517,18 +519,18 @@
 </ul>
 <h2 id="重构，复用与现实"><a href="#重构，复用与现实" class="headerlink" title="重构，复用与现实"></a>重构，复用与现实</h2><p>大约是一些重构在实际使用时的注意事项，比较碎而且涉及一些和老板的交涉之类的现实情况，目前对这一方面没什么理解，所以不整理了。<del>必然不是因为我懒</del></p>
 ]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>java</tag>
-        <tag>重构</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>3月营地战棋项目总结</title>
-    <url>/3%E6%9C%88%E8%90%A5%E5%9C%B0%E6%88%98%E6%A3%8B%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
-    <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。</p>
+        <categories>
+            <category>学习</category>
+        </categories>
+        <tags>
+            <tag>java</tag>
+            <tag>重构</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>3月营地战棋项目总结</title>
+        <url>/3%E6%9C%88%E8%90%A5%E5%9C%B0%E6%88%98%E6%A3%8B%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
+        <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。</p>
 <a id="more"></a>
 
 <h3 id="游戏流程概述"><a href="#游戏流程概述" class="headerlink" title="游戏流程概述"></a>游戏流程概述</h3><p>这次项目的玩法大致是炉石冒险+炉石酒馆战棋+炉石竞技场的神奇结合。开局选择英雄并进行若干次竞技场式选牌以确定牌池，之后依次与数个boss进行完整的1v1酒馆战棋战斗。每次战斗失败则游戏结束，胜利则获得一个宝藏并继续挑战。游戏的主体流程实现没有难点，主要难点集中在战棋模式战斗，操作的结算。</p>
@@ -545,17 +547,17 @@
 <p>此处WhenMinionSummon即为扳机名，后续的即为刚才的委托的函数名。这里表示的效果即为上文所述钴制卫士的效果描述。读取的实现也较为简单，从csv中读到字符串后进行分割，使用反射机制分别以字符串的内容得到对应的信息，赋值给对应的卡牌原型即可。<br>当然在后续的开发过程中，为了支持mod，我们对csv的结构作出了重大调整。同时创造了一种脚本语言用于mod制作者的开发过程。所以这里的csv语法与格式已经是过去式了，新的格式可能会在下一阶段的总结博文（如果有的话）中介绍一下吧。</p>
 <h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>这次项目中自己的程序/策划水平和社会经验都有了一定的提升，也算是获得了一小群玩家的认可，总体还算是收获颇丰。<br>当然，上线将近一个月后的现在来看，早期的设计也有许多不足之处，等以后有时间再重构吧。</p>
 ]]></content>
-      <categories>
-        <category>营地战棋</category>
-      </categories>
-      <tags>
-        <tag>Unity</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Mac的终端美化</title>
-    <url>/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/</url>
-    <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
+        <categories>
+            <category>营地战棋</category>
+        </categories>
+        <tags>
+            <tag>Unity</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>Mac的终端美化</title>
+        <url>/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/</url>
+        <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
 <a id="more"></a>
 <p>废话不多说先上成品  </p>
 <p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
@@ -627,20 +629,20 @@
 <p><img src="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png" alt="截屏2020-05-11 上午2.06.21.png"></p>
 <h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>虽然是看起来简单的美化，不过也有一大堆乱七八糟的坑，一晚上才搞好。花里胡哨的代价还是挺大的。</p>
 ]]></content>
-      <categories>
-        <category>花里胡哨</category>
-      </categories>
-      <tags>
-        <tag>zsh</tag>
-        <tag>oh-my-zsh</tag>
-        <tag>iTerm2</tag>
-        <tag>Mac</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>问题与优化汇总</title>
-    <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
-    <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
+        <categories>
+            <category>花里胡哨</category>
+        </categories>
+        <tags>
+            <tag>zsh</tag>
+            <tag>oh-my-zsh</tag>
+            <tag>iTerm2</tag>
+            <tag>Mac</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>问题与优化汇总</title>
+        <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
+        <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
 <p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
 <a id="more"></a>
 
@@ -649,8 +651,8 @@
 
 <p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
 ]]></content>
-      <categories>
-        <category>博客相关</category>
-      </categories>
-  </entry>
+        <categories>
+            <category>博客相关</category>
+        </categories>
+    </entry>
 </search>
