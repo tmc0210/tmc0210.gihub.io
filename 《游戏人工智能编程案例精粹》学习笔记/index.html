@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://i.loli.net/2020/07/03/uU7bx3PdtcDZjMN.png">
 <meta property="og:image" content="https://i.loli.net/2020/07/03/GqCsNBXO9ZeWtAd.png">
 <meta property="article:published_time" content="2020-07-02T13:56:14.000Z">
-<meta property="article:modified_time" content="2020-07-02T19:33:16.482Z">
+<meta property="article:modified_time" content="2020-07-02T19:37:24.109Z">
 <meta property="article:author" content="tmc">
 <meta property="article:tag" content="AI">
 <meta name="twitter:card" content="summary">
@@ -220,7 +220,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-03 03:33:16" itemprop="dateModified" datetime="2020-07-03T03:33:16+08:00">2020-07-03</time>
+                <time title="修改时间：2020-07-03 03:37:24" itemprop="dateModified" datetime="2020-07-03T03:37:24+08:00">2020-07-03</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,8 +267,9 @@
 <p><img src="https://i.loli.net/2020/07/02/Vy6ksvulb5foWxE.png" alt="徘徊"></p>
 <h4 id="Obstacle-Avoidance（避开障碍）"><a href="#Obstacle-Avoidance（避开障碍）" class="headerlink" title="Obstacle Avoidance（避开障碍）"></a>Obstacle Avoidance（避开障碍）</h4><p>控制智能体避开障碍物。这里的思路是从智能体衍生出一个长方形区域碰撞器，其宽度等同于智能体的包围半径，衍生出的长度正比于当前速度。寻找这个碰撞器与前方障碍物的交点，如果有障碍物与这个碰撞器的侧面碰撞，说明继续前进会擦到障碍物，可以施加一个大小正比于交通工具到障碍物的距离，方向垂直于运动方向的力使智能体偏转。若有需要，可以同时让智能体减速，力的大小同样可以正比于交通工具到障碍物的距离。</p>
 <blockquote>
-<p>三维空间中，类似地替换为圆柱体即可<br><img src="https://i.loli.net/2020/07/02/yCZXrxYl872eAuK.png" alt="避开障碍"></p>
+<p>三维空间中，类似地替换为圆柱体即可  </p>
 </blockquote>
+<p><img src="https://i.loli.net/2020/07/02/yCZXrxYl872eAuK.png" alt="避开障碍"></p>
 <h4 id="Wall-Avoidance（避开墙）"><a href="#Wall-Avoidance（避开墙）" class="headerlink" title="Wall Avoidance（避开墙）"></a>Wall Avoidance（避开墙）</h4><p>控制智能体避开近似为线段的墙。思路与上面类似，向前方伸出一个更为狭窄的长方形碰撞器检测是否撞到墙。不同的是可以向侧前方另外伸出两个较短的长方形碰撞器检测是否侧前方撞到墙，这取决于最后需要的行为精度。</p>
 <h4 id="Interpose（插入）"><a href="#Interpose（插入）" class="headerlink" title="Interpose（插入）"></a>Interpose（插入）</h4><p>操控智能体移动到两个智能体或空间中点的中点，例如运动员截球。类似pursuit，需要估算两个目标在一段时间后的中点位置，朝向该位置arrive。这里的关键同样在于时间的预计。书中介绍的时间取值为智能体到当前两个目标的中点所需的时间，以这个时间估算未来的位置（芝诺悖论既视感  </p>
 <p><img src="https://i.loli.net/2020/07/02/JLQTvokCIa7K2yW.png" alt="插入"></p>
@@ -276,7 +277,7 @@
 <p><img src="https://i.loli.net/2020/07/03/uU7bx3PdtcDZjMN.png" alt="隐藏"></p>
 <h4 id="Path-Following（路径跟随）"><a href="#Path-Following（路径跟随）" class="headerlink" title="Path Following（路径跟随）"></a>Path Following（路径跟随）</h4><p>使智能体沿着预先设置的一系列路点移动。实现思路较为简单，略。</p>
 <h4 id="Offset-Pursuit（保持一定偏移的追逐）"><a href="#Offset-Pursuit（保持一定偏移的追逐）" class="headerlink" title="Offset Pursuit（保持一定偏移的追逐）"></a>Offset Pursuit（保持一定偏移的追逐）</h4><p>保持与领队相对位置不变的情况下追逐领队，实现类似大雁列队飞行、战斗组队的效果。得到要求的相对位置偏移，不直接追逐领队，而是追逐领队偏移后的相对位置即可。注意使用arrive而非seek使编队有序。</p>
-<h3 id="组行为"><a href="#组行为" class="headerlink" title="组行为"></a>组行为</h3><p><img src="https://i.loli.net/2020/07/03/GqCsNBXO9ZeWtAd.png" alt="组行为"></p>
+<h3 id="组行为"><a href="#组行为" class="headerlink" title="组行为"></a>组行为</h3><p><img src="https://i.loli.net/2020/07/03/GqCsNBXO9ZeWtAd.png" alt="组行为">  </p>
 <h4 id="Separation（分离）"><a href="#Separation（分离）" class="headerlink" title="Separation（分离）"></a>Separation（分离）</h4><p>操作智能体离开邻近的智能体，应用在许多智能体上将会使它们向四周展开，拉开距离。这里的实现是遍历附近的所有智能体，对每个邻近智能体，得到一个大小反比于距离，方向为互相远离的力，以这些力的合力作为智能体的最终运动参考。</p>
 <h4 id="Alignment（队列）"><a href="#Alignment（队列）" class="headerlink" title="Alignment（队列）"></a>Alignment（队列）</h4><p>保持一组智能体的朝向一致。迭代附近的所有智能体，得到一个平均的朝向向量，减去该智能体的朝向即可得到力的方向</p>
 <h4 id="Cohesion（聚集）"><a href="#Cohesion（聚集）" class="headerlink" title="Cohesion（聚集）"></a>Cohesion（聚集）</h4><p>使智能体移向邻近智能体的质心。</p>
