@@ -1,825 +1,515 @@
 <!DOCTYPE html>
 <html lang="zh-Hans">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-    <meta name="theme-color" content="#222">
-    <meta name="generator" content="Hexo 4.2.0">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.png">
-    <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
-    <link rel="stylesheet" href="/css/main.css">
-
-
-    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-    <script id="hexo-configurations">
-        var NexT = window.NexT || {};
-        var CONFIG = {
-            "hostname": "yoursite.com",
-            "root": "/",
-            "scheme": "Muse",
-            "version": "7.7.2",
-            "exturl": false,
-            "sidebar": {"position": "right", "display": "post", "padding": 18, "offset": 12, "onmobile": false},
-            "copycode": {"enable": true, "show_result": false, "style": null},
-            "back2top": {"enable": true, "sidebar": false, "scrollpercent": false},
-            "bookmark": {"enable": false, "color": "#222", "save": "auto"},
-            "fancybox": false,
-            "mediumzoom": false,
-            "lazyload": false,
-            "pangu": false,
-            "comments": {"style": "tabs", "active": null, "storage": true, "lazyload": false, "nav": null},
-            "algolia": {
-                "hits": {"per_page": 10},
-                "labels": {
-                    "input_placeholder": "Search for Posts",
-                    "hits_empty": "We didn't find any results for the search: ${query}",
-                    "hits_stats": "${hits} results found in ${time} ms"
-                }
-            },
-            "localsearch": {
-                "enable": true,
-                "trigger": "auto",
-                "top_n_per_article": 1,
-                "unescape": false,
-                "preload": false
-            },
-            "motion": {
-                "enable": true,
-                "async": false,
-                "transition": {
-                    "post_block": "fadeIn",
-                    "post_header": "slideDownIn",
-                    "post_body": "slideDownIn",
-                    "coll_header": "slideLeftIn",
-                    "sidebar": "slideUpIn"
-                }
-            },
-            "path": "search.xml"
-        };
-    </script>
-
-    <meta name="description" content="这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍">
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Mac的终端美化">
-    <meta property="og:url" content="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/index.html">
-    <meta property="og:site_name" content="tmc&#39;s blogs">
-    <meta property="og:description" content="这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍">
-    <meta property="og:image" content="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif">
-    <meta property="og:image" content="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png">
-    <meta property="og:image" content="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png">
-    <meta property="article:published_time" content="2020-05-09T18:32:23.000Z">
-    <meta property="article:modified_time" content="2020-05-11T10:04:26.393Z">
-    <meta property="article:author" content="tmc">
-    <meta property="article:tag" content="zsh">
-    <meta property="article:tag" content="oh-my-zsh">
-    <meta property="article:tag" content="iTerm2">
-    <meta property="article:tag" content="Mac">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png">
-
-    <link rel="canonical" href="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/">
+<link rel="stylesheet" href="/css/main.css">
 
 
-    <script id="page-configurations">
-        // https://hexo.io/docs/variables.html
-        CONFIG.page = {
-            sidebar: "",
-            isHome: false,
-            isPost: true
-        };
-    </script>
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
-    <title>Mac的终端美化 | tmc's blogs</title>
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac的终端美化">
+<meta property="og:url" content="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/index.html">
+<meta property="og:site_name" content="tmc&#39;s blogs">
+<meta property="og:description" content="这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍">
+<meta property="og:image" content="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif">
+<meta property="og:image" content="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png">
+<meta property="og:image" content="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png">
+<meta property="article:published_time" content="2020-05-09T18:32:23.000Z">
+<meta property="article:modified_time" content="2020-05-26T09:37:07.652Z">
+<meta property="article:author" content="tmc">
+<meta property="article:tag" content="zsh">
+<meta property="article:tag" content="iTerm2">
+<meta property="article:tag" content="Mac">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png">
+
+<link rel="canonical" href="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/">
 
 
-    <noscript>
-        <style>
-            .use-motion .brand,
-            .use-motion .menu-item,
-            .sidebar-inner,
-            .use-motion .post-block,
-            .use-motion .pagination,
-            .use-motion .comments,
-            .use-motion .post-header,
-            .use-motion .post-body,
-            .use-motion .collection-header {
-                opacity: initial;
-            }
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
 
-            .use-motion .site-title,
-            .use-motion .site-subtitle {
-                opacity: initial;
-                top: initial;
-            }
+  <title>Mac的终端美化 | tmc's blogs</title>
+  
 
-            .use-motion .logo-line-before i {
-                left: initial;
-            }
 
-            .use-motion .logo-line-after i {
-                right: initial;
-            }
-        </style>
-    </noscript>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
 
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
-<div class="headband"></div>
+    <div class="headband"></div>
 
-<header class="header" itemscope itemtype="http://schema.org/WPHeader">
-    <div class="header-inner">
-        <div class="site-brand-container">
-            <div class="site-nav-toggle">
-                <div class="toggle" aria-label="切换导航栏">
-                    <span class="toggle-line toggle-line-first"></span>
-                    <span class="toggle-line toggle-line-middle"></span>
-                    <span class="toggle-line toggle-line-last"></span>
-                </div>
-            </div>
-
-            <div class="site-meta">
-
-                <div>
-                    <a href="/" class="brand" rel="start">
-                        <span class="logo-line-before"><i></i></span>
-                        <span class="site-title">tmc's blogs</span>
-                        <span class="logo-line-after"><i></i></span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="site-nav-right">
-                <div class="toggle popup-trigger">
-                    <i class="fa fa-search fa-fw fa-lg"></i>
-                </div>
-            </div>
-        </div>
-
-
-        <nav class="site-nav">
-
-            <ul id="menu" class="menu">
-                <li class="menu-item menu-item-home">
-
-                    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-                </li>
-                <li class="menu-item menu-item-about">
-
-                    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-                </li>
-                <li class="menu-item menu-item-archives">
-
-                    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-                </li>
-                <li class="menu-item menu-item-search">
-                    <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-                    </a>
-                </li>
-            </ul>
-
-        </nav>
-        <div class="site-search">
-            <div class="search-pop-overlay">
-                <div class="popup search-popup">
-                    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-                        <div class="search-input-container">
-                            <input autocomplete="off" autocorrect="off" autocapitalize="off"
-                                   placeholder="搜索..." spellcheck="false"
-                                   type="search" class="search-input">
-                        </div>
-                        <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-                    </div>
-                    <div id="search-result">
-                        <div id="no-result">
-                            <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-</header>
+  </div>
 
+  <div class="site-meta">
 
-<div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tmc's blogs</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
 </div>
 
 
-<main class="main">
-    <div class="main-inner">
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
         <div class="content-wrap">
+          
 
+          <div class="content">
+            
 
-            <div class="content">
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/">
 
-
-                <div class="posts-expand">
-
-
-                    <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-                        <link itemprop="mainEntityOfPage"
-                              href="http://yoursite.com/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/">
-
-                        <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
       <meta itemprop="name" content="tmc">
       <meta itemprop="description" content="">
     </span>
 
-                        <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="tmc's blogs">
     </span>
-                        <header class="post-header">
-                            <h1 class="post-title" itemprop="name headline">
-                                Mac的终端美化
-                            </h1>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Mac的终端美化
+        </h1>
 
-                            <div class="post-meta">
+        <div class="post-meta">
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-05-10 02:32:23" itemprop="dateCreated datePublished"
-                    datetime="2020-05-10T02:32:23+08:00">2020-05-10</time>
+              <time title="创建时间：2020-05-10 02:32:23" itemprop="dateCreated datePublished" datetime="2020-05-10T02:32:23+08:00">2020-05-10</time>
             </span>
-                                <span class="post-meta-item">
+              <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-05-11 18:04:26" itemprop="dateModified" datetime="2020-05-11T18:04:26+08:00">2020-05-11</time>
+                <time title="修改时间：2020-05-26 17:37:07" itemprop="dateModified" datetime="2020-05-26T17:37:07+08:00">2020-05-26</time>
               </span>
-                                <span class="post-meta-item">
+            <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%8A%B1%E9%87%8C%E8%83%A1%E5%93%A8/" itemprop="url" rel="index"><span
-                          itemprop="name">花里胡哨</span></a>
+                  <a href="/categories/%E8%8A%B1%E9%87%8C%E8%83%A1%E5%93%A8/" itemprop="url" rel="index"><span itemprop="name">花里胡哨</span></a>
                 </span>
             </span>
 
-
-                            </div>
-                        </header>
-
-
-                        <div class="post-body" itemprop="articleBody">
-
-
-                            <p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
-                            <a id="more"></a>
-                            <p>废话不多说先上成品 </p>
-                            <p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png"></p>
-                            <p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
-                            <p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。
-                            </p>
-                            <p>接下来的内容就是打造这一花里胡哨终端的步骤。</p>
-                            <ul>
-                                <li>环境: MacOS 10.15.4</li>
-                                <li>工具: 自带Terminal oh-my-zsh iTerm2 powerlevel10k 主题<br>其中，oh-my-zsh为终端优化工具，iTerm2为终端替代品，而powerlevel10k为oh-my-zsh的一个优质第三方主题
-                                </li>
-                                <li>一些其他可能用到的工具/环境: curl/wget，git等<h2 id="oh-my-zsh的安装与使用"><a href="#oh-my-zsh的安装与使用"
-                                                                                              class="headerlink"
-                                                                                              title="oh-my-zsh的安装与使用"></a>oh-my-zsh的安装与使用
-                                </h2></li>
-                            </ul>
-                            <h3 id="oh-my-zsh的下载"><a href="#oh-my-zsh的下载" class="headerlink" title="oh-my-zsh的下载"></a>oh-my-zsh的下载
-                            </h3>
-                            <p><a href="https://ohmyz.sh/" target="_blank" rel="noopener">oh-my-zsh</a>是非常优秀的终端优化工具，它是基于zsh命令行的一个扩展工具集，提供了丰富的扩展功能。但它和Iterm2不同，并不提供命令行窗口，更不是一个独立的APP。<br>其在官网给出的下载方式有如下两个
-                            </p>
-                            <ul>
-                                <li><p>使用 curl</p>
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span class="line">sh -c &quot;$(curl -fsSL https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh)&quot;</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                </li>
-                                <li><p>使用 wget</p>
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                    <p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是
-                                        <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a>
-                                        这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。 </p>
-                                </li>
-                                <li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span
-                                                            class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                </li>
-                                <li><p>按 i 键(英文输入法)进入编辑模式</p>
-                                </li>
-                                <li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133
-                                    可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span
-                                                            class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                </li>
-                                <li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
-                                </li>
-                                <li><p>重启终端重复下载步骤，dns污染的问题就解决了！ </p>
-                                </li>
-                            </ul>
-                            <p>下载成功界面大致如下</p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br><span class="line">2</span><br><span
-                                                    class="line">3</span><br><span class="line">4</span><br><span
-                                                    class="line">5</span><br><span class="line">6</span><br><span
-                                                    class="line">7</span><br><span class="line">8</span><br><span
-                                                    class="line">9</span><br><span class="line">10</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span
-                                                    class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span
-                                                    class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span
-                                                    class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span
-                                                    class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span
-                                                    class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span
-                                                    class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span
-                                                    class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题
-                            </h3>
-                            <p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank"
-                                               rel="noopener">官方主题</a>和<a
-                                    href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank"
-                                    rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑)
-                                ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png"
-                                                            alt="agnoster.png"></p>
-                            <ul>
-                                <li>首先，vim打开配置文件
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                </li>
-                                <li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span
-                                                            class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                </li>
-                                <li>再使用以下命令使刚才更改的配置生效
-                                    <figure class="highlight plain">
-                                        <table>
-                                            <tr>
-                                                <td class="gutter">
-                                                    <pre><span class="line">1</span><br></pre>
-                                                </td>
-                                                <td class="code">
-                                                    <pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </figure>
-                                    重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，
-                                </li>
-                            </ul>
-                            <p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。
-                            </p>
-                            <p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">echo $ZSH_THEME</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink"
-                                                           title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3>
-                            <p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a
-                                    href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img
-                                    src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png"
-                                    alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录
-                            </p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
-                            <p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k
-                                先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img
-                                        src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif"
-                                        alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">p10k configure</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
-                            <h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件
-                            </h3>
-                            <p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a
-                                    href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank"
-                                    rel="noopener">官方插件</a>,也可以在
-                                <del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>
-                                /.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。
-                            </p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">plugins&#x3D;(git)</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>
-                                如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
-                            <h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用
-                            </h2>
-                            <p>
-                                虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a
-                                    href="https://www.iterm2.com/downloads.html" target="_blank"
-                                    rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装 </p>
-                            <figure class="highlight plain">
-                                <table>
-                                    <tr>
-                                        <td class="gutter">
-                                            <pre><span class="line">1</span><br></pre>
-                                        </td>
-                                        <td class="code">
-                                            <pre><span class="line">brew cask install iterm2</span><br></pre>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </figure>
-                            <p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
-                            <ul>
-                                <li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。
-                                </li>
-                                <li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
-                                <li>Profiles -&gt; Text -&gt; Font -&gt; Chanage Font，选择刚才安装的合适字体。</li>
-                            </ul>
-                            <p>
-                                另一个问题是IDE的终端并不能使用iTerm2，所以它会和自带终端一样出现乱码。当然这个问题也很好解决，搜索一下你的IDE的命令行修改字体方法，类似的改成合适字体即可。效果如下图所示。</p>
-                            <p><img src="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png"
-                                    alt="截屏2020-05-11 上午2.18.06.png"><br>这样就能在iTerm2中使用花里胡哨的powerlevel10k了。虽然原本的终端里还是用不了，不过问题不大。
-                                <del>大不了不用了</del>
-                                <br>iTerm2中还有许多其他的个性化选项。其中外观相关主要在 Profiles -&gt; Colors 和 Profiles -&gt;
-                                Window中。字体/背景/光标的颜色，窗口毛玻璃效果/窗口背景图片等都在这两个选项卡中调整。其他的功能拓展就不赘述了。值得一提的是可以在Profiles -&gt; Keys
-                                -&gt; Hotkey左下角设置快速打开/隐藏终端的快捷键。
-                            </p>
-                            <h2 id="我的配置"><a href="#我的配置" class="headerlink" title="我的配置"></a>我的配置</h2>
-                            <p>
-                                这是我本人目前使用的配置，有兴趣的可以参考一下。要提醒一下iTerm2背景图的缩放不算自由，寻找背景图时建议注意一下比例和背景颜色，必要时可以使用PS等工具进行处理。比如我这张就把白色部分更改成了灰色。</p>
-                            <p><img src="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png"
-                                    alt="截屏2020-05-11 上午2.06.36.png"></p>
-                            <p><img src="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png"
-                                    alt="截屏2020-05-11 上午2.06.21.png"></p>
-                            <h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2>
-                            <p>虽然是看起来简单的美化，不过也有一大堆乱七八糟的坑，一晚上才搞好。花里胡哨的代价还是挺大的。</p>
-
-                        </div>
-
-
-                        <footer class="post-footer">
-                            <div class="post-tags">
-                                <a href="/tags/zsh/" rel="tag"><i class="fa fa-tag"></i> zsh</a>
-                                <a href="/tags/oh-my-zsh/" rel="tag"><i class="fa fa-tag"></i> oh-my-zsh</a>
-                                <a href="/tags/iTerm2/" rel="tag"><i class="fa fa-tag"></i> iTerm2</a>
-                                <a href="/tags/Mac/" rel="tag"><i class="fa fa-tag"></i> Mac</a>
-                            </div>
-
-
-                            <div class="post-nav">
-                                <div class="post-nav-item">
-                                    <a href="/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/"
-                                       rel="prev" title="问题与优化汇总">
-                                        <i class="fa fa-chevron-left"></i> 问题与优化汇总
-                                    </a></div>
-                                <div class="post-nav-item">
-                                    <a href="/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"
-                                       rel="next" title="《重构-改善既有代码的设计》学习笔记">
-                                        《重构-改善既有代码的设计》学习笔记 <i class="fa fa-chevron-right"></i>
-                                    </a></div>
-                            </div>
-                        </footer>
-
-                    </article>
-
-
-                </div>
-
-
-            </div>
-
-
-            <script>
-                window.addEventListener('tabs:register', () => {
-                    let {activeClass} = CONFIG.comments;
-                    if (CONFIG.comments.storage) {
-                        activeClass = localStorage.getItem('comments_active') || activeClass;
-                    }
-                    if (activeClass) {
-                        let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-                        if (activeTab) {
-                            activeTab.click();
-                        }
-                    }
-                });
-                if (CONFIG.comments.storage) {
-                    window.addEventListener('tabs:click', event => {
-                        if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-                        let commentClass = event.target.classList[1];
-                        localStorage.setItem('comments_active', commentClass);
-                    });
-                }
-            </script>
+          
 
         </div>
+      </header>
 
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-        <div class="toggle sidebar-toggle">
-            <span class="toggle-line toggle-line-first"></span>
-            <span class="toggle-line toggle-line-middle"></span>
-            <span class="toggle-line toggle-line-last"></span>
-        </div>
-
-        <aside class="sidebar">
-            <div class="sidebar-inner">
-
-                <ul class="sidebar-nav motion-element">
-                    <li class="sidebar-nav-toc">
-                        文章目录
-                    </li>
-                    <li class="sidebar-nav-overview">
-                        站点概览
-                    </li>
-                </ul>
-
-                <!--noindex-->
-                <div class="post-toc-wrap sidebar-panel">
-                    <div class="post-toc motion-element">
-                        <ol class="nav">
-                            <li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-zsh的安装与使用"><span
-                                    class="nav-number">1.</span> <span class="nav-text">oh-my-zsh的安装与使用</span></a>
-                                <ol class="nav-child">
-                                    <li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的下载"><span
-                                            class="nav-number">1.1.</span> <span
-                                            class="nav-text">oh-my-zsh的下载</span></a></li>
-                                    <li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的主题"><span
-                                            class="nav-number">1.2.</span> <span
-                                            class="nav-text">oh-my-zsh的主题</span></a></li>
-                                    <li class="nav-item nav-level-3"><a class="nav-link"
-                                                                        href="#powerlevel10k主题的使用"><span
-                                            class="nav-number">1.3.</span> <span
-                                            class="nav-text">powerlevel10k主题的使用</span></a></li>
-                                    <li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的插件"><span
-                                            class="nav-number">1.4.</span> <span
-                                            class="nav-text">oh-my-zsh的插件</span></a></li>
-                                </ol>
-                            </li>
-                            <li class="nav-item nav-level-2"><a class="nav-link" href="#iTerm2的安装与使用"><span
-                                    class="nav-number">2.</span> <span class="nav-text">iTerm2的安装与使用</span></a></li>
-                            <li class="nav-item nav-level-2"><a class="nav-link" href="#我的配置"><span class="nav-number">3.</span>
-                                <span class="nav-text">我的配置</span></a></li>
-                            <li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span
-                                    class="nav-number">4.</span> <span class="nav-text">其他</span></a></li>
-                        </ol>
-                    </div>
-                </div>
-                <!--/noindex-->
-
-                <div class="site-overview-wrap sidebar-panel">
-                    <div class="site-author motion-element" itemprop="author" itemscope
-                         itemtype="http://schema.org/Person">
-                        <img class="site-author-image" itemprop="image" alt="tmc"
-                             src="/images/avatar.png">
-                        <p class="site-author-name" itemprop="name">tmc</p>
-                        <div class="site-description" itemprop="description"></div>
-                    </div>
-                    <div class="site-state-wrap motion-element">
-                        <nav class="site-state">
-                            <div class="site-state-item site-state-posts">
-                                <a href="/archives/">
-
-                                    <span class="site-state-item-count">4</span>
-                                    <span class="site-state-item-name">日志</span>
-                                </a>
-                            </div>
-                            <div class="site-state-item site-state-categories">
-                                <a href="/categories/">
-                                    <span class="site-state-item-count">4</span>
-                                    <span class="site-state-item-name">分类</span></a>
-                            </div>
-                            <div class="site-state-item site-state-tags">
-                                <a href="/tags/">
-                                    <span class="site-state-item-count">7</span>
-                                    <span class="site-state-item-name">标签</span></a>
-                            </div>
-                        </nav>
-                    </div>
-                    <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/tmc0210" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tmc0210" rel="noopener"
-           target="_blank"><i class="fa fa-fw fa-github"></i></a>
-      </span>
-                        <span class="links-of-author-item">
-        <a href="mailto:494521535@qq.com" title="E-Mail → mailto:494521535@qq.com" rel="noopener" target="_blank"><i
-                class="fa fa-fw fa-envelope"></i></a>
-      </span>
-                    </div>
-
-
-                    <div class="links-of-blogroll motion-element">
-                        <div class="links-of-blogroll-title">
-                            <i class="fa fa-fw fa-link"></i>
-                            友链
-                        </div>
-                        <ul class="links-of-blogroll-list">
-                            <li class="links-of-blogroll-item">
-                                <a href="https://blog.holdice.club/" title="https:&#x2F;&#x2F;blog.holdice.club&#x2F;"
-                                   rel="noopener" target="_blank">holdice's blogs</a>
-                            </li>
-                            <li class="links-of-blogroll-item">
-                                <a href="https://shiraha.cn/" title="https:&#x2F;&#x2F;shiraha.cn&#x2F;" rel="noopener"
-                                   target="_blank">七海の参考書</a>
-                            </li>
-                            <li class="links-of-blogroll-item">
-                                <a href="https://blog.csdn.net/qq_39119496/article/details/103372437"
-                                   title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_39119496&#x2F;article&#x2F;details&#x2F;103372437"
-                                   rel="noopener" target="_blank">Ashmore</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                </div>
-                <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52
-                        src="//music.163.com/outchain/player?type=1&id=3190522&auto=0&height=32"></iframe>
-            </div>
-        </aside>
-        <div id="sidebar-dimmer"></div>
-
+      
+        <p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
+<a id="more"></a>
+<p>废话不多说先上成品  </p>
+<p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
+<p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
+<p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。</p>
+<p>接下来的内容就是打造这一花里胡哨终端的步骤。</p>
+<ul>
+<li>环境: MacOS 10.15.4  </li>
+<li>工具: 自带Terminal oh-my-zsh iTerm2 powerlevel10k 主题<br>其中，oh-my-zsh为终端优化工具，iTerm2为终端替代品，而powerlevel10k为oh-my-zsh的一个优质第三方主题   </li>
+<li>一些其他可能用到的工具/环境: curl/wget，git等<h2 id="oh-my-zsh的安装与使用"><a href="#oh-my-zsh的安装与使用" class="headerlink" title="oh-my-zsh的安装与使用"></a>oh-my-zsh的安装与使用</h2></li>
+</ul>
+<h3 id="oh-my-zsh的下载"><a href="#oh-my-zsh的下载" class="headerlink" title="oh-my-zsh的下载"></a>oh-my-zsh的下载</h3><p><a href="https://ohmyz.sh/" target="_blank" rel="noopener">oh-my-zsh</a>是非常优秀的终端优化工具，它是基于zsh命令行的一个扩展工具集，提供了丰富的扩展功能。但它和Iterm2不同，并不提供命令行窗口，更不是一个独立的APP。<br>其在官网给出的下载方式有如下两个  </p>
+<ul>
+<li><p>使用 curl</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c &quot;$(curl -fsSL https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh)&quot;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 wget</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre></td></tr></table></figure>
+<p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是 <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a> 这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。  </p>
+</li>
+<li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
+<li><p>按 i 键(英文输入法)进入编辑模式</p>
+</li>
+<li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
+<li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
+</li>
+<li><p>重启终端重复下载步骤，dns污染的问题就解决了！  </p>
+</li>
+</ul>
+<p>下载成功界面大致如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure>
+<h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题</h3><p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank" rel="noopener">官方主题</a>和<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank" rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑) ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png" alt="agnoster.png"></p>
+<ul>
+<li>首先，vim打开配置文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure></li>
+<li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre></td></tr></table></figure></li>
+<li>再使用以下命令使刚才更改的配置生效<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure>
+重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，  </li>
+</ul>
+<p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </p>
+<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure>
+<p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure>
+<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure>
+<p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
+<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure>
+<p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
+<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在<del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure>
+<p>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
+<p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
+<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
+<p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
+<ul>
+<li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。  </li>
+<li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
+<li>Profiles -&gt; Text -&gt; Font -&gt; Chanage Font，选择刚才安装的合适字体。  </li>
+</ul>
+<p>另一个问题是IDE的终端并不能使用iTerm2，所以它会和自带终端一样出现乱码。当然这个问题也很好解决，搜索一下你的IDE的命令行修改字体方法，类似的改成合适字体即可。效果如下图所示。</p>
+<p><img src="https://i.loli.net/2020/05/11/9EVr7KWnLSoR6FM.png" alt="截屏2020-05-11 上午2.18.06.png"><br>这样就能在iTerm2中使用花里胡哨的powerlevel10k了。虽然原本的终端里还是用不了，不过问题不大。<del>大不了不用了</del><br>iTerm2中还有许多其他的个性化选项。其中外观相关主要在 Profiles -&gt; Colors 和 Profiles -&gt; Window中。字体/背景/光标的颜色，窗口毛玻璃效果/窗口背景图片等都在这两个选项卡中调整。其他的功能拓展就不赘述了。值得一提的是可以在Profiles -&gt; Keys -&gt; Hotkey左下角设置快速打开/隐藏终端的快捷键。</p>
+<h2 id="我的配置"><a href="#我的配置" class="headerlink" title="我的配置"></a>我的配置</h2><p>这是我本人目前使用的配置，有兴趣的可以参考一下。要提醒一下iTerm2背景图的缩放不算自由，寻找背景图时建议注意一下比例和背景颜色，必要时可以使用PS等工具进行处理。比如我这张就把白色部分更改成了灰色。</p>
+<p><img src="https://i.loli.net/2020/05/11/zeGRviuO4QMCcrb.png" alt="截屏2020-05-11 上午2.06.36.png"></p>
+<p><img src="https://i.loli.net/2020/05/11/kvUPmZqyiXjRJhr.png" alt="截屏2020-05-11 上午2.06.21.png"></p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>虽然是看起来简单的美化，不过也有一大堆乱七八糟的坑，一晚上才搞好。花里胡哨的代价还是挺大的。</p>
 
     </div>
-</main>
 
-<footer class="footer">
-    <div class="footer-inner">
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/zsh/" rel="tag"><i class="fa fa-tag"></i> zsh</a>
+            <a href="/tags/iTerm2/" rel="tag"><i class="fa fa-tag"></i> iTerm2</a>
+            <a href="/tags/Mac/" rel="tag"><i class="fa fa-tag"></i> Mac</a>
+          </div>
+
+        
 
 
-        <div class="copyright">
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/" rel="prev" title="问题与优化汇总">
+      <i class="fa fa-chevron-left"></i> 问题与优化汇总
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" rel="next" title="《重构-改善既有代码的设计》学习笔记">
+      《重构-改善既有代码的设计》学习笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
 
-            &copy;
-            <span itemprop="copyrightYear">2020</span>
-            <span class="with-love">
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oh-my-zsh的安装与使用"><span class="nav-number">1.</span> <span class="nav-text">oh-my-zsh的安装与使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的下载"><span class="nav-number">1.1.</span> <span class="nav-text">oh-my-zsh的下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的主题"><span class="nav-number">1.2.</span> <span class="nav-text">oh-my-zsh的主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#powerlevel10k主题的使用"><span class="nav-number">1.3.</span> <span class="nav-text">powerlevel10k主题的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#oh-my-zsh的插件"><span class="nav-number">1.4.</span> <span class="nav-text">oh-my-zsh的插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iTerm2的安装与使用"><span class="nav-number">2.</span> <span class="nav-text">iTerm2的安装与使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#我的配置"><span class="nav-number">3.</span> <span class="nav-text">我的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="tmc"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">tmc</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/tmc0210" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tmc0210" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:494521535@qq.com" title="E-Mail → mailto:494521535@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.holdice.club/" title="https:&#x2F;&#x2F;blog.holdice.club&#x2F;" rel="noopener" target="_blank">holdice's blogs</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://shiraha.cn/" title="https:&#x2F;&#x2F;shiraha.cn&#x2F;" rel="noopener" target="_blank">七海の参考書</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/qq_39119496/article/details/103372437" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_39119496&#x2F;article&#x2F;details&#x2F;103372437" rel="noopener" target="_blank">Ashmore</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=1&id=3190522&auto=0&height=32"></iframe>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
-            <span class="author" itemprop="copyrightHolder">tmc</span>
-        </div>
-        <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a>
-            强力驱动 v4.2.0
-        </div>
-        <span class="post-meta-divider">|</span>
-        <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener"
-                                        target="_blank">NexT.Muse</a> v7.7.2
-        </div>
-
-
-    </div>
-</footer>
+  <span class="author" itemprop="copyrightHolder">tmc</span>
 </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
 
 
-<script src="/lib/anime.min.js"></script>
-<script src="/lib/velocity/velocity.min.js"></script>
-<script src="/lib/velocity/velocity.ui.min.js"></script>
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
 
 <script src="/js/utils.js"></script>
 
@@ -832,8 +522,31 @@
 <script src="/js/next-boot.js"></script>
 
 
+
+
+  
+
+
+
+
+  
 <script src="/js/local-search.js"></script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
 
 </body>
 </html>

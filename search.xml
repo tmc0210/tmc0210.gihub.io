@@ -2,9 +2,7 @@
 <search>
     <entry>
         <title>《重构-改善既有代码的设计》学习笔记</title>
-        <url>
-            /%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/
-        </url>
+        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
         <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
 <a id="more"></a>
 
@@ -523,8 +521,8 @@
             <category>学习</category>
         </categories>
         <tags>
-            <tag>java</tag>
             <tag>重构</tag>
+            <tag>JAVA</tag>
         </tags>
     </entry>
     <entry>
@@ -548,10 +546,11 @@
 <h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>这次项目中自己的程序/策划水平和社会经验都有了一定的提升，也算是获得了一小群玩家的认可，总体还算是收获颇丰。<br>当然，上线将近一个月后的现在来看，早期的设计也有许多不足之处，等以后有时间再重构吧。</p>
 ]]></content>
         <categories>
-            <category>营地战棋</category>
+            <category>游戏开发</category>
         </categories>
         <tags>
             <tag>Unity</tag>
+            <tag>营地战棋</tag>
         </tags>
     </entry>
     <entry>
@@ -634,7 +633,6 @@
         </categories>
         <tags>
             <tag>zsh</tag>
-            <tag>oh-my-zsh</tag>
             <tag>iTerm2</tag>
             <tag>Mac</tag>
         </tags>
@@ -654,5 +652,71 @@
         <categories>
             <category>博客相关</category>
         </categories>
+    </entry>
+    <entry>
+        <title>《游戏人工智能编程案例精粹》学习笔记</title>
+        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。主要是一些知识点的总结。</p>
+<a id="more"></a>
+
+<h2 id="自治的可移动游戏智能体"><a href="#自治的可移动游戏智能体" class="headerlink" title="自治的可移动游戏智能体"></a>自治的可移动游戏智能体</h2><blockquote>
+<p>一个自治智能体是这样一个系统，它位于一个环境的内部，是环境的一部分，且能感知该环境对它有效实施的作用，并永远按此进行，为未来的新感知提供条件。  </p>
+</blockquote>
+<p><del>也就是一个带着状态机的会动的玩意</del><br>这里主要谈到了智能体的以下一些行为思路  </p>
+<h3 id="操控行为"><a href="#操控行为" class="headerlink" title="操控行为"></a>操控行为</h3><h4 id="Seek（靠近）"><a href="#Seek（靠近）" class="headerlink" title="Seek（靠近）"></a>Seek（靠近）</h4><p>也就是直线靠近目标，直接以坐标的差作为速度的方向</p>
+<h4 id="Flee（离开）"><a href="#Flee（离开）" class="headerlink" title="Flee（离开）"></a>Flee（离开）</h4><p>与Seek相反，远离目标，略</p>
+<h4 id="Arrive（抵达）"><a href="#Arrive（抵达）" class="headerlink" title="Arrive（抵达）"></a>Arrive（抵达）</h4><p>Seek在实际移动中可能会出现一些问题，例如速度较大导致不断来回穿过目标而无法停止。这时可以使用arrive，也即智能体慢慢减速直到停在目标的位置。</p>
+<h4 id="Pursuit（追逐）"><a href="#Pursuit（追逐）" class="headerlink" title="Pursuit（追逐）"></a>Pursuit（追逐）</h4><p>当智能体需要拦截一个会移动的目标的时候，pursuit就较为合适。pursuit也就是预判目标的走位，根据目标的当前速度预估对方在未来某个时间的位置，并向这个目标前进。有以下几个需要注意的点。  </p>
+<ul>
+<li>当智能体正对逃避者时，也即两者几乎速度方向相反时（例如夹角小于20度），可以退化为seek。  </li>
+<li>需要对预测的时间作出较好的折衷以平衡效率和准确度。例如正比于逃避者和追逐者的距离，反比于两者速度的差。  </li>
+<li>一些运动模型需要考虑使智能体转向偏移位置的时间，这里可以为预测时间加上一个正比于朝向向量的点积和最大转弯率的值来实现。<br><img src="https://i.loli.net/2020/07/02/SOARyHLgiKehcZ3.png" alt="追逐"><h4 id="Evade（逃避）"><a href="#Evade（逃避）" class="headerlink" title="Evade（逃避）"></a>Evade（逃避）</h4>与pursuit完全相反，但是不需要检查面向方向。</li>
+</ul>
+<h4 id="Wander（徘徊）"><a href="#Wander（徘徊）" class="headerlink" title="Wander（徘徊）"></a>Wander（徘徊）</h4><p>使智能体在环境中随机走动。一个简单但不可行的做法是每帧计算出一个随机的速度，这会使得物体在场景中抖动而非平滑转弯。为使物体平滑转弯，可以使用Perlin噪声代替简单的随机数，虽然消耗过大但并非完全不可行。<br>书中介绍的方案来自Reynolds，在智能体的前端放置一个圆形，将一个目标限制在圆形上，每帧对这个目标添加一个随机位移，智能体再向这个随机目标移动。控制圆形的半径、圆心离智能体的距离、目标的随机位移大小就能得到不同风格的随机运动。  </p>
+<blockquote>
+<p>三维空间时将圆形改为球体即可类似地解决问题  </p>
+</blockquote>
+<p><img src="https://i.loli.net/2020/07/02/Vy6ksvulb5foWxE.png" alt="徘徊"></p>
+<h4 id="Obstacle-Avoidance（避开障碍）"><a href="#Obstacle-Avoidance（避开障碍）" class="headerlink" title="Obstacle Avoidance（避开障碍）"></a>Obstacle Avoidance（避开障碍）</h4><p>控制智能体避开障碍物。这里的思路是从智能体衍生出一个长方形区域碰撞器，其宽度等同于智能体的包围半径，衍生出的长度正比于当前速度。寻找这个碰撞器与前方障碍物的交点，如果有障碍物与这个碰撞器的侧面碰撞，说明继续前进会擦到障碍物，可以施加一个大小正比于交通工具到障碍物的距离，方向垂直于运动方向的力使智能体偏转。若有需要，可以同时让智能体减速，力的大小同样可以正比于交通工具到障碍物的距离。</p>
+<blockquote>
+<p>三维空间中，类似地替换为圆柱体即可<br><img src="https://i.loli.net/2020/07/02/yCZXrxYl872eAuK.png" alt="避开障碍"></p>
+</blockquote>
+<h4 id="Wall-Avoidance（避开墙）"><a href="#Wall-Avoidance（避开墙）" class="headerlink" title="Wall Avoidance（避开墙）"></a>Wall Avoidance（避开墙）</h4><p>控制智能体避开近似为线段的墙。思路与上面类似，向前方伸出一个更为狭窄的长方形碰撞器检测是否撞到墙。不同的是可以向侧前方另外伸出两个较短的长方形碰撞器检测是否侧前方撞到墙，这取决于最后需要的行为精度。</p>
+<h4 id="Interpose（插入）"><a href="#Interpose（插入）" class="headerlink" title="Interpose（插入）"></a>Interpose（插入）</h4><p>操控智能体移动到两个智能体或空间中点的中点，例如运动员截球。类似pursuit，需要估算两个目标在一段时间后的中点位置，朝向该位置arrive。这里的关键同样在于时间的预计。书中介绍的时间取值为智能体到当前两个目标的中点所需的时间，以这个时间估算未来的位置（芝诺悖论既视感  </p>
+<p><img src="https://i.loli.net/2020/07/02/JLQTvokCIa7K2yW.png" alt="插入"></p>
+<h4 id="Hide（隐藏）"><a href="#Hide（隐藏）" class="headerlink" title="Hide（隐藏）"></a>Hide（隐藏）</h4><p>hide行为旨在找到一个位置使得障碍物始终位于它和它想要躲避的另一智能体之间。适用于npc在开火时寻找掩体。具体实现可以先为附近的每个障碍物依据追逐者与障碍物的位置关系得到一个合适的隐藏点。例如圆形障碍物的隐藏点就位于追逐者与圆心的连线延长线上。再使用arrive抵达最近的隐藏点。如果附近没有合适的障碍物，退化为evade。如果需要实现智能体看见追逐者才会隐藏，可以在简单实现的基础上加入记忆功能，例如如果目标可见或在最近几秒看到过目标，智能体将隐藏，从而使行为更合理。  </p>
+<p><img src="https://i.loli.net/2020/07/03/uU7bx3PdtcDZjMN.png" alt="隐藏"></p>
+<h4 id="Path-Following（路径跟随）"><a href="#Path-Following（路径跟随）" class="headerlink" title="Path Following（路径跟随）"></a>Path Following（路径跟随）</h4><p>使智能体沿着预先设置的一系列路点移动。实现思路较为简单，略。</p>
+<h4 id="Offset-Pursuit（保持一定偏移的追逐）"><a href="#Offset-Pursuit（保持一定偏移的追逐）" class="headerlink" title="Offset Pursuit（保持一定偏移的追逐）"></a>Offset Pursuit（保持一定偏移的追逐）</h4><p>保持与领队相对位置不变的情况下追逐领队，实现类似大雁列队飞行、战斗组队的效果。得到要求的相对位置偏移，不直接追逐领队，而是追逐领队偏移后的相对位置即可。注意使用arrive而非seek使编队有序。</p>
+<h3 id="组行为"><a href="#组行为" class="headerlink" title="组行为"></a>组行为</h3><p><img src="https://i.loli.net/2020/07/03/GqCsNBXO9ZeWtAd.png" alt="组行为"></p>
+<h4 id="Separation（分离）"><a href="#Separation（分离）" class="headerlink" title="Separation（分离）"></a>Separation（分离）</h4><p>操作智能体离开邻近的智能体，应用在许多智能体上将会使它们向四周展开，拉开距离。这里的实现是遍历附近的所有智能体，对每个邻近智能体，得到一个大小反比于距离，方向为互相远离的力，以这些力的合力作为智能体的最终运动参考。</p>
+<h4 id="Alignment（队列）"><a href="#Alignment（队列）" class="headerlink" title="Alignment（队列）"></a>Alignment（队列）</h4><p>保持一组智能体的朝向一致。迭代附近的所有智能体，得到一个平均的朝向向量，减去该智能体的朝向即可得到力的方向</p>
+<h4 id="Cohesion（聚集）"><a href="#Cohesion（聚集）" class="headerlink" title="Cohesion（聚集）"></a>Cohesion（聚集）</h4><p>使智能体移向邻近智能体的质心。</p>
+<h3 id="Combining-Steering-Behaviors（组合操控行为）"><a href="#Combining-Steering-Behaviors（组合操控行为）" class="headerlink" title="Combining Steering Behaviors（组合操控行为）"></a>Combining Steering Behaviors（组合操控行为）</h3><p>当物体可能同时处于上述多个行为的状况中时（例如在列队前行的同时避免撞墙），就需要对这些力进行综合的计算，考虑到消耗和精确度，有以下几种方案。</p>
+<h4 id="加权截断总和"><a href="#加权截断总和" class="headerlink" title="加权截断总和"></a>加权截断总和</h4><p>对每个行为设定一个初始的权值，将它们分别计算得到的力乘以权值后相加，再截断到最大可操控力。这里的问题是每帧需要计算所有的行为，消耗较大，而且权值难以设计。</p>
+<h4 id="带优先级的加权截断累计"><a href="#带优先级的加权截断累计" class="headerlink" title="带优先级的加权截断累计"></a>带优先级的加权截断累计</h4><p>计算出一个带优先级的加权的累计，再进行截断。这里不再为行为设定权值，而是设定优先级，例如避开障碍物比保持队形重要。这个方法迭代每一个可行的行为，计算力的总和。每次计算合力的累计后如果还有剩余的可操纵力，继续计算下一个优先级的力，如果没有剩余或已超出最大可操纵力，截断。</p>
+<h4 id="带优先级的抖动"><a href="#带优先级的抖动" class="headerlink" title="带优先级的抖动"></a>带优先级的抖动</h4><p>来自Reynolds的方法。该方法检查优先级的方法不固定，而是根据预设的概率，例如优先级较高的行为的力有0.9的概率被计算，而优先级较低的只有0.5。这一方案消耗较少但是会损失精确度。</p>
+<h3 id="平滑"><a href="#平滑" class="headerlink" title="平滑"></a>平滑</h3><p>当智能体的不同行为有冲突时，可能会发生一些抖动，这里有一个方案是分离朝向向量和速度向量，通过若干次更新变量步骤得到朝向向量的平均值。</p>
+<h2 id="图"><a href="#图" class="headerlink" title="图"></a>图</h2><h3 id="盲目搜索"><a href="#盲目搜索" class="headerlink" title="盲目搜索"></a>盲目搜索</h3><p>盲目搜索在搜索一个图时不考虑相关的边的开销，但是它们能区分不同的节点和边，为了遍历一个图或是找到两个点之间的路径，可以使用这些方法。例如dfs和bfs</p>
+<h3 id="基于开销的图搜索"><a href="#基于开销的图搜索" class="headerlink" title="基于开销的图搜索"></a>基于开销的图搜索</h3><p>考虑到边的权值的搜索。可以采用Dijkstra或是A*算法。 </p>
+<h4 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h4><p>Dijkstra算法每次构建SPT（最短路径树）的一条边，简要介绍思路如下  </p>
+<ul>
+<li>源节点加入SPT</li>
+<li>从源节点出发的几条边加入搜索边界</li>
+<li>检查搜索边界指向的所有节点，将其中距离源节点最近的节点加入SPT，接下来从该点出发的边加入搜索边界</li>
+<li>如此往复直到完成</li>
+</ul>
+<p>这样得到的SPT将包含找到的每一个节点的最短路径  </p>
+<h4 id="A-算法"><a href="#A-算法" class="headerlink" title="A*算法"></a>A*算法</h4><p>Dijkstra算法的一个改进，加入了启发因子（Heuristic）。对于边界上的点的开销计算，使用被修正的开销F决定节点在优先队列中的位置：  </p>
+<center>F = G + H</center>  
+其中，G 为累计开销，H为启发因子，给出的是节点到目标节点的估计距离，常用的有欧几里得距离和曼哈顿距离。
+
+]]></content>
+        <categories>
+            <category>游戏开发</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
     </entry>
 </search>
