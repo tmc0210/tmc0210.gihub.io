@@ -121,7 +121,7 @@
 <h2 id="自治的可移动游戏智能体"><a href="#自治的可移动游戏智能体" class="headerlink" title="自治的可移动游戏智能体"></a>自治的可移动游戏智能体</h2><blockquote>
 <p>一个自治智能体是这样一个系统，它位于一个环境的内部，是环境的一部分，且能感知该环境对它有效实施的作用，并永远按此进行，为未来的新感知提供条件。  </p>
 </blockquote>
-<p><del>也就是一个带着状态机的会动的玩意</del><br>这里主要谈到了智能体的以下一些行为思路  </p>
+<p><del>也就是一个随机应变的会动的玩意</del><br>这里主要谈到了智能体的以下一些行为思路  </p>
 <h3 id="操控行为"><a href="#操控行为" class="headerlink" title="操控行为"></a>操控行为</h3><h4 id="Seek（靠近）"><a href="#Seek（靠近）" class="headerlink" title="Seek（靠近）"></a>Seek（靠近）</h4><p>也就是直线靠近目标，直接以坐标的差作为速度的方向</p>
 <h4 id="Flee（离开）"><a href="#Flee（离开）" class="headerlink" title="Flee（离开）"></a>Flee（离开）</h4><p>与Seek相反，远离目标，略</p>
 <h4 id="Arrive（抵达）"><a href="#Arrive（抵达）" class="headerlink" title="Arrive（抵达）"></a>Arrive（抵达）</h4><p>Seek在实际移动中可能会出现一些问题，例如速度较大导致不断来回穿过目标而无法停止。这时可以使用arrive，也即智能体慢慢减速直到停在目标的位置。</p>
