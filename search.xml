@@ -113,9 +113,39 @@
         </tags>
     </entry>
     <entry>
-        <title>《游戏人工智能编程案例精粹》学习笔记</title>
-        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。主要是一些知识点的总结。</p>
+        <title>问题与优化汇总</title>
+        <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
+        <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
+<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
+<a id="more"></a>
+
+<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化，不过其中有一些出了点问题。。正在解决中</p>
+<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
+
+<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
+<h2 id="2020-07-03-03-22-错误"><a href="#2020-07-03-03-22-错误" class="headerlink" title="2020-07-03 03:22 错误"></a>2020-07-03 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ERROR Asset render failed: css&#x2F;main.css</span><br><span class="line">Error: &#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;themes&#x2F;next&#x2F;source&#x2F;  css&#x2F;_common&#x2F;components&#x2F;components.styl:8:3</span><br><span class="line">    4|     text-align: center;</span><br><span class="line">    5|     the-transition();</span><br><span class="line">    6|   &#125;</span><br><span class="line">    7| </span><br><span class="line">    8|   @import</span><br><span class="line">--------^</span><br><span class="line">    9| </span><br><span class="line">   10| (</span><br><span class="line">   11| hexo-config (&#39;back2top.sidebar&#39;) ? &#39;back-to-top-sidebar&#39; : &#39;back-to-top&#39;</span><br></pre></td></tr></table></figure>
+<p>   以及另一个类似地方的类似报错，查询后发现这两个文件与GitHub上的官方版本有谜之出入，覆盖之，遂解决。</p>
+]]></content>
+        <categories>
+            <category>博客相关</category>
+        </categories>
+    </entry>
+    <entry>
+        <title>《游戏人工智能编程案例精粹》学习笔记（三）</title>
+        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是模糊逻辑。</p>
+<a id="more"></a>]]></content>
+        <categories>
+            <category>游戏开发</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《游戏人工智能编程案例精粹》学习笔记（一）</title>
+        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是智能体的行为与图算法。</p>
 <a id="more"></a>
 
 <h2 id="自治的可移动游戏智能体"><a href="#自治的可移动游戏智能体" class="headerlink" title="自治的可移动游戏智能体"></a>自治的可移动游戏智能体</h2><blockquote>
@@ -173,6 +203,20 @@
 <center>F = G + H</center>  
 
 <p>其中，G 为累计开销，H为启发因子，给出的是节点到目标节点的估计距离。常用的有欧几里得距离和曼哈顿距离。</p>
+]]></content>
+        <categories>
+            <category>游戏开发</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《游戏人工智能编程案例精粹》学习笔记（二）</title>
+        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是《掠夺者》的概述，路径规划与目标驱动。</p>
+<a id="more"></a>
+
 <h2 id="《掠夺者》概述"><a href="#《掠夺者》概述" class="headerlink" title="《掠夺者》概述"></a>《掠夺者》概述</h2><p>这是书中的一个案例，基本玩法类似于2d吃鸡。其要求如下：  </p>
 <ul>
 <li><p>决策<br>AI需要制定游戏计划，长期目标，短期目标等。目标可以是攻击敌人、找到血包等。将目标与现有状态进行对比评估，从而作出决策。后面有单独章节介绍这一评估方式。</p>
@@ -272,7 +316,7 @@
 <li>使游戏中的AI具有不同个性。对于每种目标的评估函数，可以增加一个因子，作为角色的个性。例如在一个RTS游戏中，AI可以有运营风格，速攻风格等等；在掠夺者游戏中，AI可以有武器选择偏好，射击精度等等。  </li>
 <li>不同于FSM，目标仲裁事实上是一个数据驱动而非逻辑驱动的算法，所以只需改变数据就能改变AI角色的个性与行为，也可以将数据单独存放在脚本文件或一个表中使其便于调试。</li>
 </ul>
-<h2 id="模糊逻辑"><a href="#模糊逻辑" class="headerlink" title="模糊逻辑"></a>模糊逻辑</h2>]]></content>
+]]></content>
         <categories>
             <category>游戏开发</category>
         </categories>
@@ -281,27 +325,9 @@
         </tags>
     </entry>
     <entry>
-        <title>问题与优化汇总</title>
-        <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
-        <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
-<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
-<a id="more"></a>
-
-<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化，不过其中有一些出了点问题。。正在解决中</p>
-<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
-
-<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
-<h2 id="2020-07-03-03-22-错误"><a href="#2020-07-03-03-22-错误" class="headerlink" title="2020-07-03 03:22 错误"></a>2020-07-03 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ERROR Asset render failed: css&#x2F;main.css</span><br><span class="line">Error: &#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;themes&#x2F;next&#x2F;source&#x2F;  css&#x2F;_common&#x2F;components&#x2F;components.styl:8:3</span><br><span class="line">    4|     text-align: center;</span><br><span class="line">    5|     the-transition();</span><br><span class="line">    6|   &#125;</span><br><span class="line">    7| </span><br><span class="line">    8|   @import</span><br><span class="line">--------^</span><br><span class="line">    9| </span><br><span class="line">   10| (</span><br><span class="line">   11| hexo-config (&#39;back2top.sidebar&#39;) ? &#39;back-to-top-sidebar&#39; : &#39;back-to-top&#39;</span><br></pre></td></tr></table></figure>
-<p>   以及另一个类似地方的类似报错，查询后发现这两个文件与GitHub上的官方版本有谜之出入，覆盖之，遂解决。</p>
-]]></content>
-        <categories>
-            <category>博客相关</category>
-        </categories>
-    </entry>
-    <entry>
-        <title>《重构-改善既有代码的设计》学习笔记</title>
-        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</url>
-        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。</p>
+        <title>《重构-改善既有代码的设计》学习笔记 (一)</title>
+        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。本节主要是重构的简介与代码的bad smell介绍。</p>
 <a id="more"></a>
 
 <h2 id="重构，第一个案例"><a href="#重构，第一个案例" class="headerlink" title="重构，第一个案例"></a>重构，第一个案例</h2><p>重构即为不改变代码外在行为的前提下，对代码做出修改，以改进程序的内部结构。</p>
@@ -473,8 +499,22 @@
 <p>每当你收到bug报告，请先写一个单元测试来暴露bug  </p>
 </blockquote>
 <p>本章的案例使用了20年前的JUnit版本，不适用于现今的测试体系，不多赘述。</p>
-<h2 id="重构列表"><a href="#重构列表" class="headerlink" title="重构列表"></a>重构列表</h2><p>本书的5到12节为具体的重构方法和案例，因内容较多,仅简单记录重构方法的名称解释和一些值得注意的细节供查阅</p>
-<h3 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h3><h4 id="Extract-Method-提炼函数"><a href="#Extract-Method-提炼函数" class="headerlink" title="Extract Method (提炼函数)"></a>Extract Method (提炼函数)</h4><ul>
+]]></content>
+        <categories>
+            <category>学习</category>
+        </categories>
+        <tags>
+            <tag>JAVA</tag>
+            <tag>重构</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《重构-改善既有代码的设计》学习笔记（二）</title>
+        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称解释和一些值得注意的细节供查阅</p>
+<a id="more"></a>
+
+<h2 id="重构列表"><a href="#重构列表" class="headerlink" title="重构列表"></a>重构列表</h2><h3 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h3><h4 id="Extract-Method-提炼函数"><a href="#Extract-Method-提炼函数" class="headerlink" title="Extract Method (提炼函数)"></a>Extract Method (提炼函数)</h4><ul>
 <li>你有一段代码可以被组织在一起并独立出来  </li>
 <li>将这段代码放进一个独立函数中，并让函数名称解释该函数的用途  </li>
 </ul>
