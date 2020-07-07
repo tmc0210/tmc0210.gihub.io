@@ -136,7 +136,28 @@
         <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是模糊逻辑。</p>
 <a id="more"></a>
 
-<h2 id="模糊集合"><a href="#模糊集合" class="headerlink" title="模糊集合"></a>模糊集合</h2>]]></content>
+<h2 id="模糊集合"><a href="#模糊集合" class="headerlink" title="模糊集合"></a>模糊集合</h2><p>普通集合适用于一些非黑即白的情况，而实际情形通常有一些模棱两可的情形需要考虑，这时就需要引入模糊集合。</p>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
+<p>给定一个论域U，那么从U到单位区间 [0,1] 的一个映射 μ：U-&gt;[0,1] 称为U上的一个模糊集，或U的一个模糊子集。  </p>
+</blockquote>
+<p>其中映射称为隶属函数，对于特定元素，该映射的值称为隶属度。通常简单的隶属函数为三角形或梯形。传统集合的隶属度则为0或1，也即属于或不属于。<br>这一概念由美国加利福尼亚大学控制论专家L.A.扎德于 1965 年率先提出，适用于我们熟悉的秃头悖论等玄学问题。</p>
+<h3 id="运算"><a href="#运算" class="headerlink" title="运算"></a>运算</h3><p>设A与B是同一论域U上的两个模糊集合。</p>
+<p>模糊集合的包含：  </p>
+<center>A ⊂ B 即 μ<sub>A</sub>(u) ≤ μ<sub>B</sub>(u) ∀ u ∈ U</center>  
+模糊集合的等于：  
+<center>A = B 即 μ<sub>A</sub>(u) = μ<sub>B</sub>(u) ∀ u ∈ U</center> 
+模糊集合的并集运算：  
+<center>μ<sub>A ∪ B</sub>(u) = max { μ<sub>A</sub>(u) , μ<sub>B</sub>(u) }</center>  
+模糊集合的交集运算：  
+<center>μ<sub>A ∩ B</sub>(u) = min { μ<sub>A</sub>(u) , μ<sub>B</sub>(u) }</center>  
+模糊集合的补集运算：    
+<center>μ<sub>A`</sub>(u) = 1 - μ<sub>A</sub>(u)</center>  
+
+<h3 id="基本运算定律"><a href="#基本运算定律" class="headerlink" title="基本运算定律"></a>基本运算定律</h3><p>模糊集合的运算同样满足恒等律，交换律，结合律，分配律，吸收律，同一律，对偶律等定律，不同的是互补律不满足，也即：</p>
+<center>A ∩ A` ≠ Ø </center>  
+<center>A ∪ A` ≠ E </center>  
+
+]]></content>
     </entry>
     <entry>
         <title>《游戏人工智能编程案例精粹》学习笔记（一）</title>
