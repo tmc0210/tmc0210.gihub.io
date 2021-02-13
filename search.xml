@@ -133,9 +133,7 @@
     <entry>
         <title>《游戏人工智能编程案例精粹》学习笔记（三）</title>
         <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是模糊集合的介绍以及模糊逻辑的应用。</p>
-<a id="more"></a>
-
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是模糊集合的介绍以及模糊逻辑的应用。<br><a id="more"></a></p>
 <h2 id="模糊集合"><a href="#模糊集合" class="headerlink" title="模糊集合"></a>模糊集合</h2><p>普通集合适用于一些非黑即白的情况，而实际情况通常有一些模棱两可的情形需要考虑。这时就需要引入模糊集合，仅为引入模糊逻辑所需，不作过多展开。</p>
 <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><blockquote>
 <p>给定一个论域U，那么从U到单位区间 [0,1] 的一个映射 μ：U-&gt;[0,1] 称为U上的一个<strong>模糊集合</strong>，或U的一个模糊子集。  </p>
@@ -173,7 +171,8 @@
 <center>μ<sub>稍微老</sub>(u) = μ<sub>老</sub><sup>0.25</sup>(u)</center>  
 这是非常直观的，因为集合使用这些修饰词后，标准也就应当比原先更为宽松或严格。
 
-<h3 id="模糊数"><a href="#模糊数" class="headerlink" title="模糊数"></a>模糊数</h3><p>连续论域U上的模糊数F是一个U上的正规凸模糊集合。其中正规指  </p>
+### 模糊数
+连续论域U上的模糊数F是一个U上的正规凸模糊集合。其中正规指  
 <center>max μ<sub>F</sub>(u) = 1</center>  
 凸集合指曲线上任意两点之间，曲线上的任意一点所表示的隶属度都大于或等于两点中隶属度较小的一个，也即
 <center>μ<sub>F</sub>(x) ≥ min { μ<sub>F</sub>(a) , μ<sub>F</sub>(b) } ∀ a,b ∈ U x ∈ [a,b]</center>  
@@ -211,42 +210,13 @@
 <li>取和并截断到最大值（也即1）</li>
 <li>取最大值，也即“或”运算  </li>
 </ul>
-<p>这里我们采用第二种方案。可以得到如下的计算结果<br>|结论|置信度|<br>|—|—|<br>|不期望攻击|0.33|<br>|期望攻击|0.2|<br>|非常期望攻击|0.67|<br>接下来我们需要利用矩阵结果对原本的期望值模糊集合进行截断后合并处理。注意对比下图左侧的截断后结果与原本的期望值隶属度函数。<br><img src="https://i.loli.net/2020/07/08/gtPo7V2us5Xdhr4.png" alt="截断合并"><br>于是我们便得到了对应这组输入的新的模糊形。<br>最后一步是利用模糊形得到一个期望分数，也即去模糊化。这里有以下几种方案。</p>
+<p>这里我们采用第二种方案。可以得到如下的计算结果<br>|结论|置信度|<br>|—-|—-|<br>|不期望攻击|0.33|<br>|期望攻击|0.2|<br>|非常期望攻击|0.67|<br>接下来我们需要利用矩阵结果对原本的期望值模糊集合进行截断后合并处理。注意对比下图左侧的截断后结果与原本的期望值隶属度函数。<br><img src="https://i.loli.net/2020/07/08/gtPo7V2us5Xdhr4.png" alt="截断合并"><br>于是我们便得到了对应这组输入的新的模糊形。<br>最后一步是利用模糊形得到一个期望分数，也即去模糊化。这里有以下几种方案。</p>
 <ul>
 <li><p>最大值均值（MOM）<br>  这种算法的思路是计算具有最高置信度输出值的平均值。例如对于上面的合成模糊形，在右侧梯形的上方取到最值。而右侧梯形的左上顶点为66，右上顶点为100，便得到最大值均值83，作为期望分数。<br>  这一方法的问题是为了效率抛弃了左侧的大量数据。  </p>
 </li>
-<li><p>中心法<br>  这是一种准确而复杂的方法。它的思路是通过采样大致确定模糊形的重心。其公式如下：<br>  <img src="https://i.loli.net/2020/07/08/QhPRO68eWZUJtAq.png" alt="中心法公式"><br>  其中，s是每个采样点的值，DOM(s)是对应的模糊语言变量的隶属度。显而易见，被取样值的越多，这一算法越准确。实践中通常使用10到20个采样点。<br>  例如对于上面的模糊语言变量，采样取10、20、30 …… 100，共计10个采样点。它们对应的隶属度分别为0.33、0.33、0.53、0.53、0.2、0.6、0.87、0.67、0.67、0.67（部分值为看图估计），故：<br>  Desirability = （10 * 0.33 + 20 * 0.33 + …… + 100 * 0.67）/（0.33 + 0.33 + …… + 0.67）<br>  也即 334.8/5.4 = 62  </p>
+<li><p>中心法<br>  这是一种准确而复杂的方法。它的思路是通过采样大致确定模糊形的重心。其公式如下：<br>  <img src="https://i.loli.net/2020/07/08/QhPRO68eWZUJtAq.png" alt="中心法公式"><br>  其中，s是每个采样点的值，DOM(s)是对应的模糊语言变量的隶属度。显而易见，被取样值的越多，这一算法越准确。实践中通常使用10到20个采样点。<br>  例如对于上面的模糊语言变量，采样取10、20、30 …… 100，共计10个采样点。它们对应的隶属度分别为0.33、0.33、0.53、0.53、0.2、0.6、0.87、0.67、0.67、0.67（部分值为看图估计），故：<br>  Desirability = （10 <em> 0.33 + 20 </em> 0.33 + …… + 100 * 0.67）/（0.33 + 0.33 + …… + 0.67）<br>  也即 334.8/5.4 = 62  </p>
 </li>
-<li><p>最大值平均<br>  这一方法的计算较为简单，而且结果接近于中心法，适合使用于实际的项目之中。<br>  一个模糊集合的最大值或代表值也就是对这个集合的隶属度为1的值。对于梯形集合而言，这意味着上方两顶点的平均值，退化为三角形时结论自然变为三角形上顶点。<br>  最大值平均（MaxAv）去模糊方法的公式如下：<br>  <img src="https://i.loli.net/2020/07/08/CoP1NMjae3xtyTn.png" alt="最大值平均"><br>  对于上述模糊形，计算过程如下：<br>  首先得到各个集合的代表值</p>
-<table>
-<thead>
-<tr>
-<th>集合</th>
-<th>代表值</th>
-<th>置信度</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>不期望攻击</td>
-<td>12.5</td>
-<td>0.33</td>
-</tr>
-<tr>
-<td>期望攻击</td>
-<td>50</td>
-<td>0.2</td>
-</tr>
-<tr>
-<td>非常期望攻击</td>
-<td>87.5</td>
-<td>0.67</td>
-</tr>
-<tr>
-<td>代入公式计算： Desirability = （1.25 * 0.33 + 50 * 0.2 + 87.5 * 0.67）/（0.33 + 0.2 + 0.67） = 72.75 / 1.2 = 60.625</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
+<li><p>最大值平均<br>  这一方法的计算较为简单，而且结果接近于中心法，适合使用于实际的项目之中。<br>  一个模糊集合的最大值或代表值也就是对这个集合的隶属度为1的值。对于梯形集合而言，这意味着上方两顶点的平均值，退化为三角形时结论自然变为三角形上顶点。<br>  最大值平均（MaxAv）去模糊方法的公式如下：<br>  <img src="https://i.loli.net/2020/07/08/CoP1NMjae3xtyTn.png" alt="最大值平均"><br>  对于上述模糊形，计算过程如下：<br>  首先得到各个集合的代表值<br>  |集合|代表值|置信度|<br>  |—-|—-|—-|<br>  |不期望攻击|12.5|0.33|<br>  |期望攻击|50|0.2|<br>  |非常期望攻击|87.5|0.67|<br>  代入公式计算： Desirability = （1.25 <em> 0.33 + 50 </em> 0.2 + 87.5 * 0.67）/（0.33 + 0.2 + 0.67） = 72.75 / 1.2 = 60.625  </p>
 </li>
 </ul>
 <p>于是我们便利用模糊逻辑得到了所需的期望分数，计算不同武器的期望分数即可作为AI的选择依据。</p>
@@ -261,7 +231,7 @@
 </ol>
 ]]></content>
         <categories>
-            <category>游戏开发</category>
+            <category>《游戏人工智能编程案例精粹》</category>
         </categories>
         <tags>
             <tag>AI</tag>
@@ -270,9 +240,7 @@
     <entry>
         <title>《游戏人工智能编程案例精粹》学习笔记（一）</title>
         <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是智能体的行为与极简的图算法介绍。</p>
-<a id="more"></a>
-
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是智能体的行为与极简的图算法介绍。<br><a id="more"></a></p>
 <h2 id="自治的可移动游戏智能体"><a href="#自治的可移动游戏智能体" class="headerlink" title="自治的可移动游戏智能体"></a>自治的可移动游戏智能体</h2><blockquote>
 <p>一个自治智能体是这样一个系统，它位于一个环境的内部，是环境的一部分，且能感知该环境对它有效实施的作用，并永远按此进行，为未来的新感知提供条件。  </p>
 </blockquote>
@@ -330,7 +298,7 @@
 <p>其中，G 为累计开销，H为启发因子，给出的是节点到目标节点的估计距离。常用的有欧几里得距离和曼哈顿距离。</p>
 ]]></content>
         <categories>
-            <category>游戏开发</category>
+            <category>《游戏人工智能编程案例精粹》</category>
         </categories>
         <tags>
             <tag>AI</tag>
@@ -339,9 +307,7 @@
     <entry>
         <title>《游戏人工智能编程案例精粹》学习笔记（二）</title>
         <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是《掠夺者》的概述，路径规划与目标驱动。</p>
-<a id="more"></a>
-
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是《掠夺者》的概述，路径规划与目标驱动。<br><a id="more"></a></p>
 <h2 id="《掠夺者》概述"><a href="#《掠夺者》概述" class="headerlink" title="《掠夺者》概述"></a>《掠夺者》概述</h2><p>这是书中的一个案例，基本玩法类似于2d吃鸡。其要求如下：  </p>
 <ul>
 <li><p>决策<br>AI需要制定游戏计划，长期目标，短期目标等。目标可以是攻击敌人、找到血包等。将目标与现有状态进行对比评估，从而作出决策。后面有单独章节介绍这一评估方式。</p>
@@ -443,7 +409,87 @@
 </ul>
 ]]></content>
         <categories>
-            <category>游戏开发</category>
+            <category>《游戏人工智能编程案例精粹》</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《Game AI Pro》寻路算法的优化</title>
+        <url>/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/</url>
+        <content><![CDATA[<p>关于《Game AI Pro》 Pathfinding Architecture Optimizations<br>的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了<br><a id="more"></a></p>
+<h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
+<h3 id="更好的搜索空间描述"><a href="#更好的搜索空间描述" class="headerlink" title="更好的搜索空间描述"></a>更好的搜索空间描述</h3><p>常见的三种描述是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述"><br>但是在大型游戏中，简单地使用这些描述方式并不能解决问题。常用的方法是分层寻路，例如在不需要精细寻路的高层次中采用路点或导航网格描述，低层次中使用方格。当存储空间不足以使用上述的$Floyd$查找表时便可以采取这一思路。其在英雄连、龙腾世纪：起源等游戏中被采用。</p>
+<h3 id="预分配所有重要的存储空间"><a href="#预分配所有重要的存储空间" class="headerlink" title="预分配所有重要的存储空间"></a>预分配所有重要的存储空间</h3><p>在搜索过程中分配存储空间会导致效率数量级级别的下降。所以应当使用内存池预分配搜索所需的空间。</p>
+<h3 id="高估启发因子"><a href="#高估启发因子" class="headerlink" title="高估启发因子"></a>高估启发因子</h3><p>$\mathrm{A*}$作为具有<strong>可采纳性</strong>(admissible) 的寻路算法，其对于当前节点到目标的距离估算需不高于实际的距离。不过在实际项目中，你可以通过适当地高估启发因子舍弃部分可采纳性以换取巨大的速度提升。在传统寻路领域中，这听起来简直离经叛道，但在电子游戏领域，这是一种可行的权衡。<br>为了理解具体的高估方式，我们来看传统的$\mathrm{A*}$开销计算函数<br>\begin{equation}<br>f(x)=g(x)+h(x)<br>\end{equation}<br>对启发因子进行加权后形式如下<br>\begin{equation}<br>f(x)=g(x)+h(x)\times weight<br>\end{equation}<br>通过调整权重$weight$，即可得到不同的$\mathrm{A*}$形式。如果权重为0，退化为$Dijkstra$算法，开销估计仅由之前的累计消耗决定。如果权重为1，即为经典的$\mathrm{A*}$算法。如果权重大于1，则算法向贪婪最佳优先算法(Greedy  Best-First search)靠近。<br>在实际操作中，我们可以将权重在1.1到1.5之间调整，这取决于你的地图形式。如果你的地图较为复杂，充斥着随机障碍与回溯，这种方法对可采纳性的破坏则较为严重；如果你的地图较为简单，增大权重将极大地增加寻路算法靠近终点的速度。虽然这一方法有一定风险，也不失为值得探索的思路。</p>
+<h3 id="更好的启发因子"><a href="#更好的启发因子" class="headerlink" title="更好的启发因子"></a>更好的启发因子</h3><p>对于一个能8方向移动的方格地图而言，常见的启发因子有以下三种</p>
+<ul>
+<li>欧氏距离 Euclidean distance 通常会低估实际消耗</li>
+<li>曼哈顿距离 Manhattan distance 通常会高估实际消耗</li>
+<li>八分距离 octile distance 对于此类地图是较优的启发因子，允许45度和90度的转弯，计算方式为$max(Δx, Δy) + 0.41 · min(Δx, Δy)$ </li>
+</ul>
+<h3 id="开放队列排序"><a href="#开放队列排序" class="headerlink" title="开放队列排序"></a>开放队列排序</h3><ul>
+<li>常见的存储开放队列的方式是堆，但是由于新加入的节点经常被立刻删除，可以在删除前先缓存新节点。</li>
+<li>还可以避免显式排序。在某些地图中，独一无二的f会比较少，这种情况可以改为维护f的列表而非节点的列表</li>
+<li>在一些搜索中，开放列表中只有10到30个节点，这时直接使用数组存储开放列表可能较为简单  </li>
+</ul>
+<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的$JPS$跳点算法</p>
+<h3 id="缓存后继任务"><a href="#缓存后继任务" class="headerlink" title="缓存后继任务"></a>缓存后继任务</h3><p>$\mathrm{A*}$算法需要频繁地考察相邻的节点，故直接将相邻节点存储起来而非在复杂的数据结构中遍历也能提高速度，当然这会导致更大的空间消耗。</p>
+<h3 id="寻路中的坏主意"><a href="#寻路中的坏主意" class="headerlink" title="寻路中的坏主意"></a>寻路中的坏主意</h3><h4 id="同时搜索"><a href="#同时搜索" class="headerlink" title="同时搜索"></a>同时搜索</h4><p>尽量避免同时开始多次搜索。因为$\mathrm{A*}$算法需要开辟较大的空间，同时进行多个搜索会导致极大的空间消耗。如果我们发现搜索的速度确实差距较大，可以分两个通道分别处理一般的寻路和较慢的寻路。</p>
+<h4 id="双向寻路"><a href="#双向寻路" class="headerlink" title="双向寻路"></a>双向寻路</h4><p>一般而言，当有大陆-岛屿存在时，双向寻路可以通过快速遍历岛屿上的节点迅速判断出发点和目标之间的不可达关系，而$\mathrm{A*}$需要遍历大陆中的节点得出同样的结论。但这并非使用双向寻路的理由，解决这个问题可以通过分层寻路，在宏观上先判断可达性，再使用$\mathrm{A*}$得到具体路径。<br>当然，抛开岛屿问题，双向寻路对于$\mathrm{A*}$也徒劳无功。所以，不要在$\mathrm{A*}$中使用双向寻路。</p>
+<h4 id="缓存失败的寻路结果"><a href="#缓存失败的寻路结果" class="headerlink" title="缓存失败的寻路结果"></a>缓存失败的寻路结果</h4><p>在某些算法中，缓存中间结果可以减少重复计算，但在$\mathrm{A*}$中并不适用，因为有太多不同的路径，存储中间结果对于空间的消耗过大。</p>
+<h3 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h3><p>以上即为一些常用的$\mathrm{A*}$算法优化方式，希望能给读者一些启发。</p>
+]]></content>
+        <categories>
+            <category>《Game AI Pro》</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《Game AI Pro》 高斯随机、过滤随机与柏林噪声</title>
+        <url>/%E3%80%8AGAP%E3%80%8B%E9%AB%98%E6%96%AF%E9%9A%8F%E6%9C%BA%E3%80%81%E8%BF%87%E6%BB%A4%E9%9A%8F%E6%9C%BA%E4%B8%8E%E6%9F%8F%E6%9E%97%E5%99%AA%E5%A3%B0/</url>
+        <content><![CDATA[<p>关于《Game AI Pro》 Advanced Randomness Techniques for Game AI:  Gaussian Randomness, Filtered Randomness, and Perlin Noise 的学习笔记。主要是三种随机的简介。<br><a id="more"></a></p>
+<h2 id="高斯随机"><a href="#高斯随机" class="headerlink" title="高斯随机"></a>高斯随机</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>高斯分布广泛存在于我们的身边。学生的身高、体重、成绩等变量都遵循高斯分布。当我们需要随机生成这一类变量时，简单地使用我们熟悉的均匀随机rand()是不符合要求的。这时我们就需要利用高斯随机生成符合高斯分布的随机数。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>虽然高斯分布的表达式非常复杂，但是实现高斯随机非常简单。由于中心极限定理，受到多个互为加性的均匀随机因素影响的随机变量即符合高斯分布。例如，掷出三个骰子，它们的和便遵循高斯分布。这个和受到三个骰子各自的均匀分布且具有加性的点数影响，所以为高斯分布。<br><img src="https://i.loli.net/2020/07/10/sypH4KwFxAnrTU3.png" alt="截屏2020-07-10 下午5.33.16.png"><br>具体实现中，我们可以类似地生成近似的高斯随机，将几个rand()生成的均匀随机变量加起来即可。例如将三个[-1，1]的均匀随机变量相加，得到的即为分布在[-3，3]中的高斯随机，且标准差σ为1，均值μ为0。其中100%落在 [μ-3σ，μ+3σ] 即 [-3，3] 中，95.8%落在 [μ-2σ，μ+2σ] 即 [-2，2] 中，66.7%落在 [μ-σ，μ+σ] 即 [-1，1] 中。在更为精确的模拟中可能需要模拟落在三倍标准差以外的小概率事件，但是游戏中通常不需要。  </p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>高斯随机最经典的用途之一是弹道偏移。大部分fps游戏中都需要模拟弹道偏移以增添真实感，而在弹道偏移量上简单地使用均匀随机得到的效果并不好。如果使用均匀随机，角色打靶的弹痕将均匀分布在靶心附近的一个圆上，圆的大小取决于均匀随机的范围，看起来并不真实。合理的方案是先使用均匀随机得到一个偏移的方向，再在这个方向上使用高斯随机得到偏移的距离。这样角色打靶的弹痕分布将在靶心较为密集，边缘较为稀疏，符合常识。</p>
+<h2 id="过滤随机"><a href="#过滤随机" class="headerlink" title="过滤随机"></a>过滤随机</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>小样本的随机事件看起来并不随机。当玩家发现自己被敌人连续暴击三次击杀时，玩家最先想到的通常并非“敌人的暴击率为30%，我被连续暴击三次的概率为2.7%，还算正常”，而是“这破游戏针对我，退坑！”。为避免这种玩家莫名流失的情形，便可以采用过滤随机，“修复”这一“bug”。  </p>
+<h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>过滤随机的实现更为简单，只需在生成随机数时存储最后生成的一段数列，生成最新一项时进行检查，减少一些引发玩家迷惑的组合的出现可能性即可。以下为一些示例</p>
+<h4 id="掷硬币"><a href="#掷硬币" class="headerlink" title="掷硬币"></a>掷硬币</h4><ul>
+<li>如果最新的值会导致连续的四个或更多相同值，75%的概率翻转该值。</li>
+<li>如果最新的值导致出现了四个值的重复排列，例如11001100，翻转该值（即变为11001101）</li>
+<li>如果最新的值导致出现了111000或000111，翻转该值<br>示例<br>过滤前：0 1 1 0 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 0 1 1 0<br>过滤后：0 1 1 0 1 1 0 0 0 1 1 0 0 0 1 0 1 0 1 0 0 0 1 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 1 1 1 0  </li>
+</ul>
+<h4 id="整数"><a href="#整数" class="headerlink" title="整数"></a>整数</h4><ul>
+<li>出现连续数字，例如 7，7</li>
+<li>出现连续数字被另一数字隔断，例如 8，3，8</li>
+<li>出现4个或更多递增或递减的数字，例如 3，4，5，6</li>
+<li>最后若干个数均较大或均较小，例如 6，8，7，9，8，6，9</li>
+<li>两个数字的组合在最后十位重复出现，例如 5，7，3，1，5，7</li>
+<li>某一数字在最后十位出现次数过多，例如 9，4，5，9，7，8，9，0，2，9</li>
+</ul>
+<h4 id="浮点数"><a href="#浮点数" class="headerlink" title="浮点数"></a>浮点数</h4><p>以[0，1]为例</p>
+<ul>
+<li>连续两个数差小于0.02，重新随机，例如0.875和0.856</li>
+<li>连续三个数差小于0.1，重新随机，例如0.345，0.421，0.387</li>
+<li>5个数连续递增或递减，重新随机，例如0.342，0.572，0.619，0.783，0.868</li>
+<li>最后若干个数均较大或均较小，重新随机，例如0.325，0.198，0.056，0.432，0.216</li>
+</ul>
+<h4 id="高斯随机-1"><a href="#高斯随机-1" class="headerlink" title="高斯随机"></a>高斯随机</h4><p>由于高斯随机与浮点数随机较为相似，上述的规则仍然可以沿用。除此之外，如下规则也可作为参考</p>
+<ul>
+<li>连续四个数均靠近或均远离0</li>
+<li>连续四个数位于2σ与3σ之间</li>
+<li>连续两个数位于3σ之外</li>
+</ul>
+<h3 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h3><p>以上的一些策略仅为示例，这并不意味着需要在游戏中使用类似的所有策略。事实上，上述的策略可能过于严苛以至于破坏游戏中随机数的数学完整性。在使用过滤随机时，我们需要仔细思考规则，还可以使用开源程序ENT测试规则下生成的随机数的随机程度。<br>现在的网游中暴击、抽卡、开箱等事件通常使用更复杂的随机策略。例如假设玩家的暴击率为5%，则第一次击中的暴击率将低于5%。随着连续击中而没有触发暴击，玩家的暴击率逐步上升，在第20次时达到100%。如果中途触发暴击，则暴击率将还原至初始值。这需要设计一条概率曲线，它的增长幅度合理且最终总的暴击率仍为5%。如果概率曲线设计合理，这种策略将使得暴击的触发更为分散，也符合广大玩家“暴击率5%意味着20次必暴击一次”的认知。开箱中的“幸运值”，“保底”等机制也类似如此。</p>
+<h2 id="柏林噪声"><a href="#柏林噪声" class="headerlink" title="柏林噪声"></a>柏林噪声</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>柏林噪声通常被用来产生平滑的随机，例如生成起伏的地表，平滑的随机移动，游戏角色的心情变化。一维的柏林噪声即可生成2d地图中的地表，生成类似我的世界的游戏地形则需要二维的柏林噪声。一维柏林噪声大概长下图这样。<br><img src="https://i.loli.net/2020/07/10/4lN8gvXL2yYiGWD.png" alt="一维柏林噪声"></p>
+<h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>实现柏林噪声，我们需要得到一条随机的平滑曲线。对于一条简单的随机曲线，我们可以使用随机数与插值得到，但是这样的曲线过于单调，不满足我们的使用要求。这时，我们可以将一些曲线叠加在一起，得到更具有变化性的曲线。<br>为了叠加曲线，首先我们需要引入<strong>倍频</strong>（octave）和<strong>持续度</strong>（Persistence）两个概念。在生成之前，我们需要选择你的柏林噪声使用几个倍频，这取决于你的精度要求和性能。倍频决定了你的柏林噪声由几个基本曲线合成，以及这些曲线的频率和振幅。其中倍频为n的曲线的振幅为持续度的n次方，而频率为2的n次方。例如如果取倍频为4，持续度为0.5，则我们便要将倍频为1，2，3，4的生成曲线分别乘以0.5的1，2，3，4次方并相加得到最终的柏林噪声，其中倍频为1，2，3，4的生成曲线频率分别为1，2，4，8倍。<br>那么每一个倍频的曲线该如何生成呢？此处以横纵坐标上限均为1，倍频为4，持续度为0.5为例。对于倍频1的曲线，我们只需要在[0，1]中随机取起点和终点的值，使用缓和函数插值即可。最早的缓和函数为3t<sup>2</sup> - 2t<sup>3</sup> 后来被改进为现在通常使用的6t<sup>5</sup> - 15t<sup>4</sup> + 10t<sup>3</sup>，因为这一函数的二阶导连续。而更高倍频的只需如法炮制，不同的是倍频越高，为使频率能够翻倍就需要额外取一些随机数作为插值的依据。其中，倍频1使用2个随机数，倍频2使用3个随机数，倍频3使用5个随机数，其规律为2<sup>n - 1</sup> + 1，当然这些随机数都需要间距相等。<br>生成完毕后，便可以合成为所需的柏林噪声曲线。下图即为一个示例。<br><img src="https://i.loli.net/2020/07/10/EAQqjkFrnayzBvH.png" alt="截屏2020-07-10 下午10.42.16.png"></p>
+<h3 id="其他-2"><a href="#其他-2" class="headerlink" title="其他"></a>其他</h3><p>柏林噪声在图形学上也有许多应用，可以用于生成火焰，熔岩，大理石等纹理，有许多可以深入研究的地方。这里仅为对文章内容的简单总结，如需更深入了解在图形学上的应用，可以阅读<a href="https://blog.csdn.net/candycat1992/article/details/50346469" target="_blank" rel="noopener">这篇文章</a>。</p>
+]]></content>
+        <categories>
+            <category>《Game AI Pro》</category>
         </categories>
         <tags>
             <tag>AI</tag>
@@ -451,10 +497,8 @@
     </entry>
     <entry>
         <title>《重构-改善既有代码的设计》学习笔记 (一)</title>
-        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。本节主要是重构的简介与代码的bad smell介绍。</p>
-<a id="more"></a>
-
+        <url>/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。虽然是二十年前的老书了，但是由于我不想看js案例，所以还是选择了第一版进行阅读。本节主要是重构的简介与代码的bad smell介绍。<br><a id="more"></a></p>
 <h2 id="重构，第一个案例"><a href="#重构，第一个案例" class="headerlink" title="重构，第一个案例"></a>重构，第一个案例</h2><p>重构即为不改变代码外在行为的前提下，对代码做出修改，以改进程序的内部结构。</p>
 <p>本章节以一个影片出租店用程序作为案例示范了重构的过程。主要部分没有什么特别的，值得注意的有以下两处</p>
 <ul>
@@ -463,11 +507,7 @@
 </ul>
 <blockquote>
 <p>重构之前，首先检查自己是否有一套可靠的测试机制，这些测试必须有自我检验能力</p>
-</blockquote>
-<blockquote>
 <p>重构技术就是以微小的步伐修改程序，如果你犯下错误，很容易便可发现它</p>
-</blockquote>
-<blockquote>
 <p>如果你发现自己需要为程序添加一个特性，而代码结构使你无法很方便地达成目的，那就先重构那个程序，使特性的添加比较容易进行，然后再添加特性。</p>
 </blockquote>
 <h2 id="重构原则"><a href="#重构原则" class="headerlink" title="重构原则"></a>重构原则</h2><blockquote>
@@ -481,12 +521,12 @@
 </ul>
 <h3 id="何时重构"><a href="#何时重构" class="headerlink" title="何时重构"></a>何时重构</h3><blockquote>
 <p>事不过三，三则重构 </p>
-</blockquote>
 <ul>
 <li>添加功能时重构</li>
 <li>修补错误时重构</li>
 <li>复审代码时重构</li>
 </ul>
+</blockquote>
 <h3 id="重构的难题"><a href="#重构的难题" class="headerlink" title="重构的难题"></a>重构的难题</h3><h4 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h4><ol>
 <li>大多数商用程序都与数据库高度耦合  </li>
 <li>容易导致数据迁移  </li>
@@ -522,8 +562,7 @@
 <li>如果以不同的算法做相同的事，选择较清晰的一个，用 Substitute Algorithm 将其他函数的算法替换掉</li>
 </ul>
 </li>
-<li><p>两个毫不相关的类<br>  对其中一个使用 Extra Class，将重复代码提炼到一个独立类中。注意考虑原有类与新类的关系。  </p>
-</li>
+<li>两个毫不相关的类<br>  对其中一个使用 Extra Class，将重复代码提炼到一个独立类中。注意考虑原有类与新类的关系。  </li>
 </ul>
 <h3 id="Long-Method-过长函数"><a href="#Long-Method-过长函数" class="headerlink" title="Long Method (过长函数)"></a>Long Method (过长函数)</h3><ul>
 <li>每当需要使用注释说明时，便将需要说明的东西写进独立函数中，并以其用途命名。关键不在于函数长度，而在于函数 “What” 和 “How” 之间的距离。<ul>
@@ -626,7 +665,7 @@
 <p>本章的案例使用了20年前的JUnit版本，不适用于现今的测试体系，不多赘述。</p>
 ]]></content>
         <categories>
-            <category>学习</category>
+            <category>《重构-改善既有代码的设计》</category>
         </categories>
         <tags>
             <tag>JAVA</tag>
@@ -635,18 +674,14 @@
     </entry>
     <entry>
         <title>《重构-改善既有代码的设计》学习笔记（二）</title>
-        <url>/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。</p>
-<a id="more"></a>
-
+        <url>/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。<br><a id="more"></a></p>
 <h2 id="重构列表"><a href="#重构列表" class="headerlink" title="重构列表"></a>重构列表</h2><h3 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h3><h4 id="Extract-Method-提炼函数"><a href="#Extract-Method-提炼函数" class="headerlink" title="Extract Method (提炼函数)"></a>Extract Method (提炼函数)</h4><ul>
 <li>你有一段代码可以被组织在一起并独立出来  </li>
 <li>将这段代码放进一个独立函数中，并让函数名称解释该函数的用途  </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; print details</span><br><span class="line">    System.out.println(&quot;name:&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + _amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line">    printDetails(amount);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void printDetails(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    System.out.println(&quot;name&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>注意目标代码中的局部变量。如果需要对局部变量进行再次赋值并使用，提炼出的函数可以使用参数以及返回值。</p>
 <h4 id="Inline-Method-内联函数"><a href="#Inline-Method-内联函数" class="headerlink" title="Inline Method (内联函数)"></a>Inline Method (内联函数)</h4><ul>
 <li>一个函数的本体和名称同样清楚易懂  </li>
@@ -664,7 +699,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">    if (basePrice &gt; 1000)</span><br><span class="line">        return basePrice * 0.95;</span><br><span class="line">    else</span><br><span class="line">        return basePrice * 0.95</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">if (basePrice() &gt; 1000)</span><br><span class="line">    return basePrice() * 0.95;</span><br><span class="line">else</span><br><span class="line">    return basePrice() * 0.95</span><br><span class="line">...</span><br><span class="line">double basePrice()</span><br><span class="line">&#123;</span><br><span class="line">    return _quantity * _itemPrice;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>也就是让一个函数中的表达式计算可以被其他函数使用。通常是 Extra Method 前的步骤。运用此手法可能会产生性能问题，但是通常可以忽略不计，或是可以在性能优化阶段解决。</p>
 <h4 id="Introduce-Explaining-Variable-引入解释性变量"><a href="#Introduce-Explaining-Variable-引入解释性变量" class="headerlink" title="Introduce Explaining Variable (引入解释性变量)"></a>Introduce Explaining Variable (引入解释性变量)</h4><ul>
 <li>你有一个复杂的表达式</li>
@@ -680,9 +714,7 @@
 <li>代码对一个参数进行赋值</li>
 <li>以一个临时变量取代该参数的位置</li>
 </ul>
-<p>以下为一段java代码(采用按值传递)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void aMethod(Object foo)</span><br><span class="line">&#123;</span><br><span class="line">    foo.modifyInSomeWay;    &#x2F;&#x2F;可</span><br><span class="line">    foo &#x3D; anotherObject;    &#x2F;&#x2F;不可</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这导致混用按值传递和按引用传递，降低代码清晰度。</p>
+<p>以下为一段java代码(采用按值传递)<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void aMethod(Object foo)</span><br><span class="line">&#123;</span><br><span class="line">    foo.modifyInSomeWay;    &#x2F;&#x2F;可</span><br><span class="line">    foo &#x3D; anotherObject;    &#x2F;&#x2F;不可</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这导致混用按值传递和按引用传递，降低代码清晰度。</p>
 <h4 id="Replace-Method-with-Method-Object-以函数对象取代函数"><a href="#Replace-Method-with-Method-Object-以函数对象取代函数" class="headerlink" title="Replace Method with Method Object (以函数对象取代函数)"></a>Replace Method with Method Object (以函数对象取代函数)</h4><ul>
 <li>你有一个大型函数，其中对局部变量的引用使你无法采用 Extract Method</li>
 <li>将这个函数放进一个单独对象中，如此一来局部对象就成了对象内的字段。然后你可以在同一个对象中将这个大型函数分解为多个小型函数。</li>
@@ -725,7 +757,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Date newStart &#x3D; new Date(previousEnd.getYear(),previousEnd.getMonth(),previousEnd.getDate() + 1);</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Date newStart &#x3D; nextDay(previousEnd)</span><br></pre></td></tr></table></figure>
-
 <p>正在使用一个类时，如果你需要一项服务而类无法供应，此时如果你能修改源码，可以自行添加一个新函数，如果不能，就要在客户端编码，补足所需的函数。明确信号是这个函数本应在服务类中实现，如果有可能，这些函数仍然应该放回到服务类。</p>
 <h4 id="Introduce-Local-Extension-引入本地扩展"><a href="#Introduce-Local-Extension-引入本地扩展" class="headerlink" title="Introduce Local Extension (引入本地扩展)"></a>Introduce Local Extension (引入本地扩展)</h4><ul>
 <li>你需要为服务类提供一些额外函数，但你无法修改这个类</li>
@@ -806,11 +837,9 @@
 <h4 id="Consolidate-Conditional-Expression-合并条件表达式"><a href="#Consolidate-Conditional-Expression-合并条件表达式" class="headerlink" title="Consolidate Conditional Expression (合并条件表达式)"></a>Consolidate Conditional Expression (合并条件表达式)</h4><ul>
 <li>你有一系列条件测试，都得到相同结果</li>
 <li>将这些测试合并为一个条件表达式，并将这个条件式提炼成为一个独立函数<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_seniority &lt; 2) return 0;</span><br><span class="line">    if (_monthsDisabled &lt; 12) return 0;</span><br><span class="line">    if (_isPartTime) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (isNotEligableForDisability()) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h4 id="Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段"><a href="#Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段" class="headerlink" title="Consolidate Duplicate Conditional Fragments (合并重复的条件片段)"></a>Consolidate Duplicate Conditional Fragments (合并重复的条件片段)</h4><ul>
 <li>在条件表达式的每个分支上有着相同的一段代码</li>
 <li>将这段重复代码搬移到条件表达式之外</li>
@@ -818,17 +847,14 @@
 <h4 id="Remove-Control-Flag-移除控制标记"><a href="#Remove-Control-Flag-移除控制标记" class="headerlink" title="Remove Control Flag (移除控制标记)"></a>Remove Control Flag (移除控制标记)</h4><ul>
 <li>在一系列布尔表达式中，某个变量带有”控制标记”(control flag)的作用</li>
 <li>以 break 语句或 return 语句取代控制标记<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void checkSecurity(String people)</span><br><span class="line">&#123;</span><br><span class="line">    boolean found &#x3D; false;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (!found)</span><br><span class="line">        &#123;</span><br><span class="line">            if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">            if (people(i).equals(&quot;John&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">void checkSecurity(String[] people)</span><br><span class="line">&#123;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        if (people(i).equals(&quot;John&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>这两段书中示例的代码在同时满足两个条件时的输出是不一致的，不过对于示例中检测两个嫌疑人名字的情形应该不会出现这种情况。<br>如果这里的found同时用于输出结果，可以使用 return 重构</p>
 <h4 id="Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式"><a href="#Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式" class="headerlink" title="Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)"></a>Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)</h4><ul>
 <li>函数中的条件逻辑使人难以看清正常的执行路径</li>
 <li>使用卫语句表现所有特殊情况<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    double result;</span><br><span class="line">    if (_isDead)</span><br><span class="line">    &#123;</span><br><span class="line">        result &#x3D; deadAmount();</span><br><span class="line">    &#125;</span><br><span class="line">    else </span><br><span class="line">    &#123;</span><br><span class="line">        if (_isSeparted) </span><br><span class="line">        &#123;</span><br><span class="line">            result &#x3D; separatedAmount();</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            if (_isRetired) result &#x3D; retiredAmount();</span><br><span class="line">            else result &#x3D; normalPayAmount();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_isDead) return deadAmount();</span><br><span class="line">    if (_isSeparated) return separatedAmount();</span><br><span class="line">    if (_isRetired) return retiredAmount();</span><br><span class="line">    return normalPayAmount();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <p>条件表达式通常有两种表现形式，一种是所有分支都是正常行为，另一种是只有一种是正常行为，其他都是特殊情况。<br>对于第一种就应该使用if-else语句，而对于第二种就应当使用卫语句。卫语句通常从函数中返回或抛异常。</p>
@@ -845,7 +871,6 @@
 <li>某一段代码需要对程序状态做出某种假设</li>
 <li>以断言明确表现这种假设<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F; should have either expense limit or a primary project</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    Assert.isTure(_expenseLimit !&#x3D; NULL_EXPENSE || _primaryProject !&#x3D; null)</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <h3 id="简化函数调用"><a href="#简化函数调用" class="headerlink" title="简化函数调用"></a>简化函数调用</h3><h4 id="Rename-Method-函数改名"><a href="#Rename-Method-函数改名" class="headerlink" title="Rename Method (函数改名)"></a>Rename Method (函数改名)</h4><ul>
@@ -884,7 +909,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">discountLevel &#x3D; getDiscountLevel();</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice,discountLevel);</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice);</span><br></pre></td></tr></table></figure>
-
 <h4 id="Introduce-Parameter-Object-引入参数对象"><a href="#Introduce-Parameter-Object-引入参数对象" class="headerlink" title="Introduce Parameter Object (引入参数对象)"></a>Introduce Parameter Object (引入参数对象)</h4><ul>
 <li>某些参数总是很自然地同时出现</li>
 <li>以一个对象取代这些参数</li>
@@ -908,7 +932,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Object lastReading()</span><br><span class="line">&#123;</span><br><span class="line">    return readings.lastElement();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Object lastReading()</span><br><span class="line">&#123;</span><br><span class="line">    return (Reading) reading.lastElment();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h4 id="Replace-Error-Code-with-Exception-以异常取代错误码"><a href="#Replace-Error-Code-with-Exception-以异常取代错误码" class="headerlink" title="Replace Error Code with Exception (以异常取代错误码)"></a>Replace Error Code with Exception (以异常取代错误码)</h4><ul>
 <li>某个函数返回一个特定的代码，用以表示某种错误情况</li>
 <li>改用异常</li>
@@ -981,7 +1004,7 @@
 <h2 id="重构，复用与现实"><a href="#重构，复用与现实" class="headerlink" title="重构，复用与现实"></a>重构，复用与现实</h2><p>大约是一些重构在实际使用时的注意事项，比较碎而且涉及一些和甲方、上司的交涉之类的现实情况，目前对这一方面没什么理解，所以不整理了。<del>必然不是因为我懒</del></p>
 ]]></content>
         <categories>
-            <category>学习</category>
+            <category>《重构-改善既有代码的设计》</category>
         </categories>
         <tags>
             <tag>JAVA</tag>

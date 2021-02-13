@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Game AI Pro》寻路算法的优化">
+<meta property="og:url" content="http://yoursite.com/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="tmc&#39;s blogs">
+<meta property="og:description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
+<meta property="og:image" content="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png">
+<meta property="article:published_time" content="2021-02-09T16:35:10.000Z">
+<meta property="article:modified_time" content="2021-02-13T20:01:28.353Z">
+<meta property="article:author" content="tmc">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png">
+
+<link rel="canonical" href="http://yoursite.com/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>《Game AI Pro》寻路算法的优化 | tmc's blogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tmc's blogs</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="tmc">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tmc's blogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Game AI Pro》寻路算法的优化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-10 00:35:10" itemprop="dateCreated datePublished" datetime="2021-02-10T00:35:10+08:00">2021-02-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-14 04:01:28" itemprop="dateModified" datetime="2021-02-14T04:01:28+08:00">2021-02-14</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E3%80%8AGame-AI-Pro%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《Game AI Pro》</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关于《Game AI Pro》 Pathfinding Architecture Optimizations<br>的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了<br><a id="more"></a></p>
+<h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
+<h3 id="更好的搜索空间描述"><a href="#更好的搜索空间描述" class="headerlink" title="更好的搜索空间描述"></a>更好的搜索空间描述</h3><p>常见的三种描述是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述"><br>但是在大型游戏中，简单地使用这些描述方式并不能解决问题。常用的方法是分层寻路，例如在不需要精细寻路的高层次中采用路点或导航网格描述，低层次中使用方格。当存储空间不足以使用上述的$Floyd$查找表时便可以采取这一思路。其在英雄连、龙腾世纪：起源等游戏中被采用。</p>
+<h3 id="预分配所有重要的存储空间"><a href="#预分配所有重要的存储空间" class="headerlink" title="预分配所有重要的存储空间"></a>预分配所有重要的存储空间</h3><p>在搜索过程中分配存储空间会导致效率数量级级别的下降。所以应当使用内存池预分配搜索所需的空间。</p>
+<h3 id="高估启发因子"><a href="#高估启发因子" class="headerlink" title="高估启发因子"></a>高估启发因子</h3><p>$\mathrm{A*}$作为具有<strong>可采纳性</strong>(admissible) 的寻路算法，其对于当前节点到目标的距离估算需不高于实际的距离。不过在实际项目中，你可以通过适当地高估启发因子舍弃部分可采纳性以换取巨大的速度提升。在传统寻路领域中，这听起来简直离经叛道，但在电子游戏领域，这是一种可行的权衡。<br>为了理解具体的高估方式，我们来看传统的$\mathrm{A*}$开销计算函数<br>\begin{equation}<br>f(x)=g(x)+h(x)<br>\end{equation}<br>对启发因子进行加权后形式如下<br>\begin{equation}<br>f(x)=g(x)+h(x)\times weight<br>\end{equation}<br>通过调整权重$weight$，即可得到不同的$\mathrm{A*}$形式。如果权重为0，退化为$Dijkstra$算法，开销估计仅由之前的累计消耗决定。如果权重为1，即为经典的$\mathrm{A*}$算法。如果权重大于1，则算法向贪婪最佳优先算法(Greedy  Best-First search)靠近。<br>在实际操作中，我们可以将权重在1.1到1.5之间调整，这取决于你的地图形式。如果你的地图较为复杂，充斥着随机障碍与回溯，这种方法对可采纳性的破坏则较为严重；如果你的地图较为简单，增大权重将极大地增加寻路算法靠近终点的速度。虽然这一方法有一定风险，也不失为值得探索的思路。</p>
+<h3 id="更好的启发因子"><a href="#更好的启发因子" class="headerlink" title="更好的启发因子"></a>更好的启发因子</h3><p>对于一个能8方向移动的方格地图而言，常见的启发因子有以下三种</p>
+<ul>
+<li>欧氏距离 Euclidean distance 通常会低估实际消耗</li>
+<li>曼哈顿距离 Manhattan distance 通常会高估实际消耗</li>
+<li>八分距离 octile distance 对于此类地图是较优的启发因子，允许45度和90度的转弯，计算方式为$max(Δx, Δy) + 0.41 · min(Δx, Δy)$ </li>
+</ul>
+<h3 id="开放队列排序"><a href="#开放队列排序" class="headerlink" title="开放队列排序"></a>开放队列排序</h3><ul>
+<li>常见的存储开放队列的方式是堆，但是由于新加入的节点经常被立刻删除，可以在删除前先缓存新节点。</li>
+<li>还可以避免显式排序。在某些地图中，独一无二的f会比较少，这种情况可以改为维护f的列表而非节点的列表</li>
+<li>在一些搜索中，开放列表中只有10到30个节点，这时直接使用数组存储开放列表可能较为简单  </li>
+</ul>
+<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的$JPS$跳点算法</p>
+<h3 id="缓存后继任务"><a href="#缓存后继任务" class="headerlink" title="缓存后继任务"></a>缓存后继任务</h3><p>$\mathrm{A*}$算法需要频繁地考察相邻的节点，故直接将相邻节点存储起来而非在复杂的数据结构中遍历也能提高速度，当然这会导致更大的空间消耗。</p>
+<h3 id="寻路中的坏主意"><a href="#寻路中的坏主意" class="headerlink" title="寻路中的坏主意"></a>寻路中的坏主意</h3><h4 id="同时搜索"><a href="#同时搜索" class="headerlink" title="同时搜索"></a>同时搜索</h4><p>尽量避免同时开始多次搜索。因为$\mathrm{A*}$算法需要开辟较大的空间，同时进行多个搜索会导致极大的空间消耗。如果我们发现搜索的速度确实差距较大，可以分两个通道分别处理一般的寻路和较慢的寻路。</p>
+<h4 id="双向寻路"><a href="#双向寻路" class="headerlink" title="双向寻路"></a>双向寻路</h4><p>一般而言，当有大陆-岛屿存在时，双向寻路可以通过快速遍历岛屿上的节点迅速判断出发点和目标之间的不可达关系，而$\mathrm{A*}$需要遍历大陆中的节点得出同样的结论。但这并非使用双向寻路的理由，解决这个问题可以通过分层寻路，在宏观上先判断可达性，再使用$\mathrm{A*}$得到具体路径。<br>当然，抛开岛屿问题，双向寻路对于$\mathrm{A*}$也徒劳无功。所以，不要在$\mathrm{A*}$中使用双向寻路。</p>
+<h4 id="缓存失败的寻路结果"><a href="#缓存失败的寻路结果" class="headerlink" title="缓存失败的寻路结果"></a>缓存失败的寻路结果</h4><p>在某些算法中，缓存中间结果可以减少重复计算，但在$\mathrm{A*}$中并不适用，因为有太多不同的路径，存储中间结果对于空间的消耗过大。</p>
+<h3 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h3><p>以上即为一些常用的$\mathrm{A*}$算法优化方式，希望能给读者一些启发。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/AI/" rel="tag"><i class="fa fa-tag"></i> AI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AGAP%E3%80%8B%E9%AB%98%E6%96%AF%E9%9A%8F%E6%9C%BA%E3%80%81%E8%BF%87%E6%BB%A4%E9%9A%8F%E6%9C%BA%E4%B8%8E%E6%9F%8F%E6%9E%97%E5%99%AA%E5%A3%B0/" rel="prev" title="《Game AI Pro》 高斯随机、过滤随机与柏林噪声">
+      <i class="fa fa-chevron-left"></i> 《Game AI Pro》 高斯随机、过滤随机与柏林噪声
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用查找表构造高质量的启发因子"><span class="nav-number">1.</span> <span class="nav-text">使用查找表构造高质量的启发因子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更好的搜索空间描述"><span class="nav-number">2.</span> <span class="nav-text">更好的搜索空间描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预分配所有重要的存储空间"><span class="nav-number">3.</span> <span class="nav-text">预分配所有重要的存储空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高估启发因子"><span class="nav-number">4.</span> <span class="nav-text">高估启发因子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更好的启发因子"><span class="nav-number">5.</span> <span class="nav-text">更好的启发因子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#开放队列排序"><span class="nav-number">6.</span> <span class="nav-text">开放队列排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#避免寻路中的回溯"><span class="nav-number">7.</span> <span class="nav-text">避免寻路中的回溯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存后继任务"><span class="nav-number">8.</span> <span class="nav-text">缓存后继任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#寻路中的坏主意"><span class="nav-number">9.</span> <span class="nav-text">寻路中的坏主意</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#同时搜索"><span class="nav-number">9.1.</span> <span class="nav-text">同时搜索</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#双向寻路"><span class="nav-number">9.2.</span> <span class="nav-text">双向寻路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缓存失败的寻路结果"><span class="nav-number">9.3.</span> <span class="nav-text">缓存失败的寻路结果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结语"><span class="nav-number">10.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="tmc"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">tmc</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/tmc0210" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tmc0210" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:494521535@qq.com" title="E-Mail → mailto:494521535@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.holdice.club/" title="https:&#x2F;&#x2F;blog.holdice.club&#x2F;" rel="noopener" target="_blank">holdice's blogs</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://shiraha.cn/" title="https:&#x2F;&#x2F;shiraha.cn&#x2F;" rel="noopener" target="_blank">七海の参考書</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/qq_39119496/article/details/103372437" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_39119496&#x2F;article&#x2F;details&#x2F;103372437" rel="noopener" target="_blank">Ashmore</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=1&id=3190522&auto=0&height=32"></iframe>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tmc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -23,17 +23,17 @@
   <meta name="description" content="关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《重构-改善既有代码的设计》学习笔记（二）">
-<meta property="og:url" content="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:url" content="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
 <meta property="og:site_name" content="tmc&#39;s blogs">
 <meta property="og:description" content="关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。">
 <meta property="article:published_time" content="2020-05-12T19:17:26.000Z">
-<meta property="article:modified_time" content="2020-07-07T19:29:46.564Z">
+<meta property="article:modified_time" content="2020-07-09T18:05:18.966Z">
 <meta property="article:author" content="tmc">
 <meta property="article:tag" content="JAVA">
 <meta property="article:tag" content="重构">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
+<link rel="canonical" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
 
 <script id="page-configurations">
@@ -184,7 +184,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -214,7 +214,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-08 03:29:46" itemprop="dateModified" datetime="2020-07-08T03:29:46+08:00">2020-07-08</time>
+                <time title="修改时间：2020-07-10 02:05:18" itemprop="dateModified" datetime="2020-07-10T02:05:18+08:00">2020-07-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -222,7 +222,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                  <a href="/categories/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《重构-改善既有代码的设计》</span></a>
                 </span>
             </span>
 
@@ -237,17 +237,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。</p>
-<a id="more"></a>
-
+        <p>关于《重构-改善既有代码的设计》第一版的学习笔记。本节主要是书中的重构列表也即具体重构方法。因内容较多,仅简单记录名称、解释和一些值得注意的细节以供查阅。<br><a id="more"></a></p>
 <h2 id="重构列表"><a href="#重构列表" class="headerlink" title="重构列表"></a>重构列表</h2><h3 id="重新组织函数"><a href="#重新组织函数" class="headerlink" title="重新组织函数"></a>重新组织函数</h3><h4 id="Extract-Method-提炼函数"><a href="#Extract-Method-提炼函数" class="headerlink" title="Extract Method (提炼函数)"></a>Extract Method (提炼函数)</h4><ul>
 <li>你有一段代码可以被组织在一起并独立出来  </li>
 <li>将这段代码放进一个独立函数中，并让函数名称解释该函数的用途  </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; print details</span><br><span class="line">    System.out.println(&quot;name:&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + _amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">void printOwing(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    printBanner();</span><br><span class="line">    printDetails(amount);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void printDetails(double amount)</span><br><span class="line">&#123;</span><br><span class="line">    System.out.println(&quot;name&quot; + _name);</span><br><span class="line">    System.out.println(&quot;amount&quot; + amount);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>注意目标代码中的局部变量。如果需要对局部变量进行再次赋值并使用，提炼出的函数可以使用参数以及返回值。</p>
 <h4 id="Inline-Method-内联函数"><a href="#Inline-Method-内联函数" class="headerlink" title="Inline Method (内联函数)"></a>Inline Method (内联函数)</h4><ul>
 <li>一个函数的本体和名称同样清楚易懂  </li>
@@ -265,7 +261,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">double basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">    if (basePrice &gt; 1000)</span><br><span class="line">        return basePrice * 0.95;</span><br><span class="line">    else</span><br><span class="line">        return basePrice * 0.95</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if (basePrice() &gt; 1000)</span><br><span class="line">    return basePrice() * 0.95;</span><br><span class="line">else</span><br><span class="line">    return basePrice() * 0.95</span><br><span class="line">...</span><br><span class="line">double basePrice()</span><br><span class="line">&#123;</span><br><span class="line">    return _quantity * _itemPrice;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>也就是让一个函数中的表达式计算可以被其他函数使用。通常是 Extra Method 前的步骤。运用此手法可能会产生性能问题，但是通常可以忽略不计，或是可以在性能优化阶段解决。</p>
 <h4 id="Introduce-Explaining-Variable-引入解释性变量"><a href="#Introduce-Explaining-Variable-引入解释性变量" class="headerlink" title="Introduce Explaining Variable (引入解释性变量)"></a>Introduce Explaining Variable (引入解释性变量)</h4><ul>
 <li>你有一个复杂的表达式</li>
@@ -281,9 +276,7 @@
 <li>代码对一个参数进行赋值</li>
 <li>以一个临时变量取代该参数的位置</li>
 </ul>
-<p>以下为一段java代码(采用按值传递)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void aMethod(Object foo)</span><br><span class="line">&#123;</span><br><span class="line">    foo.modifyInSomeWay;    &#x2F;&#x2F;可</span><br><span class="line">    foo &#x3D; anotherObject;    &#x2F;&#x2F;不可</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这导致混用按值传递和按引用传递，降低代码清晰度。</p>
+<p>以下为一段java代码(采用按值传递)<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">void aMethod(Object foo)</span><br><span class="line">&#123;</span><br><span class="line">    foo.modifyInSomeWay;    &#x2F;&#x2F;可</span><br><span class="line">    foo &#x3D; anotherObject;    &#x2F;&#x2F;不可</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这导致混用按值传递和按引用传递，降低代码清晰度。</p>
 <h4 id="Replace-Method-with-Method-Object-以函数对象取代函数"><a href="#Replace-Method-with-Method-Object-以函数对象取代函数" class="headerlink" title="Replace Method with Method Object (以函数对象取代函数)"></a>Replace Method with Method Object (以函数对象取代函数)</h4><ul>
 <li>你有一个大型函数，其中对局部变量的引用使你无法采用 Extract Method</li>
 <li>将这个函数放进一个单独对象中，如此一来局部对象就成了对象内的字段。然后你可以在同一个对象中将这个大型函数分解为多个小型函数。</li>
@@ -326,7 +319,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Date newStart &#x3D; new Date(previousEnd.getYear(),previousEnd.getMonth(),previousEnd.getDate() + 1);</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Date newStart &#x3D; nextDay(previousEnd)</span><br></pre></td></tr></table></figure>
-
 <p>正在使用一个类时，如果你需要一项服务而类无法供应，此时如果你能修改源码，可以自行添加一个新函数，如果不能，就要在客户端编码，补足所需的函数。明确信号是这个函数本应在服务类中实现，如果有可能，这些函数仍然应该放回到服务类。</p>
 <h4 id="Introduce-Local-Extension-引入本地扩展"><a href="#Introduce-Local-Extension-引入本地扩展" class="headerlink" title="Introduce Local Extension (引入本地扩展)"></a>Introduce Local Extension (引入本地扩展)</h4><ul>
 <li>你需要为服务类提供一些额外函数，但你无法修改这个类</li>
@@ -407,11 +399,9 @@
 <h4 id="Consolidate-Conditional-Expression-合并条件表达式"><a href="#Consolidate-Conditional-Expression-合并条件表达式" class="headerlink" title="Consolidate Conditional Expression (合并条件表达式)"></a>Consolidate Conditional Expression (合并条件表达式)</h4><ul>
 <li>你有一系列条件测试，都得到相同结果</li>
 <li>将这些测试合并为一个条件表达式，并将这个条件式提炼成为一个独立函数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_seniority &lt; 2) return 0;</span><br><span class="line">    if (_monthsDisabled &lt; 12) return 0;</span><br><span class="line">    if (_isPartTime) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">double disabilityAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (isNotEligableForDisability()) return 0;</span><br><span class="line">    &#x2F;&#x2F;...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h4 id="Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段"><a href="#Consolidate-Duplicate-Conditional-Fragments-合并重复的条件片段" class="headerlink" title="Consolidate Duplicate Conditional Fragments (合并重复的条件片段)"></a>Consolidate Duplicate Conditional Fragments (合并重复的条件片段)</h4><ul>
 <li>在条件表达式的每个分支上有着相同的一段代码</li>
 <li>将这段重复代码搬移到条件表达式之外</li>
@@ -419,17 +409,14 @@
 <h4 id="Remove-Control-Flag-移除控制标记"><a href="#Remove-Control-Flag-移除控制标记" class="headerlink" title="Remove Control Flag (移除控制标记)"></a>Remove Control Flag (移除控制标记)</h4><ul>
 <li>在一系列布尔表达式中，某个变量带有”控制标记”(control flag)的作用</li>
 <li>以 break 语句或 return 语句取代控制标记<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">void checkSecurity(String people)</span><br><span class="line">&#123;</span><br><span class="line">    boolean found &#x3D; false;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (!found)</span><br><span class="line">        &#123;</span><br><span class="line">            if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">            if (people(i).equals(&quot;John&quot;))</span><br><span class="line">            &#123;</span><br><span class="line">                sendAlert();</span><br><span class="line">                found &#x3D; true;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">void checkSecurity(String[] people)</span><br><span class="line">&#123;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; people.length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if (people(i).equals(&quot;Don&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">        if (people(i).equals(&quot;John&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            sendAlert();</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>这两段书中示例的代码在同时满足两个条件时的输出是不一致的，不过对于示例中检测两个嫌疑人名字的情形应该不会出现这种情况。<br>如果这里的found同时用于输出结果，可以使用 return 重构</p>
 <h4 id="Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式"><a href="#Replace-Nested-Conditional-with-Guard-Clauses-以卫语句取代嵌套表达式" class="headerlink" title="Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)"></a>Replace Nested Conditional with Guard Clauses (以卫语句取代嵌套表达式)</h4><ul>
 <li>函数中的条件逻辑使人难以看清正常的执行路径</li>
 <li>使用卫语句表现所有特殊情况<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    double result;</span><br><span class="line">    if (_isDead)</span><br><span class="line">    &#123;</span><br><span class="line">        result &#x3D; deadAmount();</span><br><span class="line">    &#125;</span><br><span class="line">    else </span><br><span class="line">    &#123;</span><br><span class="line">        if (_isSeparted) </span><br><span class="line">        &#123;</span><br><span class="line">            result &#x3D; separatedAmount();</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            if (_isRetired) result &#x3D; retiredAmount();</span><br><span class="line">            else result &#x3D; normalPayAmount();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">double getPayAmount()</span><br><span class="line">&#123;</span><br><span class="line">    if (_isDead) return deadAmount();</span><br><span class="line">    if (_isSeparated) return separatedAmount();</span><br><span class="line">    if (_isRetired) return retiredAmount();</span><br><span class="line">    return normalPayAmount();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <p>条件表达式通常有两种表现形式，一种是所有分支都是正常行为，另一种是只有一种是正常行为，其他都是特殊情况。<br>对于第一种就应该使用if-else语句，而对于第二种就应当使用卫语句。卫语句通常从函数中返回或抛异常。</p>
@@ -446,7 +433,6 @@
 <li>某一段代码需要对程序状态做出某种假设</li>
 <li>以断言明确表现这种假设<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    &#x2F;&#x2F; should have either expense limit or a primary project</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">double getExpenseLimit()</span><br><span class="line">&#123;</span><br><span class="line">    Assert.isTure(_expenseLimit !&#x3D; NULL_EXPENSE || _primaryProject !&#x3D; null)</span><br><span class="line">    return (_expenseLimit !&#x3D; NULL_EXPENSE) ?</span><br><span class="line">        _expenseLimit:</span><br><span class="line">        _primaryProject.getMemberExpenseLimit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 </li>
 </ul>
 <h3 id="简化函数调用"><a href="#简化函数调用" class="headerlink" title="简化函数调用"></a>简化函数调用</h3><h4 id="Rename-Method-函数改名"><a href="#Rename-Method-函数改名" class="headerlink" title="Rename Method (函数改名)"></a>Rename Method (函数改名)</h4><ul>
@@ -485,7 +471,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">discountLevel &#x3D; getDiscountLevel();</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice,discountLevel);</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">int basePrice &#x3D; _quantity * _itemPrice;</span><br><span class="line">double finalPrice &#x3D; discountedPrice(basePrice);</span><br></pre></td></tr></table></figure>
-
 <h4 id="Introduce-Parameter-Object-引入参数对象"><a href="#Introduce-Parameter-Object-引入参数对象" class="headerlink" title="Introduce Parameter Object (引入参数对象)"></a>Introduce Parameter Object (引入参数对象)</h4><ul>
 <li>某些参数总是很自然地同时出现</li>
 <li>以一个对象取代这些参数</li>
@@ -509,7 +494,6 @@
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object lastReading()</span><br><span class="line">&#123;</span><br><span class="line">    return readings.lastElement();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object lastReading()</span><br><span class="line">&#123;</span><br><span class="line">    return (Reading) reading.lastElment();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <h4 id="Replace-Error-Code-with-Exception-以异常取代错误码"><a href="#Replace-Error-Code-with-Exception-以异常取代错误码" class="headerlink" title="Replace Error Code with Exception (以异常取代错误码)"></a>Replace Error Code with Exception (以异常取代错误码)</h4><ul>
 <li>某个函数返回一个特定的代码，用以表示某种错误情况</li>
 <li>改用异常</li>
@@ -599,7 +583,7 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/%E3%80%8A%E9%87%8D%E6%9E%84-%E6%94%B9%E5%96%84%E6%97%A2%E6%9C%89%E4%BB%A3%E7%A0%81%E7%9A%84%E8%AE%BE%E8%AE%A1%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="《重构-改善既有代码的设计》学习笔记 (一)">
+    <a href="/%E3%80%8A%E9%87%8D%E6%9E%84%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="《重构-改善既有代码的设计》学习笔记 (一)">
       <i class="fa fa-chevron-left"></i> 《重构-改善既有代码的设计》学习笔记 (一)
     </a></div>
       <div class="post-nav-item">
@@ -681,13 +665,13 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
@@ -742,7 +726,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
@@ -804,6 +788,8 @@
 
 
 
+
+  
 
   
 
