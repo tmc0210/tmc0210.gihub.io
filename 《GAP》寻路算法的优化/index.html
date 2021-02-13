@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
+  <meta name="description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations 的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
 <meta property="og:type" content="article">
 <meta property="og:title" content="《Game AI Pro》寻路算法的优化">
 <meta property="og:url" content="http://yoursite.com/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/index.html">
 <meta property="og:site_name" content="tmc&#39;s blogs">
-<meta property="og:description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
+<meta property="og:description" content="关于《Game AI Pro》 Pathfinding Architecture Optimizations 的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了">
 <meta property="og:image" content="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png">
 <meta property="article:published_time" content="2021-02-09T16:35:10.000Z">
-<meta property="article:modified_time" content="2021-02-13T20:01:28.353Z">
+<meta property="article:modified_time" content="2021-02-13T20:05:20.731Z">
 <meta property="article:author" content="tmc">
 <meta property="article:tag" content="AI">
 <meta name="twitter:card" content="summary">
@@ -215,7 +215,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-02-14 04:01:28" itemprop="dateModified" datetime="2021-02-14T04:01:28+08:00">2021-02-14</time>
+                <time title="修改时间：2021-02-14 04:05:20" itemprop="dateModified" datetime="2021-02-14T04:05:20+08:00">2021-02-14</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -238,7 +238,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>关于《Game AI Pro》 Pathfinding Architecture Optimizations<br>的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了<br><a id="more"></a></p>
+        <p>关于《Game AI Pro》 Pathfinding Architecture Optimizations 的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化。（之前的章节懒得补了<br><a id="more"></a></p>
 <h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
 <h3 id="更好的搜索空间描述"><a href="#更好的搜索空间描述" class="headerlink" title="更好的搜索空间描述"></a>更好的搜索空间描述</h3><p>常见的三种描述是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述"><br>但是在大型游戏中，简单地使用这些描述方式并不能解决问题。常用的方法是分层寻路，例如在不需要精细寻路的高层次中采用路点或导航网格描述，低层次中使用方格。当存储空间不足以使用上述的$Floyd$查找表时便可以采取这一思路。其在英雄连、龙腾世纪：起源等游戏中被采用。</p>
 <h3 id="预分配所有重要的存储空间"><a href="#预分配所有重要的存储空间" class="headerlink" title="预分配所有重要的存储空间"></a>预分配所有重要的存储空间</h3><p>在搜索过程中分配存储空间会导致效率数量级级别的下降。所以应当使用内存池预分配搜索所需的空间。</p>
@@ -254,7 +254,7 @@
 <li>还可以避免显式排序。在某些地图中，独一无二的f会比较少，这种情况可以改为维护f的列表而非节点的列表</li>
 <li>在一些搜索中，开放列表中只有10到30个节点，这时直接使用数组存储开放列表可能较为简单  </li>
 </ul>
-<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的$JPS$跳点算法</p>
+<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的JPS跳点算法</p>
 <h3 id="缓存后继任务"><a href="#缓存后继任务" class="headerlink" title="缓存后继任务"></a>缓存后继任务</h3><p>$\mathrm{A*}$算法需要频繁地考察相邻的节点，故直接将相邻节点存储起来而非在复杂的数据结构中遍历也能提高速度，当然这会导致更大的空间消耗。</p>
 <h3 id="寻路中的坏主意"><a href="#寻路中的坏主意" class="headerlink" title="寻路中的坏主意"></a>寻路中的坏主意</h3><h4 id="同时搜索"><a href="#同时搜索" class="headerlink" title="同时搜索"></a>同时搜索</h4><p>尽量避免同时开始多次搜索。因为$\mathrm{A*}$算法需要开辟较大的空间，同时进行多个搜索会导致极大的空间消耗。如果我们发现搜索的速度确实差距较大，可以分两个通道分别处理一般的寻路和较慢的寻路。</p>
 <h4 id="双向寻路"><a href="#双向寻路" class="headerlink" title="双向寻路"></a>双向寻路</h4><p>一般而言，当有大陆-岛屿存在时，双向寻路可以通过快速遍历岛屿上的节点迅速判断出发点和目标之间的不可达关系，而$\mathrm{A*}$需要遍历大陆中的节点得出同样的结论。但这并非使用双向寻路的理由，解决这个问题可以通过分层寻路，在宏观上先判断可达性，再使用$\mathrm{A*}$得到具体路径。<br>当然，抛开岛屿问题，双向寻路对于$\mathrm{A*}$也徒劳无功。所以，不要在$\mathrm{A*}$中使用双向寻路。</p>
