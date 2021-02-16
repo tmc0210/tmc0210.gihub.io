@@ -418,10 +418,10 @@
     <entry>
         <title>《Game AI Pro》寻路算法的优化</title>
         <url>/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/</url>
-        <content><![CDATA[<p>关于《Game AI Pro》 Pathfinding Architecture Optimizations 的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化，需要读者对$\mathrm{A*}$算法有基本的了解。（之前的章节懒得补了<br><a id="more"></a></p>
+        <content><![CDATA[<p>关于《Game AI Pro》 Pathfinding Architecture Optimizations和 Choosing a Search Space Representation的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化以及搜索空间表示的选择，需要读者对$\mathrm{A*}$算法有基本的了解。（之前的章节懒得补博客了<br><a id="more"></a></p>
 <h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
-<h3 id="更好的搜索空间表示"><a href="#更好的搜索空间表示" class="headerlink" title="更好的搜索空间表示"></a>更好的搜索空间表示</h3><p>常见的三种描述是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述">  </p>
-<p>以下为几种搜索空间表示的优劣对比。</p>
+<h3 id="更好的搜索空间表示"><a href="#更好的搜索空间表示" class="headerlink" title="更好的搜索空间表示"></a>更好的搜索空间表示</h3><p>常见的三种表示是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述">  </p>
+<p>其思路不再赘述，以下为几种搜索空间表示的优劣对比。</p>
 <h4 id="Grid"><a href="#Grid" class="headerlink" title="Grid"></a>Grid</h4><ul>
 <li>优点  <ul>
 <li>简单，易于实现</li>
