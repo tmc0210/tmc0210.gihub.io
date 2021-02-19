@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
     <entry>
+        <title>《Game AI Pro》使用迭代波前边扩展构建高层次导航网格</title>
+        <url>/%E3%80%8AGAP%E3%80%8B%E4%BD%BF%E7%94%A8%E8%BF%AD%E4%BB%A3%E6%B3%A2%E5%89%8D%E8%BE%B9%E7%BC%98%E6%89%A9%E5%B1%95%E6%9E%84%E5%BB%BA%E9%AB%98%E5%B1%82%E6%AC%A1%E5%AF%BC%E8%88%AA%E7%BD%91%E6%A0%BC/</url>
+        <content><![CDATA[<p>关于《Game AI Pro》 Creating High-Order Navigation Meshes through Iterative Wavefront Edge Expansions 的学习笔记。主要涉及使用迭代波前边扩展<del>我也不知道怎么翻译</del>构建navmesh。<br><a id="more"></a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>传统上，导航网格是由人工创建的，或者使用某种形式的自动空间分解算法。这些算法检查环境中存在的障碍物，然后将它们之间的区域分解为尽可能少的区域。遗憾的是，为游戏环境创建一个具有最佳（绝对最小）区域数量的分解是NP的。这意味着并没有最好的技术。  </p>
+<h3 id="三角分解方法"><a href="#三角分解方法" class="headerlink" title="三角分解方法"></a>三角分解方法</h3><p>当然，有许多种方法正在被尝试与改进。最经典的方法通常从某种形式的环境三角测量开始，然后试图通过组合这些三角形来最小化环境中存在的区域数量。<br>这种方法的问题在于，在导航网格中保留的三角形会给角色在许多三角形的公共顶点上的区域的导航带来问题。一个角色难以得知他们在汇合点上站在哪个区域。而这些汇合点在复杂的环境中经常出现，这就导致了各种各样的问题。  </p>
+<h3 id="基于增长的方法"><a href="#基于增长的方法" class="headerlink" title="基于增长的方法"></a>基于增长的方法</h3><p>三角分解方法的替代方法是基于生长的方法，它将有助于最小化角色的localization问题。在作者之前的工作中，他们已经提出了基于生长的二维(PASFV)和三维(VASFV)空间分解定位算法，它的灵感来自于空间填充体积算法。虽然这些方法确实能生成高质量的导航网格，但在大型环境中执行时可能会很慢。这是因为这些算法要执行许多不必要的碰撞测试，因为它们必须验证每个生长区域在每个生长步骤中没有侵入另一个区域或障碍物。绝大多数时候，这种测试会返回一个否定的结果。这种不必要的测试是传统的基于生长的算法中顺序迭代扩展的结果。  </p>
+<h3 id="波前算法"><a href="#波前算法" class="headerlink" title="波前算法"></a>波前算法</h3><p>于是作者开发了<strong>迭代波前边扩展单元分解</strong>（为简洁起见，简称<strong>波前</strong>）算法，通过减少碰撞测试和迭代增长来解决之前技术中的问题。该算法的工作原理是扫描放置在世界中的每个区域可见的世界几何体，并确定可能发生碰撞的地方。通过强制我们的区域直接扩展到这些位置，我们消除了大量的碰撞测试。这改变了基于生长的算法的运行时间度量，使其随着世界的复杂性（障碍物的数量）而增加，而不是随着世界的面积而增加。这种技术不仅比现有的基于生长的技术快，而且产生的导航网格通过提供高阶多边形/多面体几何区域，保留了PASFV和VASFV算法所表现出的高网格质量。接下来我们来看这一算法的具体实现思路。  </p>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>大致步骤如下</p>
+<ol>
+<li>将单位大小的潜在区域（种子）放入世界中  </li>
+<li>随机选择其中一个区域，从这个区域的角度分析世界中存在的障碍物  </li>
+<li>所选区域进入加速扩张阶段。扩张的方向是算法第二步中分析发现的障碍物。对每个区域重复算法的第二步和第三步；这将使每个区域扩展到它们的最大可能尺寸。  </li>
+<li>新的种子被放置到与刚刚创建的区域相邻的任何可遍历空间中，算法返回到第二步，让这些新的区域扩张。如果无法放置新的种子，算法就会终止。 </li>
+</ol>
+<p>以下为步骤的详细介绍</p>
+<h3 id="初始播种"><a href="#初始播种" class="headerlink" title="初始播种"></a>初始播种</h3><p>传统上，基于增长的算法首先使用基于网格的模式将初始单位大小的区域放入世界中。然后，这些方法迭代地给每个区域提供机会，使其沿着该区域的每个边的法线方向向外生长和扩展。<br>当我们在初始播种阶段使用波前算法时，我们会使用播种算法生成一个潜在的种子点列表，将潜在的种子放在每一个障碍物边旁边。与简单的网格播种相比，在放置更少的种子的同时有更好的整体覆盖率。然后，我们随机选择其中一个种子点作为我们的初始区域。其他潜在的种子点将被保留在以后的播种队列中，但只有当它们仍然在未被某一区域占用的可达空间中时才会被使用。如果在以后的播种阶段，这个列表是空的，我们将尝试通过寻找与我们放置的区域相邻的无人认领的可达空间来重新填充它。如果在这之后这个列表仍然是空的，那么波前算法将终止。  </p>
+<h3 id="边分类"><a href="#边分类" class="headerlink" title="边分类"></a>边分类</h3><p>在生成种子区域后，我们进入波前算法的边分类步骤。接下来的这两步是该算法中计算量最大的步骤，我们只希望在我们知道要扩展的有效区域上执行。因此，我们每次只扩展一个区域，并舍弃被之前扩展所覆盖的空间中的种子。在这一步骤中，我们会遍历存在于世界中的障碍物的每一条边，以及存在于我们已经放置到环境中的区域中的所有边。然后，我们舍弃所有法向远离区域目标种子点的障碍物边，因为这些边是背向种子区域的，不能与种子区域交互。然后，我们根据这些边与目标区域位置相比的相对空间位置（+x、-x、+y、-y、+z、-z）将其分类。跨越多个类别的边被放置在第一个适用的类别中，这取决于算法实现中使用的评估顺序。作者的参考实现使用以下排序+y、-y、+x、-x、+z和-z。当然，任何排序都可以完成算法。<br>一旦这些障碍物边被排序，我们就会定位所有潜在的事件点。我们的区域中法线与排序分类相匹配的边被称为<strong>分类边</strong>。通过比较我们的每个障碍物边与适当的分类边的斜率，我们可以预先确定扩大的区域将如何与障碍物互动。这可以通过思考一个从初始种子点绘制的径向半平面扫描来可视化。这条扫描线将报告它发现的边的方向以及边上最接近初始种子点的点。这些被占用空间的边和我们刚刚放置的区域边之间的相互作用可以简化为一系列的情况。<br><img src="https://i.loli.net/2021/02/19/a8FzHqyimr2SV76.png" alt="情况1"><br>其中第一种情况是，障碍物边与分类边平行，如上图所示。在这种情况下，我们希望扩张分类边，使其与目标边平齐。我们通过考察边上离我们正在评估的区域的初始种子点最近的点来实现这一操作。我们会将这个点以及从它到区域初始种子点的距离作为一个<strong>事件</strong>记录下来。同时，由于我们所有已完成扩张的种子区域和正在扩展的区域都只暴露出轴对齐的边，因此任何涉及已被占用的可达空间的情况都属于这一类。<br><img src="https://i.loli.net/2021/02/19/3AqpLCGJeXZiYfu.png" alt="情况2"><br>如上图所示，当分类边将与障碍物的一个角相遇时，就会出现一种稍微复杂的情况。在这种情况下，我们只能平行地扩展区域使这个角的顶点位于分类边上。我们不能改变分类边的斜率，因为这将可能覆盖到之前已完成的种子区域扩张占用的可达空间，这将违反被某一区域占用的空间必须始终保持被该区域占用这一原则。这种情况同样会存储被评估边上最近的顶点的位置以及该顶点到区域初始种子点的距离。<br><img src="https://i.loli.net/2021/02/19/iUxqoMIrWLyNPfc.png" alt="情况3"><br>接下来这种情况更为复杂，它可能会导致在扩大的区域中增加新的边。如上图所示，最近的障碍边中间的某点与扫描线相交。这是一种<strong>边分割</strong>的情况，为了计算这种分割应该发生在哪里，我们要找到正在被考虑的障碍物边上最接近区域初始种子点的点。然后，这个点和这个点与区域的初始种子点之间的距离一起被存储为事件点。此外，我们希望存储被考虑的边的两个端点（假设最近的点不是端点），这样我们将能为这个区域增加一条与交点到某一端点长度相同的新边。然而，我们将不计算这些端点与初始种子点之间的距离，而是将它们视为一种只比事件点离初始种子点稍远一些的特殊情况。这将防止这些点在过程中干扰其他计算。<br><img src="https://i.loli.net/2021/02/19/3pdqu8k5xTbtBgn.png" alt="情况4"><br>上图中可以看到一个更复杂的情况，有多个边分割事件。这样的事件应该根据扩张区域的初始种子点的距离来依次处理，通过考虑这些端点的距离，我们将确保区域在处理该点时，尽量将其中间的所有空间完全包含在内。<br>此时，我们已经有了一个潜在事件的集合，从而让我们的新区域向着这个空间扩展。但是，在开始扩展之前，我们需要做两件事。首先，如果世界的边界被定义为一些边界条件，而非不可达的空间，则需要插入事件以允许每个区域向外扩展到世界的边界。同时这个列表需要根据每个事件与区域的初始种子点之间的距离进行排序。从而先处理距离较近、更有可能到达的事件，因为更远的事件往往因为存在更直接的障碍物而无法到达。</p>
+<h3 id="边扩展"><a href="#边扩展" class="headerlink" title="边扩展"></a>边扩展</h3><p>有了某个区域的完整潜在事件列表，我们就可以进入波前算法的扩展阶段。首先，选择第一个（最接近的）未处理的扩展事件，并从潜在事件列表中删除。然后计算区域边必须移动的距离，以便它们到达这个扩展事件点。这是通过计算两个（三维中的三个）最接近的边的当前位置和目标扩展位置之间的距离来完成的。这个结果会被分解成几个分量（x, y, z），如果这些值是正数，边将直接扩张到事件点。扩张应该随着每个边迭代地向外移动而发生。所有的边都移动了之后，就可以执行碰撞和无效扩展的检查。之所以会发生这种情况，是因为有一些分割事件，如果只执行一半的事件（即允许一条边而不是两条边扩展），可能会出现各种问题。<br>区域完成扩展时，我们必须处理任何与其他区域或障碍物的碰撞。任何与障碍物碰撞的扩展区域的顶点处需要插入一条新的边来将该区域转换为一个高阶多边形/多面体。为了构造这个新边，我们可以取障碍边的相反法线，并将这个新边约束在障碍边的外延上。由于扩展事件是孤立计算的，并没有考虑其他区域，因此有可能发生碰撞，此时区域将不得不从潜在的膨胀事件中收缩。如果发生这种情况，发生碰撞的边应该停止进一步的扩张尝试；然后，算法将选择另一个扩张事件继续处理。重复这一过程，直到没有更多的事件或其所有边因碰撞而停止尝试扩张。</p>
+<h3 id="重新播种"><a href="#重新播种" class="headerlink" title="重新播种"></a>重新播种</h3><p>在所有种子完成扩展后，将按照前面的播种过程放置更多的种子。如果算法进入播种阶段，但无法放置任何新的区域，它就会终止。这样就会产生一个区域集合，即为所需的navimesh。</p>
+<h2 id="后处理步骤"><a href="#后处理步骤" class="headerlink" title="后处理步骤"></a>后处理步骤</h2><p>现有的基于增长的空间分解算法(如PASFV、VASFV和SFV)利用了一个后处理步骤来提高所得导航网格的质量。有时其中两个或更多的区域会成长为一个可以由单个凸区域填充的环境区域。这是同时放置和生长多个种子的自然结果，通常会通过合并区域来纠正。然而，这种组合需要花费时间和精力。波前算法的一个优点是它避免了大部分这种形式的后处理。由于两个区域永远不会同时生长，它们不能同时试图细分同一可达空间的凸形区域，从而产生更好的分解。</p>
+<h2 id="运行时间"><a href="#运行时间" class="headerlink" title="运行时间"></a>运行时间</h2><p>波前算法最坏情况下的运行时间受其执行的环境复杂度的限制，为O(n*m)。其中，n是世界中预设的障碍物的数量，每个障碍物都必须由算法播种的m个区域来评估。这个运行时间可能看起来比现有的基于生长的空间分解算法更差，但这些算法的运行时间会根据世界的大小而增加（由于必须执行额外的生长步骤以填充世界），而波前算法的运行时间只会随着环境的实际复杂程度而增加。一般来说，波前算法的平均运行时间在毫秒到秒的范围内，而相比之下，基于增长的实现的运行时间在几秒到几分钟的范围内。同时，波前算法的内存占用是线性增长的，因为每个新生成的区域只需要在任何给定的时间点上与现有的区域和障碍物进行交互和了解。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><img src="https://i.loli.net/2021/02/19/WQTL3A6wHXuFsPS.png" alt="截屏2021-02-19 上午2.52.29.png"></p>
+<p>以上即为一个波前算法的运行结果。<br>总的来说，波前算法通过基于四边形的扩展算法生成快速、高质量的分解。这种分解有较少的小区域和退化区域（一般是三角形），而这些区域会干扰角色的导航。这种算法通过执行较少的扩展步骤改进了以前基于生长的方法，从而减少了必须执行的碰撞测试的数量。它的运行时间随世界的复杂性而扩展，而不是像现有的基于生长的方法那样随世界的大小而扩展。此外，由于该算法每次只生长一个区域，减少了通常由多个区域竞争填充同一凸区域而引起的后处理。本算法产生的分解与现有流行算法（如Hertel-Melhlorn或梯形单元分解<del>两个奇怪的我没听说也搜不到的算法</del>）产生的分解相比，效果较好。</p>
+]]></content>
+        <categories>
+            <category>《Game AI Pro》</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
         <title>3月营地战棋项目总结</title>
         <url>/3%E6%9C%88%E8%90%A5%E5%9C%B0%E6%88%98%E6%A3%8B%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93/</url>
-        <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。</p>
-<a id="more"></a>
-
+        <content><![CDATA[<p>这是关于我在3月份参与的一个单人卡牌roguelike游戏项目的初期开发相关总结。由于在项目开发流程中,动画,UI等部分主要由另一名合作者完成,所以在本文的内容中,我将主要总结在游戏逻辑相关开发中的一些收获。因为是杂谈性质的文章，应该不会有什么技术细节，仅将一些思路抛砖引玉。如果有时间的话也可以另开博文简单讲讲这次卡牌设计的相关思路或者游戏本身的介绍什么的。游戏的下载可以访问旅法师营地并搜索营地战棋专区。<br><a id="more"></a></p>
 <h3 id="游戏流程概述"><a href="#游戏流程概述" class="headerlink" title="游戏流程概述"></a>游戏流程概述</h3><p>这次项目的玩法大致是炉石冒险+炉石酒馆战棋+炉石竞技场的神奇结合。开局选择英雄并进行若干次竞技场式选牌以确定牌池，之后依次与数个boss进行完整的1v1酒馆战棋战斗。每次战斗失败则游戏结束，胜利则获得一个宝藏并继续挑战。游戏的主体流程实现没有难点，主要难点集中在战棋模式战斗，操作的结算。</p>
 <h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p><em>以下名词解释基于读者对于炉石或类似卡牌游戏有充分了解，如读者对此类卡牌游戏毫无涉猎，接下来的内容可能难以阅读，请出门左转官网下载游戏一起成为无敌的恶魔猎手（此</em></p>
 <p><strong>扳机</strong> : 一张卡牌触发效果的时机，例如:<br>        钴制卫士 3星6/3 机械 每当你召唤一个机械，便获得圣盾<br>        此处 “每当你召唤一个机械”，便是一个召唤时扳机，表示每当玩家召唤一个机械，就会触发场上的钴制卫士的效果，使钴制卫士获得圣盾。游戏中存在大量的其他扳机机制，例如回收机器人的随从死亡时扳机，钢铁武道家的回合结束扳机等。扳机在此次项目中的实现<del>本应</del>是基于观察者模式。每当一个扳机入场便注册为游戏结算事件的观察者，离场时反之。当游戏发生事件时便通知所有的观察者，例如对于钴制卫士，召唤随从时便被通知，判断召唤的是机械后便执行之后的获得圣盾语句。</p>
 <h3 id="技术总结"><a href="#技术总结" class="headerlink" title="技术总结"></a>技术总结</h3><p>接下来的内容是一些技术相关的收获和教训总结</p>
 <h4 id="总体架构"><a href="#总体架构" class="headerlink" title="总体架构"></a>总体架构</h4><p>由于本次项目是和他人合作，我和合作者早期的交流也不很适应，所以框架的设计讨论并不充分，采取的方案可能不是最优解，仅供抛砖引玉。<br>因为在早期分工中制定了一人负责游戏逻辑，一人负责UI与动画的分工，也考虑到项目的实用性及可移植性，采用了模仿web开发的前后端信息交互模式。对于战棋模式中的一场战斗，在战斗开始时战斗过程与结果便由后端即游戏逻辑部分代码计算完毕并将战斗过程按照一定格式传递给前端。前端得到信息后，根据信息让随从互相撞击，播放对应动画等。另一方面，对于玩家的操作，例如选择了随从并购买，则由前端传递给后端进行处理。后端会在玩家手牌中添加该随从并减少对应铸币。当然，后端也会再次返回信息告知前端操作的后续影响，例如将酒馆中的该随从移动到手牌里，或者触发了购买时扳机等。这样的优点自然是降低耦合度，避免逻辑运算和动画处理混杂，同时因为后端代码是纯C#，也可以方便移植至服务器，甚至改造成多人游戏<del>做梦</del>。<br>当然这样也导致了一些问题，比如本次的合作者闲的没事手写UI写了7000行，我完全没能及时阻止。。<br>在后续的开发过程中，这几千行的UI代码大约要被简洁明了的UGUI替代吧。</p>
 <h4 id="卡牌效果的定义"><a href="#卡牌效果的定义" class="headerlink" title="卡牌效果的定义"></a>卡牌效果的定义</h4><p>首先，我们进行一下简单的设想，如果游戏中存在一些有着复杂描述信息的卡牌，简单的实现思路是什么？<br>最容易想到的实现就是定义一个抽象卡牌基类，然后在其中为每个扳机定义抽象方法，在具体卡牌子类中实现。这样做的缺点简直数不胜数。例如如果有200张卡牌，便要写200个不同的卡牌类，简直离谱。作为一个懒惰的程序员，必然不能这样写。<br>稍显高级的思路是使用策略模式，不定义200个卡牌，而是对于每种行为定义策略，在卡牌中通过对策略的引用来实现不同的行为，当然也可以随时更换策略。在这个项目中，我便参考了此思路。使用了委托结合策略模式的思路实现卡牌的复杂效果。   </p>
-<p>我们以上文中的钴制卫士为例，钴制卫士的效果是 召唤时扳机，如果召唤的是机械，就获得圣盾<br>事实上这段描述分为扳机和实际效果两部分，当扳机被通知时，扳机便将扳机得到的一些信息（例如此处的召唤的随从）传递给实际效果，实际效果部分判断这个随从是不是机械，如果是，则使钴制卫士获得圣盾。在理清了这个效果的本质后，一个 扳机-效果 的具体实现也就呼之欲出了。<br>显然，这里的效果事实上是一个委托，它的参数是扳机所要传递的信息（触发扳机的事件也即召唤的随从，扳机的所属者也即钴制卫士），内容则是使扳机的所属者钴制卫士获得圣盾。<br>结合上诉的策略模式思维，我们便可以将委托包装成卡牌的策略，使用枚举表示各种不同的扳机，得到包装后的扳机-委托对来实现复杂的卡牌描述<br>此处为委托对应的函数（已省略无关内容）</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public static bool GainDivineShieldWhenSummonMech(GameEvent gameEvent)</span><br><span class="line">&#123;</span><br><span class="line">    if (gameEvent.targetCard.IsMinionType(MinionType.Mechs))</span><br><span class="line">    &#123;</span><br><span class="line">        gameEvent.hostCard.effectsStay.Add(</span><br><span class="line">        new KeyWordEffect(Keyword.DivineShield));&#x2F;&#x2F;获得圣盾</span><br><span class="line">        return true;            </span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>此处GameEvent为封装的游戏信息传递类，hostCard即钴制卫士，targetCard即召唤的随从<br>当游戏中发生了召唤随从事件时，钴制卫士就会被系统通知，调用上述函数并传入携带该事件具体信息的gameEvent参数，函数执行判断传入的随从是机械后即获得圣盾。<br>所以，只要将扳机与委托相互绑定并挂载在卡牌上，就能实现卡牌的复杂描述。  </p>
+<p>我们以上文中的钴制卫士为例，钴制卫士的效果是 召唤时扳机，如果召唤的是机械，就获得圣盾<br>事实上这段描述分为扳机和实际效果两部分，当扳机被通知时，扳机便将扳机得到的一些信息（例如此处的召唤的随从）传递给实际效果，实际效果部分判断这个随从是不是机械，如果是，则使钴制卫士获得圣盾。在理清了这个效果的本质后，一个 扳机-效果 的具体实现也就呼之欲出了。<br>显然，这里的效果事实上是一个委托，它的参数是扳机所要传递的信息（触发扳机的事件也即召唤的随从，扳机的所属者也即钴制卫士），内容则是使扳机的所属者钴制卫士获得圣盾。<br>结合上诉的策略模式思维，我们便可以将委托包装成卡牌的策略，使用枚举表示各种不同的扳机，得到包装后的扳机-委托对来实现复杂的卡牌描述<br>此处为委托对应的函数（已省略无关内容）<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">public static bool GainDivineShieldWhenSummonMech(GameEvent gameEvent)</span><br><span class="line">&#123;</span><br><span class="line">    if (gameEvent.targetCard.IsMinionType(MinionType.Mechs))</span><br><span class="line">    &#123;</span><br><span class="line">        gameEvent.hostCard.effectsStay.Add(</span><br><span class="line">        new KeyWordEffect(Keyword.DivineShield));&#x2F;&#x2F;获得圣盾</span><br><span class="line">        return true;            </span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>此处GameEvent为封装的游戏信息传递类，hostCard即钴制卫士，targetCard即召唤的随从<br>当游戏中发生了召唤随从事件时，钴制卫士就会被系统通知，调用上述函数并传入携带该事件具体信息的gameEvent参数，函数执行判断传入的随从是机械后即获得圣盾。<br>所以，只要将扳机与委托相互绑定并挂载在卡牌上，就能实现卡牌的复杂描述。  </p>
 <h4 id="csv与反射机制的结合"><a href="#csv与反射机制的结合" class="headerlink" title="csv与反射机制的结合"></a>csv与反射机制的结合</h4><p>在框架设计中，采用了csv这一文件格式来存储卡牌并生成。在游戏的resource文件夹中的chess.csv存储了所有棋子的攻击力，生命值，描述，关键词等信息。当游戏初始化时，后端会读取csv中的所有棋子信息并生成一系列卡牌原型，之后战斗中生成的新卡牌实例生成均采用工厂模式在卡牌工厂中由卡牌原型生成，这样能够在不增加过多运行时开销的前提下将卡牌的数据与代码分离，方便策划的修改。策划只需要知道unity的界面使用而不需掌握代码知识，就能简单使用excel等工具修改csv并在unity中测试游戏。<br>当然，csv能读取的信息属实有限，我们显然无法将刚才提到的扳机-委托对直接存储在csv中。于是，便可以借助反射机制的帮助。我们可以使用特定的格式在csv中记录卡牌的扳机-委托对中的扳机信息与委托的函数名，同样在初始化时读取并绑定在对应的卡牌原型上。  </p>
 <p><strong>例如</strong>：<br>钴制卫士在csv中的记录如下（已略去无关项）<br>钴制卫士,WhenMinionSummon:GainDivineShieldWhenSummonMech;,  </p>
 <p>此处WhenMinionSummon即为扳机名，后续的即为刚才的委托的函数名。这里表示的效果即为上文所述钴制卫士的效果描述。读取的实现也较为简单，从csv中读到字符串后进行分割，使用反射机制分别以字符串的内容得到对应的信息，赋值给对应的卡牌原型即可。<br>当然在后续的开发过程中，为了支持mod，我们对csv的结构作出了重大调整。同时创造了一种脚本语言用于mod制作者的开发过程。所以这里的csv语法与格式已经是过去式了，新的格式可能会在下一阶段的总结博文（如果有的话）中介绍一下吧。</p>
@@ -31,9 +59,7 @@
     <entry>
         <title>Mac的终端美化</title>
         <url>/Mac%E7%9A%84%E7%BB%88%E7%AB%AF%E7%BE%8E%E5%8C%96/</url>
-        <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
-<a id="more"></a>
-<p>废话不多说先上成品  </p>
+        <content><![CDATA[<p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍<br><a id="more"></a><br>废话不多说先上成品  </p>
 <p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
 <p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
 <p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。</p>
@@ -52,45 +78,25 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre></td></tr></table></figure>
 <p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是 <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a> 这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。  </p>
 </li>
-<li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
-<li><p>按 i 键(英文输入法)进入编辑模式</p>
-</li>
-<li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
-<li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
-</li>
-<li><p>重启终端重复下载步骤，dns污染的问题就解决了！  </p>
-</li>
+<li>在终端中输入以下命令，使用vim修改hosts文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
+<li>按 i 键(英文输入法)进入编辑模式</li>
+<li>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
+<li>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</li>
+<li>重启终端重复下载步骤，dns污染的问题就解决了！  </li>
 </ul>
-<p>下载成功界面大致如下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure>
+<p>下载成功界面大致如下<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure></p>
 <h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题</h3><p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank" rel="noopener">官方主题</a>和<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank" rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑) ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png" alt="agnoster.png"></p>
 <ul>
 <li>首先，vim打开配置文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure></li>
 <li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre></td></tr></table></figure></li>
 <li>再使用以下命令使刚才更改的配置生效<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure>
-重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，  </li>
+重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，<br><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </li>
 </ul>
-<p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </p>
-<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure>
-<p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure>
-<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure>
-<p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
-<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure>
-<p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
-<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在<del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure>
-<p>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
-<p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
-<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装  </p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
-<p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
+<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure><br>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure></p>
+<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure><br>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
+<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure><br>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
+<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在~/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在~/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure><br>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure><br>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
+<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure><br>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
 <ul>
 <li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。  </li>
 <li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
@@ -113,22 +119,245 @@
         </tags>
     </entry>
     <entry>
-        <title>问题与优化汇总</title>
-        <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
-        <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
-<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索</p>
-<a id="more"></a>
-
-<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化，不过其中有一些出了点问题。。正在解决中</p>
-<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
-
-<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
-<h2 id="2020-07-03-03-22-错误"><a href="#2020-07-03-03-22-错误" class="headerlink" title="2020-07-03 03:22 错误"></a>2020-07-03 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ERROR Asset render failed: css&#x2F;main.css</span><br><span class="line">Error: &#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;themes&#x2F;next&#x2F;source&#x2F;  css&#x2F;_common&#x2F;components&#x2F;components.styl:8:3</span><br><span class="line">    4|     text-align: center;</span><br><span class="line">    5|     the-transition();</span><br><span class="line">    6|   &#125;</span><br><span class="line">    7| </span><br><span class="line">    8|   @import</span><br><span class="line">--------^</span><br><span class="line">    9| </span><br><span class="line">   10| (</span><br><span class="line">   11| hexo-config (&#39;back2top.sidebar&#39;) ? &#39;back-to-top-sidebar&#39; : &#39;back-to-top&#39;</span><br></pre></td></tr></table></figure>
-<p>   以及另一个类似地方的类似报错，查询后发现这两个文件与GitHub上的官方版本有谜之出入，覆盖之，遂解决。</p>
+        <title>《Game AI Pro》寻路算法的优化</title>
+        <url>/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/</url>
+        <content><![CDATA[<p>关于《Game AI Pro》 Pathfinding Architecture Optimizations和 Choosing a Search Space Representation的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化以及搜索空间表示的选择，需要读者对$\mathrm{A*}$算法有基本的了解。（之前的章节懒得补博客了<br><a id="more"></a></p>
+<h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
+<h3 id="更好的搜索空间表示"><a href="#更好的搜索空间表示" class="headerlink" title="更好的搜索空间表示"></a>更好的搜索空间表示</h3><p>常见的三种表示是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述">  </p>
+<p>其思路不再赘述，以下为几种搜索空间表示的优劣对比。</p>
+<h4 id="Grid"><a href="#Grid" class="headerlink" title="Grid"></a>Grid</h4><ul>
+<li>优点  <ul>
+<li>简单，易于实现</li>
+<li>对地图编辑器友好</li>
+<li>特定方格的消耗/可通行性易于修改，当然重新加权的方格太多也会影响速度</li>
+<li>从游戏地图位置容易映射到方格位置，坐标除以每个网格的边长即可</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>对于大型地图，方格属于内存密集型</li>
+<li>通常需要对所得的路径进行路径平滑</li>
+<li>由于粒度过细，路径规划的消耗可能较大</li>
+<li>通常含有许多对称路径，增加了路径规划的成本。这一问题可以通过一些技术缓解  </li>
+</ul>
+</li>
+</ul>
+<h4 id="Waypoint"><a href="#Waypoint" class="headerlink" title="Waypoint"></a>Waypoint</h4><ul>
+<li>优点  <ul>
+<li>同样易于实现</li>
+<li>如果能够提前预知改动（例如一扇门的开关），则同样易于修改</li>
+<li>稀疏的表示使得存储和路径规划的消耗都较低</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>如果边过少，路径质量会受到影响；过多则会影响存储与路径规划的复杂度</li>
+<li>需要手动放置节点才能得到较好的路径质量</li>
+<li>玩家的位置映射到路点图的数据结构（localization）较为困难，玩家被碰撞出边时可能难以定位</li>
+<li>未储存明确的物理等底层状态空间表示信息，平滑路径时可能会导致角色卡在物理对象上</li>
+<li>如果改动无法被预知，修改的过程较为复杂，需要验证附近的所有路点是否因为地形修改导致可被连接。（例如角色可以任意地进行墙体破坏）  </li>
+</ul>
+</li>
+</ul>
+<h4 id="Navmesh"><a href="#Navmesh" class="headerlink" title="Navmesh"></a>Navmesh</h4><ul>
+<li>优点  <ul>
+<li>多边形可以比网格更精确地表示游戏世界，因为它可以处理非网格对齐的地图</li>
+<li>多边形精确表示有利于路径的平滑</li>
+<li>路径规划非常快且不影响质量</li>
+<li>不像网格一样消耗内存</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>实现过于复杂，不过有非常不错的开源实现</li>
+<li>需要使用特殊的几何算法，在某些特殊情况（如平行线）可能导致失败。这更增加了实现的难度</li>
+<li>对导航网格的改动可能难以实现且消耗较大</li>
+<li>如果实现不好，localization可能比较复杂。优秀的实现可能会借助额外的数据结构，如gird进行映射  </li>
+</ul>
+</li>
+</ul>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>每种路径规划架构都有自己的优点和缺点。架构的选择应该取决于正在开发的游戏类型、已有的工具以及可用于实现和调试的时间。许多游戏引擎都自带路径规划表示，但对于必须进行新的实现的情况，其优缺点总结如下。<br>当地形是2D时，当实现时间有限，当世界是动态时，当内存充足时，网格是最有用的。它们并不适合大型的开放世界游戏，或者需要高质量动画的可行走空间的精确边界的游戏。<br>当实现时间有限，需要快速路径规划，以及不需要世界的精确表示时，路点图是最有用的。当有足够的时间进行测试和实现时，导航网格是最好的。如果实现得好，导航网格是最灵活的实现方式，但对于小项目来说，导航网格可能是矫枉过正。<br>但是在大型游戏中，简单地使用这些表示方式可能并不能解决问题。常用的方法是分层寻路，例如在不需要精细寻路的高层次中采用路点或导航网格描述，低层次中使用方格。当存储空间不足以使用上述的$Floyd$查找表时便可以采取这一思路。其在英雄连、龙腾世纪：起源等游戏中被采用。</p>
+<h3 id="预分配所有重要的存储空间"><a href="#预分配所有重要的存储空间" class="headerlink" title="预分配所有重要的存储空间"></a>预分配所有重要的存储空间</h3><p>在搜索过程中分配存储空间会导致效率数量级级别的下降。所以应当使用内存池预分配搜索所需的空间。</p>
+<h3 id="高估启发因子"><a href="#高估启发因子" class="headerlink" title="高估启发因子"></a>高估启发因子</h3><p>$\mathrm{A*}$作为具有<strong>可采纳性</strong>(admissible) 的寻路算法，其对于当前节点到目标的距离估算需不高于实际的距离。不过在实际项目中，你可以通过适当地高估启发因子舍弃部分可采纳性以换取巨大的速度提升。在传统寻路领域中，这听起来简直离经叛道，但在电子游戏领域，这是一种可行的权衡。<br>为了理解具体的高估方式，我们来看传统的$\mathrm{A*}$开销计算函数<br>\begin{equation}<br>f(x)=g(x)+h(x)<br>\end{equation}<br>对启发因子进行加权后形式如下<br>\begin{equation}<br>f(x)=g(x)+h(x)\times weight<br>\end{equation}<br>通过调整权重$weight$，即可得到不同的$\mathrm{A*}$形式。如果权重为0，退化为$Dijkstra$算法，开销估计仅由之前的累计消耗决定。如果权重为1，即为经典的$\mathrm{A*}$算法。如果权重大于1，则算法向贪婪最佳优先算法(Greedy  Best-First search)靠近。<br>在实际操作中，我们可以将权重在1.1到1.5之间调整，这取决于你的地图形式。如果你的地图较为复杂，充斥着随机障碍与回溯，这种方法对可采纳性的破坏则较为严重；如果你的地图较为简单，增大权重将极大地增加寻路算法靠近终点的速度。虽然这一方法有一定风险，也不失为值得探索的思路。</p>
+<h3 id="更好的启发因子"><a href="#更好的启发因子" class="headerlink" title="更好的启发因子"></a>更好的启发因子</h3><p>对于一个能8方向移动的方格地图而言，常见的启发因子有以下三种</p>
+<ul>
+<li>欧氏距离 Euclidean distance 通常会低估实际消耗</li>
+<li>曼哈顿距离 Manhattan distance 通常会高估实际消耗</li>
+<li>八分距离 octile distance 对于此类地图是较优的启发因子，允许45度和90度的转弯，计算方式为$max(Δx, Δy) + 0.41 · min(Δx, Δy)$ </li>
+</ul>
+<h3 id="开放队列排序"><a href="#开放队列排序" class="headerlink" title="开放队列排序"></a>开放队列排序</h3><ul>
+<li>常见的存储开放队列的方式是堆，但是由于新加入的节点经常被立刻删除，可以在删除前先缓存新节点。</li>
+<li>还可以避免显式排序。在某些地图中，独一无二的f会比较少，这种情况可以改为维护f的列表而非节点的列表</li>
+<li>在一些搜索中，开放列表中只有10到30个节点，这时直接使用数组存储开放列表可能较为简单  </li>
+</ul>
+<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的JPS跳点算法</p>
+<h3 id="缓存后继任务"><a href="#缓存后继任务" class="headerlink" title="缓存后继任务"></a>缓存后继任务</h3><p>$\mathrm{A*}$算法需要频繁地考察相邻的节点，故直接将相邻节点存储起来而非在复杂的数据结构中遍历也能提高速度，当然这会导致更大的空间消耗。</p>
+<h3 id="寻路中的坏主意"><a href="#寻路中的坏主意" class="headerlink" title="寻路中的坏主意"></a>寻路中的坏主意</h3><h4 id="同时搜索"><a href="#同时搜索" class="headerlink" title="同时搜索"></a>同时搜索</h4><p>尽量避免同时开始多次搜索。因为$\mathrm{A*}$算法需要开辟较大的空间，同时进行多个搜索会导致极大的空间消耗。如果我们发现搜索的速度确实差距较大，可以分两个通道分别处理一般的寻路和较慢的寻路。</p>
+<h4 id="双向寻路"><a href="#双向寻路" class="headerlink" title="双向寻路"></a>双向寻路</h4><p>一般而言，当有大陆-岛屿存在时，双向寻路可以通过快速遍历岛屿上的节点迅速判断出发点和目标之间的不可达关系，而$\mathrm{A*}$需要遍历大陆中的节点得出同样的结论。但这并非使用双向寻路的理由，解决这个问题可以通过分层寻路，在宏观上先判断可达性，再使用$\mathrm{A*}$得到具体路径。<br>当然，抛开岛屿问题，双向寻路对于$\mathrm{A*}$也徒劳无功。所以，不要在$\mathrm{A*}$中使用双向寻路。</p>
+<h4 id="缓存失败的寻路结果"><a href="#缓存失败的寻路结果" class="headerlink" title="缓存失败的寻路结果"></a>缓存失败的寻路结果</h4><p>在某些算法中，缓存中间结果可以减少重复计算，但在$\mathrm{A*}$中并不适用，因为有太多不同的路径，存储中间结果对于空间的消耗过大。</p>
+<h3 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h3><p>以上即为一些常用的$\mathrm{A*}$算法优化方式，希望能给读者一些启发。</p>
 ]]></content>
         <categories>
-            <category>博客相关</category>
+            <category>《Game AI Pro》</category>
         </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《Game AI Pro》 高斯随机、过滤随机与柏林噪声</title>
+        <url>/%E3%80%8AGAP%E3%80%8B%E9%AB%98%E6%96%AF%E9%9A%8F%E6%9C%BA%E3%80%81%E8%BF%87%E6%BB%A4%E9%9A%8F%E6%9C%BA%E4%B8%8E%E6%9F%8F%E6%9E%97%E5%99%AA%E5%A3%B0/</url>
+        <content><![CDATA[<p>关于《Game AI Pro》 Advanced Randomness Techniques for Game AI:  Gaussian Randomness, Filtered Randomness, and Perlin Noise 的学习笔记。主要是三种随机的简介。<br><a id="more"></a></p>
+<h2 id="高斯随机"><a href="#高斯随机" class="headerlink" title="高斯随机"></a>高斯随机</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>高斯分布广泛存在于我们的身边。学生的身高、体重、成绩等变量都遵循高斯分布。当我们需要随机生成这一类变量时，简单地使用我们熟悉的均匀随机rand()是不符合要求的。这时我们就需要利用高斯随机生成符合高斯分布的随机数。</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>虽然高斯分布的表达式非常复杂，但是实现高斯随机非常简单。由于中心极限定理，受到多个互为加性的均匀随机因素影响的随机变量即符合高斯分布。例如，掷出三个骰子，它们的和便遵循高斯分布。这个和受到三个骰子各自的均匀分布且具有加性的点数影响，所以为高斯分布。<br><img src="https://i.loli.net/2020/07/10/sypH4KwFxAnrTU3.png" alt="截屏2020-07-10 下午5.33.16.png"><br>具体实现中，我们可以类似地生成近似的高斯随机，将几个rand()生成的均匀随机变量加起来即可。例如将三个[-1，1]的均匀随机变量相加，得到的即为分布在[-3，3]中的高斯随机，且标准差σ为1，均值μ为0。其中100%落在 [μ-3σ，μ+3σ] 即 [-3，3] 中，95.8%落在 [μ-2σ，μ+2σ] 即 [-2，2] 中，66.7%落在 [μ-σ，μ+σ] 即 [-1，1] 中。在更为精确的模拟中可能需要模拟落在三倍标准差以外的小概率事件，但是游戏中通常不需要。  </p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>高斯随机最经典的用途之一是弹道偏移。大部分fps游戏中都需要模拟弹道偏移以增添真实感，而在弹道偏移量上简单地使用均匀随机得到的效果并不好。如果使用均匀随机，角色打靶的弹痕将均匀分布在靶心附近的一个圆上，圆的大小取决于均匀随机的范围，看起来并不真实。合理的方案是先使用均匀随机得到一个偏移的方向，再在这个方向上使用高斯随机得到偏移的距离。这样角色打靶的弹痕分布将在靶心较为密集，边缘较为稀疏，符合常识。</p>
+<h2 id="过滤随机"><a href="#过滤随机" class="headerlink" title="过滤随机"></a>过滤随机</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>小样本的随机事件看起来并不随机。当玩家发现自己被敌人连续暴击三次击杀时，玩家最先想到的通常并非“敌人的暴击率为30%，我被连续暴击三次的概率为2.7%，还算正常”，而是“这破游戏针对我，退坑！”。为避免这种玩家莫名流失的情形，便可以采用过滤随机，“修复”这一“bug”。  </p>
+<h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>过滤随机的实现更为简单，只需在生成随机数时存储最后生成的一段数列，生成最新一项时进行检查，出现一些引发玩家迷惑的组合时考虑重新随机或调整。以下为一些示例</p>
+<h4 id="掷硬币"><a href="#掷硬币" class="headerlink" title="掷硬币"></a>掷硬币</h4><ul>
+<li>如果最新的值会导致连续的四个或更多相同值，75%的概率翻转该值。</li>
+<li>如果最新的值导致出现了四个值的重复排列，例如11001100，翻转该值（即变为11001101）</li>
+<li>如果最新的值导致出现了111000或000111，翻转该值<br>示例<br>过滤前：0 1 1 0 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 0 1 1 0<br>过滤后：0 1 1 0 1 1 0 0 0 1 1 0 0 0 1 0 1 0 1 0 0 0 1 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 1 1 1 0  </li>
+</ul>
+<h4 id="整数"><a href="#整数" class="headerlink" title="整数"></a>整数</h4><ul>
+<li>出现连续数字，例如 7，7</li>
+<li>出现连续数字被另一数字隔断，例如 8，3，8</li>
+<li>出现4个或更多递增或递减的数字，例如 3，4，5，6</li>
+<li>最后若干个数均较大或均较小，例如 6，8，7，9，8，6，9</li>
+<li>两个数字的组合在最后十位重复出现，例如 5，7，3，1，5，7</li>
+<li>某一数字在最后十位出现次数过多，例如 9，4，5，9，7，8，9，0，2，9</li>
+</ul>
+<h4 id="浮点数"><a href="#浮点数" class="headerlink" title="浮点数"></a>浮点数</h4><p>以[0，1]为例</p>
+<ul>
+<li>连续两个数差小于0.02，重新随机，例如0.875和0.856</li>
+<li>连续三个数差小于0.1，重新随机，例如0.345，0.421，0.387</li>
+<li>5个数连续递增或递减，重新随机，例如0.342，0.572，0.619，0.783，0.868</li>
+<li>最后若干个数均较大或均较小，重新随机，例如0.325，0.198，0.056，0.432，0.216</li>
+</ul>
+<h4 id="高斯随机-1"><a href="#高斯随机-1" class="headerlink" title="高斯随机"></a>高斯随机</h4><p>由于高斯随机与浮点数随机较为相似，上述的规则仍然可以沿用。除此之外，如下规则也可作为参考</p>
+<ul>
+<li>连续四个数均靠近或均远离0</li>
+<li>连续四个数位于2σ与3σ之间</li>
+<li>连续两个数位于3σ之外</li>
+</ul>
+<h3 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h3><p>以上的一些策略仅为示例，这并不意味着需要在游戏中使用类似的所有策略。事实上，上述的策略可能过于严苛以至于破坏游戏中随机数的数学完整性。在使用过滤随机时，我们需要仔细思考规则，还可以使用开源程序ENT测试规则下生成的随机数的随机程度。<br>现在的网游中暴击、抽卡、开箱等事件通常使用更复杂的随机策略。例如假设玩家的暴击率为5%，则第一次击中的暴击率将低于5%。随着连续击中而没有触发暴击，玩家的暴击率逐步上升，在第20次时达到100%。如果中途触发暴击，则暴击率将还原至初始值。这需要设计一条概率曲线，它的增长幅度合理且最终总的暴击率仍为5%。如果概率曲线设计合理，这种策略将使得暴击的触发更为分散，也符合广大玩家“暴击率5%意味着20次必暴击一次”的认知。开箱中的“幸运值”，“保底”等机制也类似如此。</p>
+<h2 id="柏林噪声"><a href="#柏林噪声" class="headerlink" title="柏林噪声"></a>柏林噪声</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>柏林噪声通常被用来产生平滑的随机，例如生成起伏的地表，平滑的随机移动，游戏角色的心情变化。一维的柏林噪声即可生成2d地图中的地表，生成类似我的世界的游戏地形则需要二维的柏林噪声。一维柏林噪声大概长下图这样。<br><img src="https://i.loli.net/2020/07/10/4lN8gvXL2yYiGWD.png" alt="一维柏林噪声"></p>
+<h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>实现柏林噪声，我们需要得到一条随机的平滑曲线。对于一条简单的随机曲线，我们可以使用随机数与插值得到，但是这样的曲线过于单调，不满足我们的使用要求。这时，我们可以将一些曲线叠加在一起，得到更具有变化性的曲线。<br>为了叠加曲线，首先我们需要引入<strong>倍频</strong>（octave）和<strong>持续度</strong>（Persistence）两个概念。在生成之前，我们需要选择你的柏林噪声使用几个倍频，这取决于你的精度要求和性能。倍频决定了你的柏林噪声由几个基本曲线合成，以及这些曲线的频率和振幅。其中倍频为n的曲线的振幅为持续度的n次方，而频率为2的n次方。例如如果取倍频为4，持续度为0.5，则我们便要将倍频为1，2，3，4的生成曲线分别乘以0.5的1，2，3，4次方并相加得到最终的柏林噪声，其中倍频为1，2，3，4的生成曲线频率分别为1，2，4，8倍。<br>那么每一个倍频的曲线该如何生成呢？此处以横纵坐标上限均为1，倍频为4，持续度为0.5为例。对于倍频1的曲线，我们只需要在[0，1]中随机取起点和终点的值，使用缓和函数插值即可。最早的缓和函数为3t<sup>2</sup> - 2t<sup>3</sup> 后来被改进为现在通常使用的6t<sup>5</sup> - 15t<sup>4</sup> + 10t<sup>3</sup>，因为这一函数的二阶导连续。而更高倍频的只需如法炮制，不同的是倍频越高，为使频率能够翻倍就需要额外取一些随机数作为插值的依据。其中，倍频1使用2个随机数，倍频2使用3个随机数，倍频3使用5个随机数，其规律为2<sup>n - 1</sup> + 1，当然这些随机数都需要间距相等。<br>生成完毕后，便可以合成为所需的柏林噪声曲线。下图即为一个示例。<br><img src="https://i.loli.net/2020/07/10/EAQqjkFrnayzBvH.png" alt="截屏2020-07-10 下午10.42.16.png"></p>
+<h3 id="其他-2"><a href="#其他-2" class="headerlink" title="其他"></a>其他</h3><p>柏林噪声在图形学上也有许多应用，可以用于生成火焰，熔岩，大理石等纹理，有许多可以深入研究的地方。这里仅为对文章内容的简单总结，如需更深入了解在图形学上的应用，可以阅读<a href="https://blog.csdn.net/candycat1992/article/details/50346469" target="_blank" rel="noopener">这篇文章</a>。</p>
+]]></content>
+        <categories>
+            <category>《Game AI Pro》</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
+    </entry>
+    <entry>
+        <title>《游戏人工智能编程案例精粹》学习笔记（二）</title>
+        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
+        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是《掠夺者》的概述，路径规划与目标驱动。<br><a id="more"></a></p>
+<h2 id="《掠夺者》概述"><a href="#《掠夺者》概述" class="headerlink" title="《掠夺者》概述"></a>《掠夺者》概述</h2><p>这是书中的一个案例，基本玩法类似于2d吃鸡。其要求如下：  </p>
+<ul>
+<li><p>决策<br>AI需要制定游戏计划，长期目标，短期目标等。目标可以是攻击敌人、找到血包等。将目标与现有状态进行对比评估，从而作出决策。后面有单独章节介绍这一评估方式。</p>
+</li>
+<li><p>移动<br>AI需要综合使用上述的移动方式，使移动自然。主要使用的移动方式有Seek，Arrive，Wander，Wall Avoidance 和 Separation。  </p>
+</li>
+<li><p>路径规划<br>AI需要对于一个想要达成的目标，规划合适的路径去达成。后面有单独章节介绍完整的寻路</p>
+</li>
+<li><p>感知<br>AI需要模拟角色的视觉听觉以及记忆。如果不考虑角色的记忆而只是采用简单的视觉模拟感知，效果将大打折扣。想象一个情况，A的视野中有B，C两个敌人，A选择率先攻击B，于是转向B并发动攻击，这使得C消失在了视野中。于是消灭B后，A便不会回头攻击C，这显然是不合理的。所以可以为AI角色引入记忆功能，例如使用一个map存储上一次遇到各个敌人的时间，根据这个map对较近时候碰到的敌人作出反应。 </p>
+</li>
+<li><p>目标选择<br>AI需要选择合适的目标以发起攻击或追逐等操作，可以简单地以最近的敌人为目标，实际的开发可能需要综合考虑敌人的武器，生命等要素。</p>
+</li>
+<li><p>武器控制<br>AI需要根据敌人的距离等要素选择合适的武器进行攻击，例如近距离时不使用两败俱伤的爆炸性武器。不同武器也需要不同的瞄准方式，例如瞬发武器可以直接瞄准敌人当前位置，而弹道较慢的武器应当预判敌人的走位。另外，为保护玩家体验，可以加入进入视野到开始射击的反应时间以及射击的精度误差，此处误差建议为0～0.2弧度。武器控制的具体实现采用模糊逻辑。后面有单独章节介绍。</p>
+<blockquote>
+<p>tips</p>
+<ul>
+<li>对于某些游戏，AI对玩家的第一发子弹打偏是一个好主意，这可以提醒玩家AI的出现，使玩家做好准备。同时，如果能看到子弹的轨迹，这也能极大地提高游戏的刺激性  </li>
+<li>当玩家生命值较低时，降低AI射击的精准度。这可以使玩家更频繁地达成死里逃生或绝地反杀，使游戏更加刺激。  </li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<h2 id="路径规划"><a href="#路径规划" class="headerlink" title="路径规划"></a>路径规划</h2><h3 id="导航图"><a href="#导航图" class="headerlink" title="导航图"></a>导航图</h3><p>为确定一条路径，游戏环境需要被分割为导航图，从而利用搜索算法对导航图进行搜索。常见的导航图有如下几种：</p>
+<ul>
+<li><p>单元<br>  基于正方形或六边形的单元导航图，每个图中的节点表示一个单元，图中的边表示相邻单元的连接。对于类似文明的游戏，每个单元通过的消耗不一，这可以为每个地图分配相应的地图信息，使用该信息为地图的边加权。<br>  这一方法的问题在于随着单元格的增加，导航图的节点和边也将急速增加。</p>
+</li>
+<li><p>可视点<br>  也即POV导航图，通常手工放置地图中的关键点并将它们连接起来。作为游戏中的导航图。<br>  如果地图较为庞大复杂导致手工填充地图过于耗时，或是有随机生成地图功能，就需要开发自动生成POV图的方法，例如下面的扩展图形。</p>
+</li>
+<li><p>扩展图形<br>  如果游戏环境由多边形构建，可以利用图形自带的信息去创建POV图。</p>
+<ul>
+<li>将多边形向外扩展一定的半径（略大于智能体半径）</li>
+<li>把扩展出的图形的顶点作为导航图的节点</li>
+<li>测试这些节点的可见性，得出导航图<br>因为扩展了一定的半径，智能体便可以沿导航图自由通行而不撞到墙壁。  </li>
+</ul>
+</li>
+<li><p>导航网<br>  也即NavMesh，使用凸多边形描述游戏环境中的可访问区域。这里利用了凸多边形的重要性质：凸多边形的任意顶点可以互相直线到达。图的每个节点代表一个凸多边形区域而非一个点。</p>
+</li>
+</ul>
+<h3 id="粒度"><a href="#粒度" class="headerlink" title="粒度"></a>粒度</h3><ul>
+<li><p>粗粒度<br>  导航图较为简单，且只能沿导航图的边移动。类似吃豆人的游戏可以采取这种策略，但是需要任意导航的RTS游戏不适用。</p>
+</li>
+<li><p>细粒度<br>  增加导航图的粒度。细粒度导航图的生成通常使用洪水填充算法。</p>
+<ul>
+<li>将一个种子节点放入地图中</li>
+<li>算法在每个节点的方向上向外扩展纳入图中</li>
+<li>重复以上步骤，直到所有可以通航的区域都被填充满</li>
+</ul>
+</li>
+</ul>
+<h3 id="路径平滑"><a href="#路径平滑" class="headerlink" title="路径平滑"></a>路径平滑</h3><p>当游戏导航图是网状而实际游戏地图可以任意导航时，自动寻路创建的路径通常有额外的边。例如如下情况。  </p>
+<p><img src="https://i.loli.net/2020/07/08/L3GD8fa5QwlUZpC.png" alt="路径图">  </p>
+<p>A点试图到达C点，由于图的拓扑限制了45度的转向增量，寻路的结果可能是由A到B到C，但是实际游戏中需要从A到C直线前进，这时就需要对路径进行平滑处理。  </p>
+<ul>
+<li><p>粗糙而快地平滑路径<br>  算法按如下步骤执行  </p>
+<ul>
+<li>将两个迭代指针E1和E2放在第一条边和第二条边上。</li>
+<li>如果E1的起点和E2的终点之间可直达（注意考虑智能体体积），说明E1和E2可被省略。在这两点之间连接一条新边，作为E1，将下一条边作为E2。</li>
+<li>如果无法直达，则把E2赋给E1，并将E2指向路径中的下一条边。</li>
+<li>重复以上步骤，直到E2的终点等于路径目的地。</li>
+</ul>
+</li>
+<li><p>精确而慢地平滑路径<br>  每次E1向前移动，必须遍历从E1到最后一条边之间的所有边。这种方案较为精确但是显然消耗巨大。  </p>
+</li>
+</ul>
+<h3 id="降低消耗"><a href="#降低消耗" class="headerlink" title="降低消耗"></a>降低消耗</h3><ul>
+<li><p>预先计算好的路径<br>  地图创建的同时，为地图创建一份查询表，查询表中包含每个节点到图中任意节点的路线。这可以用Dijkstra算法为每个节点创建一个最短路径树（SPT）以实现，并将SPT直接存储在一个二维整数数组中。<br>  查询表存储在二维整数数组的一个方式示例：<br>  节点0到节点5的最短路径的下一个节点是节点3，则将3存储在SPT[0][5]中，以此类推。</p>
+</li>
+<li><p>预先计算成本<br>  当考虑游戏中智能体的决策时，有时需要计算成本，例如移动所需的时间。如果对于每次决策都需要计算所有成本，那消耗将十分巨大。这时就需要一个计算好的成本表，这一创建方式与路径表类似，不过改为存储最短路径的总时间成本。</p>
+</li>
+<li><p>分层路径寻找<br>  利用两个不同粒度的导航图存储整个地图，例如对于中国地图，可以用粗粒度的导航图存储省之间的连接信息，细粒度的导航图存储城镇或道路的连接信息。当然如果两层不足以保证质量，也可以使用更多层。<br>  <img src="https://i.loli.net/2020/07/08/GI6qM1JOpsTX8gv.png" alt="分层路径寻找"></p>
+</li>
+</ul>
+<h3 id="走出困境"><a href="#走出困境" class="headerlink" title="走出困境"></a>走出困境</h3><p>当一个环境中包含大量智能体时，智能体将很容易陷入困境，例如在狭窄的门附近拥堵。例如在一个狭窄的门口，某一智能体试图定位附近的一个路点作为目标。这时由于某些原因，智能体被挤出了门，而智能体仍然在试图向该路点直线移动。这时该智能体就会开始日墙。<br>解决方案是每当更新时，计算到当前路点的距离。如果这个值的变化超过了预期，就需要重新规划路径。</p>
+<h2 id="目标驱动智能体行为"><a href="#目标驱动智能体行为" class="headerlink" title="目标驱动智能体行为"></a>目标驱动智能体行为</h2><p>游戏中智能体的游戏思路事实上可以分解为多个目标，而目标也可以分为更细。例如对于掠夺者游戏，角色为了赢得游戏，可以先去搜集武器；为了搜集武器，需要寻找武器的位置并获取武器；而如果在寻找武器的途中突然遇到了敌人，就需要评估双方实力并转而攻击敌人或者逃跑；攻击敌人的过程中需要选择合适的武器攻击敌人并不断走位；如果选择了攻击敌人并成功消灭敌人后，还需要继续刚才的寻找武器行为。  </p>
+<ul>
+<li>目标的实现类似于状态，不过分为更多层次。分解和试图达成目标的行为不断进行，直到整个层次已被遍历。目标具有类似状态模式中Enter，Execate，Exit的Activate，Process，Terminate方法。不同的是Activate可能需要每当激活该目标时被调用以进行初始化。  </li>
+<li>层次目标的实现类似于组合模式。同时通过将子目标压入子目标容器的前面以添加子目标，按照LIFO的顺序进行处理。</li>
+<li>目标之间的选择使用目标仲裁，通过整体目标Think实现，需要对当前的状态进行评估以计算不同目标的价值分数，比较得到合适的目标。</li>
+<li>为实现自动恢复被中断的活动，例如击杀半路遇到的敌人后继续寻找武器这一功能，其整体实现原理需类似于下推自动机。如果出现击杀敌人后寻路起点变化导致寻路丢失，也会因寻路目标的Activate再次被调用而重新开始寻路。</li>
+<li>游戏中可能需要一些特殊的障碍，例如打开开关才能开启的门。这些障碍应该存储在地图的信息中作为对AI透明的数据，需要花费的时间也应该体现在导航图的边成本中。为了使AI存储这些障碍，特殊的边需要额外存储对应的开关，当智能体试图通过该边时，通过备注的开关信息将开启开关这一新目标压入栈中</li>
+</ul>
+<h3 id="命令综述"><a href="#命令综述" class="headerlink" title="命令综述"></a>命令综述</h3><p>在掠夺者案例中，有如下一些组合命令举例</p>
+<ul>
+<li>Think<br>  也即游戏中的整体目标</li>
+<li>GetItem<br>  控制角色寻找回血道具/武器等，这与玩家的生命/距离目标的距离等相关。如果需要让角色在离物品较近时更倾向于获取物品，可以使评分与距离的平方成反比。</li>
+<li>MoveToPosition<br>  试图将角色移动到地图上的任意位置，这会请求一条路径。如果利用时间片方式进行规划，在路径被规划完成前，角色可以随机漫步。</li>
+<li>AttackTarget<br>  当玩家认为自己能够战胜当前目标敌人时，便可以主动攻击敌人。这包含了复杂的逻辑，例如选择合适的武器，进行走位以躲避子弹并达到武器最佳攻击距离等等。角色攻击目标的评分可以取决于当前双方的生命值/距离/武器等因素</li>
+<li>HuntTarget<br>  当AttackTarget行为的目标消失在视线中时，角色可能需要继续追击敌人。这需要再次评估且评分应当低于攻击视线中的同样敌人，毕竟追击敌人需要承担更多的未知风险。</li>
+</ul>
+<p>和如下基本命令举例</p>
+<ul>
+<li>Wander<br>  控制角色随机漫步</li>
+<li>TraverseEdge<br>  控制角色沿着一条路径移动，这可能需要使用上一节提供的各种技巧。</li>
+</ul>
+<h3 id="其他优化策略"><a href="#其他优化策略" class="headerlink" title="其他优化策略"></a>其他优化策略</h3><ul>
+<li>使AI可以在一定程度上预判其他角色（例如玩家）的行为。例如当玩家残血时，AI控制角色移动到较近的血包附近埋伏玩家。这可以通过对玩家的当前状态调用AI的目标评估函数得知角色的大致行为，这种预判的准确性取决于你设计的AI评估函数是否贴近玩家心理。</li>
+<li>使游戏中的AI具有不同个性。对于每种目标的评估函数，可以增加一个因子，作为角色的个性。例如在一个RTS游戏中，AI可以有运营风格，速攻风格等等；在掠夺者游戏中，AI可以有武器选择偏好，射击精度等等。  </li>
+<li>不同于FSM，目标仲裁事实上是一个数据驱动而非逻辑驱动的算法，所以只需改变数据就能改变AI角色的个性与行为，也可以将数据单独存放在脚本文件或一个表中使其便于调试。</li>
+</ul>
+]]></content>
+        <categories>
+            <category>《游戏人工智能编程案例精粹》</category>
+        </categories>
+        <tags>
+            <tag>AI</tag>
+        </tags>
     </entry>
     <entry>
         <title>《游戏人工智能编程案例精粹》学习笔记（三）</title>
@@ -299,247 +528,6 @@
 ]]></content>
         <categories>
             <category>《游戏人工智能编程案例精粹》</category>
-        </categories>
-        <tags>
-            <tag>AI</tag>
-        </tags>
-    </entry>
-    <entry>
-        <title>《游戏人工智能编程案例精粹》学习笔记（二）</title>
-        <url>/%E3%80%8A%E6%B8%B8%E6%88%8F%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%BC%96%E7%A8%8B%E6%A1%88%E4%BE%8B%E7%B2%BE%E7%B2%B9%E3%80%8B%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/</url>
-        <content><![CDATA[<p>关于《游戏人工智能编程案例精粹》的学习笔记。本节主要是《掠夺者》的概述，路径规划与目标驱动。<br><a id="more"></a></p>
-<h2 id="《掠夺者》概述"><a href="#《掠夺者》概述" class="headerlink" title="《掠夺者》概述"></a>《掠夺者》概述</h2><p>这是书中的一个案例，基本玩法类似于2d吃鸡。其要求如下：  </p>
-<ul>
-<li><p>决策<br>AI需要制定游戏计划，长期目标，短期目标等。目标可以是攻击敌人、找到血包等。将目标与现有状态进行对比评估，从而作出决策。后面有单独章节介绍这一评估方式。</p>
-</li>
-<li><p>移动<br>AI需要综合使用上述的移动方式，使移动自然。主要使用的移动方式有Seek，Arrive，Wander，Wall Avoidance 和 Separation。  </p>
-</li>
-<li><p>路径规划<br>AI需要对于一个想要达成的目标，规划合适的路径去达成。后面有单独章节介绍完整的寻路</p>
-</li>
-<li><p>感知<br>AI需要模拟角色的视觉听觉以及记忆。如果不考虑角色的记忆而只是采用简单的视觉模拟感知，效果将大打折扣。想象一个情况，A的视野中有B，C两个敌人，A选择率先攻击B，于是转向B并发动攻击，这使得C消失在了视野中。于是消灭B后，A便不会回头攻击C，这显然是不合理的。所以可以为AI角色引入记忆功能，例如使用一个map存储上一次遇到各个敌人的时间，根据这个map对较近时候碰到的敌人作出反应。 </p>
-</li>
-<li><p>目标选择<br>AI需要选择合适的目标以发起攻击或追逐等操作，可以简单地以最近的敌人为目标，实际的开发可能需要综合考虑敌人的武器，生命等要素。</p>
-</li>
-<li><p>武器控制<br>AI需要根据敌人的距离等要素选择合适的武器进行攻击，例如近距离时不使用两败俱伤的爆炸性武器。不同武器也需要不同的瞄准方式，例如瞬发武器可以直接瞄准敌人当前位置，而弹道较慢的武器应当预判敌人的走位。另外，为保护玩家体验，可以加入进入视野到开始射击的反应时间以及射击的精度误差，此处误差建议为0～0.2弧度。武器控制的具体实现采用模糊逻辑。后面有单独章节介绍。</p>
-<blockquote>
-<p>tips</p>
-<ul>
-<li>对于某些游戏，AI对玩家的第一发子弹打偏是一个好主意，这可以提醒玩家AI的出现，使玩家做好准备。同时，如果能看到子弹的轨迹，这也能极大地提高游戏的刺激性  </li>
-<li>当玩家生命值较低时，降低AI射击的精准度。这可以使玩家更频繁地达成死里逃生或绝地反杀，使游戏更加刺激。  </li>
-</ul>
-</blockquote>
-</li>
-</ul>
-<h2 id="路径规划"><a href="#路径规划" class="headerlink" title="路径规划"></a>路径规划</h2><h3 id="导航图"><a href="#导航图" class="headerlink" title="导航图"></a>导航图</h3><p>为确定一条路径，游戏环境需要被分割为导航图，从而利用搜索算法对导航图进行搜索。常见的导航图有如下几种：</p>
-<ul>
-<li><p>单元<br>  基于正方形或六边形的单元导航图，每个图中的节点表示一个单元，图中的边表示相邻单元的连接。对于类似文明的游戏，每个单元通过的消耗不一，这可以为每个地图分配相应的地图信息，使用该信息为地图的边加权。<br>  这一方法的问题在于随着单元格的增加，导航图的节点和边也将急速增加。</p>
-</li>
-<li><p>可视点<br>  也即POV导航图，通常手工放置地图中的关键点并将它们连接起来。作为游戏中的导航图。<br>  如果地图较为庞大复杂导致手工填充地图过于耗时，或是有随机生成地图功能，就需要开发自动生成POV图的方法，例如下面的扩展图形。</p>
-</li>
-<li><p>扩展图形<br>  如果游戏环境由多边形构建，可以利用图形自带的信息去创建POV图。</p>
-<ul>
-<li>将多边形向外扩展一定的半径（略大于智能体半径）</li>
-<li>把扩展出的图形的顶点作为导航图的节点</li>
-<li>测试这些节点的可见性，得出导航图<br>因为扩展了一定的半径，智能体便可以沿导航图自由通行而不撞到墙壁。  </li>
-</ul>
-</li>
-<li><p>导航网<br>  也即NavMesh，使用凸多边形描述游戏环境中的可访问区域。这里利用了凸多边形的重要性质：凸多边形的任意顶点可以互相直线到达。图的每个节点代表一个凸多边形区域而非一个点。</p>
-</li>
-</ul>
-<h3 id="粒度"><a href="#粒度" class="headerlink" title="粒度"></a>粒度</h3><ul>
-<li><p>粗粒度<br>  导航图较为简单，且只能沿导航图的边移动。类似吃豆人的游戏可以采取这种策略，但是需要任意导航的RTS游戏不适用。</p>
-</li>
-<li><p>细粒度<br>  增加导航图的粒度。细粒度导航图的生成通常使用洪水填充算法。</p>
-<ul>
-<li>将一个种子节点放入地图中</li>
-<li>算法在每个节点的方向上向外扩展纳入图中</li>
-<li>重复以上步骤，直到所有可以通航的区域都被填充满</li>
-</ul>
-</li>
-</ul>
-<h3 id="路径平滑"><a href="#路径平滑" class="headerlink" title="路径平滑"></a>路径平滑</h3><p>当游戏导航图是网状而实际游戏地图可以任意导航时，自动寻路创建的路径通常有额外的边。例如如下情况。  </p>
-<p><img src="https://i.loli.net/2020/07/08/L3GD8fa5QwlUZpC.png" alt="路径图">  </p>
-<p>A点试图到达C点，由于图的拓扑限制了45度的转向增量，寻路的结果可能是由A到B到C，但是实际游戏中需要从A到C直线前进，这时就需要对路径进行平滑处理。  </p>
-<ul>
-<li><p>粗糙而快地平滑路径<br>  算法按如下步骤执行  </p>
-<ul>
-<li>将两个迭代指针E1和E2放在第一条边和第二条边上。</li>
-<li>如果E1的起点和E2的终点之间可直达（注意考虑智能体体积），说明E1和E2可被省略。在这两点之间连接一条新边，作为E1，将下一条边作为E2。</li>
-<li>如果无法直达，则把E2赋给E1，并将E2指向路径中的下一条边。</li>
-<li>重复以上步骤，直到E2的终点等于路径目的地。</li>
-</ul>
-</li>
-<li><p>精确而慢地平滑路径<br>  每次E1向前移动，必须遍历从E1到最后一条边之间的所有边。这种方案较为精确但是显然消耗巨大。  </p>
-</li>
-</ul>
-<h3 id="降低消耗"><a href="#降低消耗" class="headerlink" title="降低消耗"></a>降低消耗</h3><ul>
-<li><p>预先计算好的路径<br>  地图创建的同时，为地图创建一份查询表，查询表中包含每个节点到图中任意节点的路线。这可以用Dijkstra算法为每个节点创建一个最短路径树（SPT）以实现，并将SPT直接存储在一个二维整数数组中。<br>  查询表存储在二维整数数组的一个方式示例：<br>  节点0到节点5的最短路径的下一个节点是节点3，则将3存储在SPT[0][5]中，以此类推。</p>
-</li>
-<li><p>预先计算成本<br>  当考虑游戏中智能体的决策时，有时需要计算成本，例如移动所需的时间。如果对于每次决策都需要计算所有成本，那消耗将十分巨大。这时就需要一个计算好的成本表，这一创建方式与路径表类似，不过改为存储最短路径的总时间成本。</p>
-</li>
-<li><p>分层路径寻找<br>  利用两个不同粒度的导航图存储整个地图，例如对于中国地图，可以用粗粒度的导航图存储省之间的连接信息，细粒度的导航图存储城镇或道路的连接信息。当然如果两层不足以保证质量，也可以使用更多层。<br>  <img src="https://i.loli.net/2020/07/08/GI6qM1JOpsTX8gv.png" alt="分层路径寻找"></p>
-</li>
-</ul>
-<h3 id="走出困境"><a href="#走出困境" class="headerlink" title="走出困境"></a>走出困境</h3><p>当一个环境中包含大量智能体时，智能体将很容易陷入困境，例如在狭窄的门附近拥堵。例如在一个狭窄的门口，某一智能体试图定位附近的一个路点作为目标。这时由于某些原因，智能体被挤出了门，而智能体仍然在试图向该路点直线移动。这时该智能体就会开始日墙。<br>解决方案是每当更新时，计算到当前路点的距离。如果这个值的变化超过了预期，就需要重新规划路径。</p>
-<h2 id="目标驱动智能体行为"><a href="#目标驱动智能体行为" class="headerlink" title="目标驱动智能体行为"></a>目标驱动智能体行为</h2><p>游戏中智能体的游戏思路事实上可以分解为多个目标，而目标也可以分为更细。例如对于掠夺者游戏，角色为了赢得游戏，可以先去搜集武器；为了搜集武器，需要寻找武器的位置并获取武器；而如果在寻找武器的途中突然遇到了敌人，就需要评估双方实力并转而攻击敌人或者逃跑；攻击敌人的过程中需要选择合适的武器攻击敌人并不断走位；如果选择了攻击敌人并成功消灭敌人后，还需要继续刚才的寻找武器行为。  </p>
-<ul>
-<li>目标的实现类似于状态，不过分为更多层次。分解和试图达成目标的行为不断进行，直到整个层次已被遍历。目标具有类似状态模式中Enter，Execate，Exit的Activate，Process，Terminate方法。不同的是Activate可能需要每当激活该目标时被调用以进行初始化。  </li>
-<li>层次目标的实现类似于组合模式。同时通过将子目标压入子目标容器的前面以添加子目标，按照LIFO的顺序进行处理。</li>
-<li>目标之间的选择使用目标仲裁，通过整体目标Think实现，需要对当前的状态进行评估以计算不同目标的价值分数，比较得到合适的目标。</li>
-<li>为实现自动恢复被中断的活动，例如击杀半路遇到的敌人后继续寻找武器这一功能，其整体实现原理需类似于下推自动机。如果出现击杀敌人后寻路起点变化导致寻路丢失，也会因寻路目标的Activate再次被调用而重新开始寻路。</li>
-<li>游戏中可能需要一些特殊的障碍，例如打开开关才能开启的门。这些障碍应该存储在地图的信息中作为对AI透明的数据，需要花费的时间也应该体现在导航图的边成本中。为了使AI存储这些障碍，特殊的边需要额外存储对应的开关，当智能体试图通过该边时，通过备注的开关信息将开启开关这一新目标压入栈中</li>
-</ul>
-<h3 id="命令综述"><a href="#命令综述" class="headerlink" title="命令综述"></a>命令综述</h3><p>在掠夺者案例中，有如下一些组合命令举例</p>
-<ul>
-<li>Think<br>  也即游戏中的整体目标</li>
-<li>GetItem<br>  控制角色寻找回血道具/武器等，这与玩家的生命/距离目标的距离等相关。如果需要让角色在离物品较近时更倾向于获取物品，可以使评分与距离的平方成反比。</li>
-<li>MoveToPosition<br>  试图将角色移动到地图上的任意位置，这会请求一条路径。如果利用时间片方式进行规划，在路径被规划完成前，角色可以随机漫步。</li>
-<li>AttackTarget<br>  当玩家认为自己能够战胜当前目标敌人时，便可以主动攻击敌人。这包含了复杂的逻辑，例如选择合适的武器，进行走位以躲避子弹并达到武器最佳攻击距离等等。角色攻击目标的评分可以取决于当前双方的生命值/距离/武器等因素</li>
-<li>HuntTarget<br>  当AttackTarget行为的目标消失在视线中时，角色可能需要继续追击敌人。这需要再次评估且评分应当低于攻击视线中的同样敌人，毕竟追击敌人需要承担更多的未知风险。</li>
-</ul>
-<p>和如下基本命令举例</p>
-<ul>
-<li>Wander<br>  控制角色随机漫步</li>
-<li>TraverseEdge<br>  控制角色沿着一条路径移动，这可能需要使用上一节提供的各种技巧。</li>
-</ul>
-<h3 id="其他优化策略"><a href="#其他优化策略" class="headerlink" title="其他优化策略"></a>其他优化策略</h3><ul>
-<li>使AI可以在一定程度上预判其他角色（例如玩家）的行为。例如当玩家残血时，AI控制角色移动到较近的血包附近埋伏玩家。这可以通过对玩家的当前状态调用AI的目标评估函数得知角色的大致行为，这种预判的准确性取决于你设计的AI评估函数是否贴近玩家心理。</li>
-<li>使游戏中的AI具有不同个性。对于每种目标的评估函数，可以增加一个因子，作为角色的个性。例如在一个RTS游戏中，AI可以有运营风格，速攻风格等等；在掠夺者游戏中，AI可以有武器选择偏好，射击精度等等。  </li>
-<li>不同于FSM，目标仲裁事实上是一个数据驱动而非逻辑驱动的算法，所以只需改变数据就能改变AI角色的个性与行为，也可以将数据单独存放在脚本文件或一个表中使其便于调试。</li>
-</ul>
-]]></content>
-        <categories>
-            <category>《游戏人工智能编程案例精粹》</category>
-        </categories>
-        <tags>
-            <tag>AI</tag>
-        </tags>
-    </entry>
-    <entry>
-        <title>《Game AI Pro》寻路算法的优化</title>
-        <url>/%E3%80%8AGAP%E3%80%8B%E5%AF%BB%E8%B7%AF%E7%AE%97%E6%B3%95%E7%9A%84%E4%BC%98%E5%8C%96/</url>
-        <content><![CDATA[<p>关于《Game AI Pro》 Pathfinding Architecture Optimizations和 Choosing a Search Space Representation的学习笔记，主要涉及$\mathrm{A*}$算法的一些优化以及搜索空间表示的选择，需要读者对$\mathrm{A*}$算法有基本的了解。（之前的章节懒得补博客了<br><a id="more"></a></p>
-<h3 id="使用查找表构造高质量的启发因子"><a href="#使用查找表构造高质量的启发因子" class="headerlink" title="使用查找表构造高质量的启发因子"></a>使用查找表构造高质量的启发因子</h3><p>我们可以使用$Floyd$算法预先得到一个查找表，将它压缩后在实时运算中作为 $\mathrm{A*}$ 算法的启发因子。<del>毕竟不压缩就不需要 $\mathrm{A*}$ 了</del><br>这里压缩的方法在2012年的GPPC（Grid-Based Path Planning competition，基于网格地图寻路的比赛，JPS跳点算法也在其中被提出）中被提出。当然这一压缩方法也不仅适用于网格地图。<br>在一个地图中，会有许多关键的节点，在FLoyd算法的查找表中，到这些节点的路径会被反复计算，这些点被称为<strong>枢纽</strong>，对于每个点z，在查找表中只记录到枢纽的距离d（p，z），当我们需要两个点间的估计距离作为启发因子时，令 $h(x, y) = |d(p, x) – d(p, y)|$即可。如果我们选择了多个枢纽，就选取以每个枢纽计算得到的估计距离中的最大值。这一方法被称为<strong>欧氏嵌入</strong> (Euclidean embedding)，兼顾了空间与时间。<br>接下来的问题则是枢纽的选择，这因游戏类型而异。例如，在一个RTS游戏中，可以选取双方的基地为枢纽；在一个RPG游戏中，则可以选择地图的出入口和主城为枢纽。</p>
-<h3 id="更好的搜索空间表示"><a href="#更好的搜索空间表示" class="headerlink" title="更好的搜索空间表示"></a>更好的搜索空间表示</h3><p>常见的三种表示是基于<strong>方格</strong>(grid)、<strong>路点</strong>(waypoint)、<strong>导航网格</strong>(navmesh)<br><img src="https://i.loli.net/2021/02/12/jM2XtqRxy6LriUk.png" alt="搜索空间描述">  </p>
-<p>其思路不再赘述，以下为几种搜索空间表示的优劣对比。</p>
-<h4 id="Grid"><a href="#Grid" class="headerlink" title="Grid"></a>Grid</h4><ul>
-<li>优点  <ul>
-<li>简单，易于实现</li>
-<li>对地图编辑器友好</li>
-<li>特定方格的消耗/可通行性易于修改，当然重新加权的方格太多也会影响速度</li>
-<li>从游戏地图位置容易映射到方格位置，坐标除以每个网格的边长即可</li>
-</ul>
-</li>
-<li>缺点<ul>
-<li>对于大型地图，方格属于内存密集型</li>
-<li>通常需要对所得的路径进行路径平滑</li>
-<li>由于粒度过细，路径规划的消耗可能较大</li>
-<li>通常含有许多对称路径，增加了路径规划的成本。这一问题可以通过一些技术缓解  </li>
-</ul>
-</li>
-</ul>
-<h4 id="Waypoint"><a href="#Waypoint" class="headerlink" title="Waypoint"></a>Waypoint</h4><ul>
-<li>优点  <ul>
-<li>同样易于实现</li>
-<li>如果能够提前预知改动（例如一扇门的开关），则同样易于修改</li>
-<li>稀疏的表示使得存储和路径规划的消耗都较低</li>
-</ul>
-</li>
-<li>缺点<ul>
-<li>如果边过少，路径质量会受到影响；过多则会影响存储与路径规划的复杂度</li>
-<li>需要手动放置节点才能得到较好的路径质量</li>
-<li>玩家的位置映射到路点图的数据结构（localization）较为困难，玩家被碰撞出边时可能难以定位</li>
-<li>未储存明确的物理等底层状态空间表示信息，平滑路径时可能会导致角色卡在物理对象上</li>
-<li>如果改动无法被预知，修改的过程较为复杂，需要验证附近的所有路点是否因为地形修改导致可被连接。（例如角色可以任意地进行墙体破坏）  </li>
-</ul>
-</li>
-</ul>
-<h4 id="Navmesh"><a href="#Navmesh" class="headerlink" title="Navmesh"></a>Navmesh</h4><ul>
-<li>优点  <ul>
-<li>多边形可以比网格更精确地表示游戏世界，因为它可以处理非网格对齐的地图</li>
-<li>多边形精确表示有利于路径的平滑</li>
-<li>路径规划非常快且不影响质量</li>
-<li>不像网格一样消耗内存</li>
-</ul>
-</li>
-<li>缺点<ul>
-<li>实现过于复杂，不过有非常不错的开源实现</li>
-<li>需要使用特殊的几何算法，在某些特殊情况（如平行线）可能导致失败。这更增加了实现的难度</li>
-<li>对导航网格的改动可能难以实现且消耗较大</li>
-<li>如果实现不好，localization可能比较复杂。优秀的实现可能会借助额外的数据结构，如gird进行映射  </li>
-</ul>
-</li>
-</ul>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>每种路径规划架构都有自己的优点和缺点。架构的选择应该取决于正在开发的游戏类型、已有的工具以及可用于实现和调试的时间。许多游戏引擎都自带路径规划表示，但对于必须进行新的实现的情况，其优缺点总结如下。<br>当地形是2D时，当实现时间有限，当世界是动态时，当内存充足时，网格是最有用的。它们并不适合大型的开放世界游戏，或者需要高质量动画的可行走空间的精确边界的游戏。<br>当实现时间有限，需要快速路径规划，以及不需要世界的精确表示时，路点图是最有用的。当有足够的时间进行测试和实现时，导航网格是最好的。如果实现得好，导航网格是最灵活的实现方式，但对于小项目来说，导航网格可能是矫枉过正。<br>但是在大型游戏中，简单地使用这些表示方式可能并不能解决问题。常用的方法是分层寻路，例如在不需要精细寻路的高层次中采用路点或导航网格描述，低层次中使用方格。当存储空间不足以使用上述的$Floyd$查找表时便可以采取这一思路。其在英雄连、龙腾世纪：起源等游戏中被采用。</p>
-<h3 id="预分配所有重要的存储空间"><a href="#预分配所有重要的存储空间" class="headerlink" title="预分配所有重要的存储空间"></a>预分配所有重要的存储空间</h3><p>在搜索过程中分配存储空间会导致效率数量级级别的下降。所以应当使用内存池预分配搜索所需的空间。</p>
-<h3 id="高估启发因子"><a href="#高估启发因子" class="headerlink" title="高估启发因子"></a>高估启发因子</h3><p>$\mathrm{A*}$作为具有<strong>可采纳性</strong>(admissible) 的寻路算法，其对于当前节点到目标的距离估算需不高于实际的距离。不过在实际项目中，你可以通过适当地高估启发因子舍弃部分可采纳性以换取巨大的速度提升。在传统寻路领域中，这听起来简直离经叛道，但在电子游戏领域，这是一种可行的权衡。<br>为了理解具体的高估方式，我们来看传统的$\mathrm{A*}$开销计算函数<br>\begin{equation}<br>f(x)=g(x)+h(x)<br>\end{equation}<br>对启发因子进行加权后形式如下<br>\begin{equation}<br>f(x)=g(x)+h(x)\times weight<br>\end{equation}<br>通过调整权重$weight$，即可得到不同的$\mathrm{A*}$形式。如果权重为0，退化为$Dijkstra$算法，开销估计仅由之前的累计消耗决定。如果权重为1，即为经典的$\mathrm{A*}$算法。如果权重大于1，则算法向贪婪最佳优先算法(Greedy  Best-First search)靠近。<br>在实际操作中，我们可以将权重在1.1到1.5之间调整，这取决于你的地图形式。如果你的地图较为复杂，充斥着随机障碍与回溯，这种方法对可采纳性的破坏则较为严重；如果你的地图较为简单，增大权重将极大地增加寻路算法靠近终点的速度。虽然这一方法有一定风险，也不失为值得探索的思路。</p>
-<h3 id="更好的启发因子"><a href="#更好的启发因子" class="headerlink" title="更好的启发因子"></a>更好的启发因子</h3><p>对于一个能8方向移动的方格地图而言，常见的启发因子有以下三种</p>
-<ul>
-<li>欧氏距离 Euclidean distance 通常会低估实际消耗</li>
-<li>曼哈顿距离 Manhattan distance 通常会高估实际消耗</li>
-<li>八分距离 octile distance 对于此类地图是较优的启发因子，允许45度和90度的转弯，计算方式为$max(Δx, Δy) + 0.41 · min(Δx, Δy)$ </li>
-</ul>
-<h3 id="开放队列排序"><a href="#开放队列排序" class="headerlink" title="开放队列排序"></a>开放队列排序</h3><ul>
-<li>常见的存储开放队列的方式是堆，但是由于新加入的节点经常被立刻删除，可以在删除前先缓存新节点。</li>
-<li>还可以避免显式排序。在某些地图中，独一无二的f会比较少，这种情况可以改为维护f的列表而非节点的列表</li>
-<li>在一些搜索中，开放列表中只有10到30个节点，这时直接使用数组存储开放列表可能较为简单  </li>
-</ul>
-<h3 id="避免寻路中的回溯"><a href="#避免寻路中的回溯" class="headerlink" title="避免寻路中的回溯"></a>避免寻路中的回溯</h3><p>即使是最简单的剔除（例如剔除已经经过的节点）也能极大地加快寻路的速度。更为高级的剔除则衍生出了$\mathrm{A*}$的许多变种，例如前文提到的JPS跳点算法</p>
-<h3 id="缓存后继任务"><a href="#缓存后继任务" class="headerlink" title="缓存后继任务"></a>缓存后继任务</h3><p>$\mathrm{A*}$算法需要频繁地考察相邻的节点，故直接将相邻节点存储起来而非在复杂的数据结构中遍历也能提高速度，当然这会导致更大的空间消耗。</p>
-<h3 id="寻路中的坏主意"><a href="#寻路中的坏主意" class="headerlink" title="寻路中的坏主意"></a>寻路中的坏主意</h3><h4 id="同时搜索"><a href="#同时搜索" class="headerlink" title="同时搜索"></a>同时搜索</h4><p>尽量避免同时开始多次搜索。因为$\mathrm{A*}$算法需要开辟较大的空间，同时进行多个搜索会导致极大的空间消耗。如果我们发现搜索的速度确实差距较大，可以分两个通道分别处理一般的寻路和较慢的寻路。</p>
-<h4 id="双向寻路"><a href="#双向寻路" class="headerlink" title="双向寻路"></a>双向寻路</h4><p>一般而言，当有大陆-岛屿存在时，双向寻路可以通过快速遍历岛屿上的节点迅速判断出发点和目标之间的不可达关系，而$\mathrm{A*}$需要遍历大陆中的节点得出同样的结论。但这并非使用双向寻路的理由，解决这个问题可以通过分层寻路，在宏观上先判断可达性，再使用$\mathrm{A*}$得到具体路径。<br>当然，抛开岛屿问题，双向寻路对于$\mathrm{A*}$也徒劳无功。所以，不要在$\mathrm{A*}$中使用双向寻路。</p>
-<h4 id="缓存失败的寻路结果"><a href="#缓存失败的寻路结果" class="headerlink" title="缓存失败的寻路结果"></a>缓存失败的寻路结果</h4><p>在某些算法中，缓存中间结果可以减少重复计算，但在$\mathrm{A*}$中并不适用，因为有太多不同的路径，存储中间结果对于空间的消耗过大。</p>
-<h3 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h3><p>以上即为一些常用的$\mathrm{A*}$算法优化方式，希望能给读者一些启发。</p>
-]]></content>
-        <categories>
-            <category>《Game AI Pro》</category>
-        </categories>
-        <tags>
-            <tag>AI</tag>
-        </tags>
-    </entry>
-    <entry>
-        <title>《Game AI Pro》 高斯随机、过滤随机与柏林噪声</title>
-        <url>/%E3%80%8AGAP%E3%80%8B%E9%AB%98%E6%96%AF%E9%9A%8F%E6%9C%BA%E3%80%81%E8%BF%87%E6%BB%A4%E9%9A%8F%E6%9C%BA%E4%B8%8E%E6%9F%8F%E6%9E%97%E5%99%AA%E5%A3%B0/</url>
-        <content><![CDATA[<p>关于《Game AI Pro》 Advanced Randomness Techniques for Game AI:  Gaussian Randomness, Filtered Randomness, and Perlin Noise 的学习笔记。主要是三种随机的简介。<br><a id="more"></a></p>
-<h2 id="高斯随机"><a href="#高斯随机" class="headerlink" title="高斯随机"></a>高斯随机</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>高斯分布广泛存在于我们的身边。学生的身高、体重、成绩等变量都遵循高斯分布。当我们需要随机生成这一类变量时，简单地使用我们熟悉的均匀随机rand()是不符合要求的。这时我们就需要利用高斯随机生成符合高斯分布的随机数。</p>
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>虽然高斯分布的表达式非常复杂，但是实现高斯随机非常简单。由于中心极限定理，受到多个互为加性的均匀随机因素影响的随机变量即符合高斯分布。例如，掷出三个骰子，它们的和便遵循高斯分布。这个和受到三个骰子各自的均匀分布且具有加性的点数影响，所以为高斯分布。<br><img src="https://i.loli.net/2020/07/10/sypH4KwFxAnrTU3.png" alt="截屏2020-07-10 下午5.33.16.png"><br>具体实现中，我们可以类似地生成近似的高斯随机，将几个rand()生成的均匀随机变量加起来即可。例如将三个[-1，1]的均匀随机变量相加，得到的即为分布在[-3，3]中的高斯随机，且标准差σ为1，均值μ为0。其中100%落在 [μ-3σ，μ+3σ] 即 [-3，3] 中，95.8%落在 [μ-2σ，μ+2σ] 即 [-2，2] 中，66.7%落在 [μ-σ，μ+σ] 即 [-1，1] 中。在更为精确的模拟中可能需要模拟落在三倍标准差以外的小概率事件，但是游戏中通常不需要。  </p>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>高斯随机最经典的用途之一是弹道偏移。大部分fps游戏中都需要模拟弹道偏移以增添真实感，而在弹道偏移量上简单地使用均匀随机得到的效果并不好。如果使用均匀随机，角色打靶的弹痕将均匀分布在靶心附近的一个圆上，圆的大小取决于均匀随机的范围，看起来并不真实。合理的方案是先使用均匀随机得到一个偏移的方向，再在这个方向上使用高斯随机得到偏移的距离。这样角色打靶的弹痕分布将在靶心较为密集，边缘较为稀疏，符合常识。</p>
-<h2 id="过滤随机"><a href="#过滤随机" class="headerlink" title="过滤随机"></a>过滤随机</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>小样本的随机事件看起来并不随机。当玩家发现自己被敌人连续暴击三次击杀时，玩家最先想到的通常并非“敌人的暴击率为30%，我被连续暴击三次的概率为2.7%，还算正常”，而是“这破游戏针对我，退坑！”。为避免这种玩家莫名流失的情形，便可以采用过滤随机，“修复”这一“bug”。  </p>
-<h3 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h3><p>过滤随机的实现更为简单，只需在生成随机数时存储最后生成的一段数列，生成最新一项时进行检查，出现一些引发玩家迷惑的组合时考虑重新随机或调整。以下为一些示例</p>
-<h4 id="掷硬币"><a href="#掷硬币" class="headerlink" title="掷硬币"></a>掷硬币</h4><ul>
-<li>如果最新的值会导致连续的四个或更多相同值，75%的概率翻转该值。</li>
-<li>如果最新的值导致出现了四个值的重复排列，例如11001100，翻转该值（即变为11001101）</li>
-<li>如果最新的值导致出现了111000或000111，翻转该值<br>示例<br>过滤前：0 1 1 0 1 1 0 0 0 0 1 1 0 0 0 0 1 0 1 0 0 0 0 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 0 1 1 0<br>过滤后：0 1 1 0 1 1 0 0 0 1 1 0 0 0 1 0 1 0 1 0 0 0 1 0 0 1 0 0 1 0 1 1 1 1 0 0 1 1 1 0 0 1 1 1 0 0 1 1 1 0  </li>
-</ul>
-<h4 id="整数"><a href="#整数" class="headerlink" title="整数"></a>整数</h4><ul>
-<li>出现连续数字，例如 7，7</li>
-<li>出现连续数字被另一数字隔断，例如 8，3，8</li>
-<li>出现4个或更多递增或递减的数字，例如 3，4，5，6</li>
-<li>最后若干个数均较大或均较小，例如 6，8，7，9，8，6，9</li>
-<li>两个数字的组合在最后十位重复出现，例如 5，7，3，1，5，7</li>
-<li>某一数字在最后十位出现次数过多，例如 9，4，5，9，7，8，9，0，2，9</li>
-</ul>
-<h4 id="浮点数"><a href="#浮点数" class="headerlink" title="浮点数"></a>浮点数</h4><p>以[0，1]为例</p>
-<ul>
-<li>连续两个数差小于0.02，重新随机，例如0.875和0.856</li>
-<li>连续三个数差小于0.1，重新随机，例如0.345，0.421，0.387</li>
-<li>5个数连续递增或递减，重新随机，例如0.342，0.572，0.619，0.783，0.868</li>
-<li>最后若干个数均较大或均较小，重新随机，例如0.325，0.198，0.056，0.432，0.216</li>
-</ul>
-<h4 id="高斯随机-1"><a href="#高斯随机-1" class="headerlink" title="高斯随机"></a>高斯随机</h4><p>由于高斯随机与浮点数随机较为相似，上述的规则仍然可以沿用。除此之外，如下规则也可作为参考</p>
-<ul>
-<li>连续四个数均靠近或均远离0</li>
-<li>连续四个数位于2σ与3σ之间</li>
-<li>连续两个数位于3σ之外</li>
-</ul>
-<h3 id="其他-1"><a href="#其他-1" class="headerlink" title="其他"></a>其他</h3><p>以上的一些策略仅为示例，这并不意味着需要在游戏中使用类似的所有策略。事实上，上述的策略可能过于严苛以至于破坏游戏中随机数的数学完整性。在使用过滤随机时，我们需要仔细思考规则，还可以使用开源程序ENT测试规则下生成的随机数的随机程度。<br>现在的网游中暴击、抽卡、开箱等事件通常使用更复杂的随机策略。例如假设玩家的暴击率为5%，则第一次击中的暴击率将低于5%。随着连续击中而没有触发暴击，玩家的暴击率逐步上升，在第20次时达到100%。如果中途触发暴击，则暴击率将还原至初始值。这需要设计一条概率曲线，它的增长幅度合理且最终总的暴击率仍为5%。如果概率曲线设计合理，这种策略将使得暴击的触发更为分散，也符合广大玩家“暴击率5%意味着20次必暴击一次”的认知。开箱中的“幸运值”，“保底”等机制也类似如此。</p>
-<h2 id="柏林噪声"><a href="#柏林噪声" class="headerlink" title="柏林噪声"></a>柏林噪声</h2><h3 id="介绍-2"><a href="#介绍-2" class="headerlink" title="介绍"></a>介绍</h3><p>柏林噪声通常被用来产生平滑的随机，例如生成起伏的地表，平滑的随机移动，游戏角色的心情变化。一维的柏林噪声即可生成2d地图中的地表，生成类似我的世界的游戏地形则需要二维的柏林噪声。一维柏林噪声大概长下图这样。<br><img src="https://i.loli.net/2020/07/10/4lN8gvXL2yYiGWD.png" alt="一维柏林噪声"></p>
-<h3 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h3><p>实现柏林噪声，我们需要得到一条随机的平滑曲线。对于一条简单的随机曲线，我们可以使用随机数与插值得到，但是这样的曲线过于单调，不满足我们的使用要求。这时，我们可以将一些曲线叠加在一起，得到更具有变化性的曲线。<br>为了叠加曲线，首先我们需要引入<strong>倍频</strong>（octave）和<strong>持续度</strong>（Persistence）两个概念。在生成之前，我们需要选择你的柏林噪声使用几个倍频，这取决于你的精度要求和性能。倍频决定了你的柏林噪声由几个基本曲线合成，以及这些曲线的频率和振幅。其中倍频为n的曲线的振幅为持续度的n次方，而频率为2的n次方。例如如果取倍频为4，持续度为0.5，则我们便要将倍频为1，2，3，4的生成曲线分别乘以0.5的1，2，3，4次方并相加得到最终的柏林噪声，其中倍频为1，2，3，4的生成曲线频率分别为1，2，4，8倍。<br>那么每一个倍频的曲线该如何生成呢？此处以横纵坐标上限均为1，倍频为4，持续度为0.5为例。对于倍频1的曲线，我们只需要在[0，1]中随机取起点和终点的值，使用缓和函数插值即可。最早的缓和函数为3t<sup>2</sup> - 2t<sup>3</sup> 后来被改进为现在通常使用的6t<sup>5</sup> - 15t<sup>4</sup> + 10t<sup>3</sup>，因为这一函数的二阶导连续。而更高倍频的只需如法炮制，不同的是倍频越高，为使频率能够翻倍就需要额外取一些随机数作为插值的依据。其中，倍频1使用2个随机数，倍频2使用3个随机数，倍频3使用5个随机数，其规律为2<sup>n - 1</sup> + 1，当然这些随机数都需要间距相等。<br>生成完毕后，便可以合成为所需的柏林噪声曲线。下图即为一个示例。<br><img src="https://i.loli.net/2020/07/10/EAQqjkFrnayzBvH.png" alt="截屏2020-07-10 下午10.42.16.png"></p>
-<h3 id="其他-2"><a href="#其他-2" class="headerlink" title="其他"></a>其他</h3><p>柏林噪声在图形学上也有许多应用，可以用于生成火焰，熔岩，大理石等纹理，有许多可以深入研究的地方。这里仅为对文章内容的简单总结，如需更深入了解在图形学上的应用，可以阅读<a href="https://blog.csdn.net/candycat1992/article/details/50346469" target="_blank" rel="noopener">这篇文章</a>。</p>
-]]></content>
-        <categories>
-            <category>《Game AI Pro》</category>
         </categories>
         <tags>
             <tag>AI</tag>
@@ -721,6 +709,22 @@
             <tag>JAVA</tag>
             <tag>重构</tag>
         </tags>
+    </entry>
+    <entry>
+        <title>问题与优化汇总</title>
+        <url>/%E9%97%AE%E9%A2%98%E4%B8%8E%E4%BC%98%E5%8C%96%E6%B1%87%E6%80%BB/</url>
+        <content><![CDATA[<p>这篇博文诞生的原因是上一篇博文的hexo d 失效并报了谜之错误  </p>
+<p>历经2小时解决后决定用此记录今后遇到的问题，同时也能记录今后的博客美化（如果有的话<br>如果有后续更新的话大概会倒序排列方便查看检索<br><a id="more"></a></p>
+<h2 id="2021-02-19-18-42-优化"><a href="#2021-02-19-18-42-优化" class="headerlink" title="2021-02-19 18:42 优化"></a>2021-02-19 18:42 优化</h2><p>添加字数统计功能</p>
+<h2 id="2020-05-08-20-42-优化"><a href="#2020-05-08-20-42-优化" class="headerlink" title="2020-05-08 20:42 优化"></a>2020-05-08 20:42 优化</h2><p>增加了一些小的优化</p>
+<h2 id="2020-05-08-03-22-错误"><a href="#2020-05-08-03-22-错误" class="headerlink" title="2020-05-08 03:22 错误"></a>2020-05-08 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Error: Spawn failed</span><br><span class="line">    at ChildProcess.&lt;anonymous&gt; (&#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;node_modules&#x2F;hexo-util&#x2F;lib&#x2F;spawn.js:51:21)</span><br><span class="line">    at ChildProcess.emit (events.js:310:20)</span><br><span class="line">    at Process.ChildProcess._handle.onexit (internal&#x2F;child_process.js:275:12)</span><br></pre></td></tr></table></figure>
+<p>这一段报错并没有看出什么端倪，查看官方Issues并尝试各网上解决方案后无果。仔细观察后发现在没截到图的上文中出现了git的访问请求被拒的错误，于是删除原有ssh key并重新生成了一个新的key，绑定在了GitHub上。然后问题莫名奇妙地解决了。。报了一模一样错误的某同学通过换连手机热点的方式解决了，所以这必然是玄学bug。</p>
+<h2 id="2020-07-03-03-22-错误"><a href="#2020-07-03-03-22-错误" class="headerlink" title="2020-07-03 03:22 错误"></a>2020-07-03 03:22 错误</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ERROR Asset render failed: css&#x2F;main.css</span><br><span class="line">Error: &#x2F;Users&#x2F;tmc&#x2F;Documents&#x2F;GitHub&#x2F;hexo_tmc&#x2F;themes&#x2F;next&#x2F;source&#x2F;  css&#x2F;_common&#x2F;components&#x2F;components.styl:8:3</span><br><span class="line">    4|     text-align: center;</span><br><span class="line">    5|     the-transition();</span><br><span class="line">    6|   &#125;</span><br><span class="line">    7| </span><br><span class="line">    8|   @import</span><br><span class="line">--------^</span><br><span class="line">    9| </span><br><span class="line">   10| (</span><br><span class="line">   11| hexo-config (&#39;back2top.sidebar&#39;) ? &#39;back-to-top-sidebar&#39; : &#39;back-to-top&#39;</span><br></pre></td></tr></table></figure>
+<p>   以及另一个类似地方的类似报错，查询后发现这两个文件与GitHub上的官方版本有谜之出入，覆盖之，遂解决。</p>
+]]></content>
+        <categories>
+            <category>博客相关</category>
+        </categories>
     </entry>
     <entry>
         <title>《重构-改善既有代码的设计》学习笔记（二）</title>
@@ -1059,38 +1063,6 @@
         <tags>
             <tag>JAVA</tag>
             <tag>重构</tag>
-        </tags>
-    </entry>
-    <entry>
-        <title>《Game AI Pro》使用迭代波前边扩展构建高层次导航网格</title>
-        <url>/%E3%80%8AGAP%E3%80%8B%E4%BD%BF%E7%94%A8%E8%BF%AD%E4%BB%A3%E6%B3%A2%E5%89%8D%E8%BE%B9%E7%BC%98%E6%89%A9%E5%B1%95%E6%9E%84%E5%BB%BA%E9%AB%98%E5%B1%82%E6%AC%A1%E5%AF%BC%E8%88%AA%E7%BD%91%E6%A0%BC/</url>
-        <content><![CDATA[<p>关于《Game AI Pro》 Creating High-Order Navigation Meshes through Iterative Wavefront Edge Expansions 的学习笔记。主要涉及使用迭代波前边扩展<del>我也不知道怎么翻译</del>构建navmesh。<br><a id="more"></a></p>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>传统上，导航网格是由人工创建的，或者使用某种形式的自动空间分解算法。这些算法检查环境中存在的障碍物，然后将它们之间的区域分解为尽可能少的区域。遗憾的是，为游戏环境创建一个具有最佳（绝对最小）区域数量的分解是NP的。这意味着并没有最好的技术。  </p>
-<h3 id="三角分解方法"><a href="#三角分解方法" class="headerlink" title="三角分解方法"></a>三角分解方法</h3><p>当然，有许多种方法正在被尝试与改进。最经典的方法通常从某种形式的环境三角测量开始，然后试图通过组合这些三角形来最小化环境中存在的区域数量。<br>这种方法的问题在于，在导航网格中保留的三角形会给角色在许多三角形的公共顶点上的区域的导航带来问题。一个角色难以得知他们在汇合点上站在哪个区域。而这些汇合点在复杂的环境中经常出现，这就导致了各种各样的问题。  </p>
-<h3 id="基于增长的方法"><a href="#基于增长的方法" class="headerlink" title="基于增长的方法"></a>基于增长的方法</h3><p>三角分解方法的替代方法是基于生长的方法，它将有助于最小化角色的localization问题。在作者之前的工作中，他们已经提出了基于生长的二维(PASFV)和三维(VASFV)空间分解定位算法，它的灵感来自于空间填充体积算法。虽然这些方法确实能生成高质量的导航网格，但在大型环境中执行时可能会很慢。这是因为这些算法要执行许多不必要的碰撞测试，因为它们必须验证每个生长区域在每个生长步骤中没有侵入另一个区域或障碍物。绝大多数时候，这种测试会返回一个否定的结果。这种不必要的测试是传统的基于生长的算法中顺序迭代扩展的结果。  </p>
-<h3 id="波前算法"><a href="#波前算法" class="headerlink" title="波前算法"></a>波前算法</h3><p>于是作者开发了<strong>迭代波前边扩展单元分解</strong>（为简洁起见，简称<strong>波前</strong>）算法，通过减少碰撞测试和迭代增长来解决之前技术中的问题。该算法的工作原理是扫描放置在世界中的每个区域可见的世界几何体，并确定可能发生碰撞的地方。通过强制我们的区域直接扩展到这些位置，我们消除了大量的碰撞测试。这改变了基于生长的算法的运行时间度量，使其随着世界的复杂性（障碍物的数量）而增加，而不是随着世界的面积而增加。这种技术不仅比现有的基于生长的技术快，而且产生的导航网格通过提供高阶多边形/多面体几何区域，保留了PASFV和VASFV算法所表现出的高网格质量。接下来我们来看这一算法的具体实现思路。  </p>
-<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>大致步骤如下</p>
-<ol>
-<li>将单位大小的潜在区域（种子）放入世界中  </li>
-<li>随机选择其中一个区域，从这个区域的角度分析世界中存在的障碍物  </li>
-<li>所选区域进入加速扩张阶段。扩张的方向是算法第二步中分析发现的障碍物。对每个区域重复算法的第二步和第三步；这将使每个区域扩展到它们的最大可能尺寸。  </li>
-<li>新的种子被放置到与刚刚创建的区域相邻的任何可遍历空间中，算法返回到第二步，让这些新的区域扩张。如果无法放置新的种子，算法就会终止。 </li>
-</ol>
-<p>以下为步骤的详细介绍</p>
-<h3 id="初始播种"><a href="#初始播种" class="headerlink" title="初始播种"></a>初始播种</h3><p>传统上，基于增长的算法首先使用基于网格的模式将初始单位大小的区域放入世界中。然后，这些方法迭代地给每个区域提供机会，使其沿着该区域的每个边的法线方向向外生长和扩展。<br>当我们在初始播种阶段使用波前算法时，我们会使用播种算法生成一个潜在的种子点列表，将潜在的种子放在每一个障碍物边旁边。与简单的网格播种相比，在放置更少的种子的同时有更好的整体覆盖率。然后，我们随机选择其中一个种子点作为我们的初始区域。其他潜在的种子点将被保留在以后的播种队列中，但只有当它们仍然在未被某一区域占用的可达空间中时才会被使用。如果在以后的播种阶段，这个列表是空的，我们将尝试通过寻找与我们放置的区域相邻的无人认领的可达空间来重新填充它。如果在这之后这个列表仍然是空的，那么波前算法将终止。  </p>
-<h3 id="边分类"><a href="#边分类" class="headerlink" title="边分类"></a>边分类</h3><p>在生成种子区域后，我们进入波前算法的边分类步骤。接下来的这两步是该算法中计算量最大的步骤，我们只希望在我们知道要扩展的有效区域上执行。因此，我们每次只扩展一个区域，并舍弃被之前扩展所覆盖的空间中的种子。在这一步骤中，我们会遍历存在于世界中的障碍物的每一条边，以及存在于我们已经放置到环境中的区域中的所有边。然后，我们舍弃所有法向远离区域目标种子点的障碍物边，因为这些边是背向种子区域的，不能与种子区域交互。然后，我们根据这些边与目标区域位置相比的相对空间位置（+x、-x、+y、-y、+z、-z）将其分类。跨越多个类别的边被放置在第一个适用的类别中，这取决于算法实现中使用的评估顺序。作者的参考实现使用以下排序+y、-y、+x、-x、+z和-z。当然，任何排序都可以完成算法。<br>一旦这些障碍物边被排序，我们就会定位所有潜在的事件点。我们的区域中法线与排序分类相匹配的边被称为<strong>分类边</strong>。通过比较我们的每个障碍物边与适当的分类边的斜率，我们可以预先确定扩大的区域将如何与障碍物互动。这可以通过思考一个从初始种子点绘制的径向半平面扫描来可视化。这条扫描线将报告它发现的边的方向以及边上最接近初始种子点的点。这些被占用空间的边和我们刚刚放置的区域边之间的相互作用可以简化为一系列的情况。<br><img src="https://i.loli.net/2021/02/19/a8FzHqyimr2SV76.png" alt="情况1"><br>其中第一种情况是，障碍物边与分类边平行，如上图所示。在这种情况下，我们希望扩张分类边，使其与目标边平齐。我们通过考察边上离我们正在评估的区域的初始种子点最近的点来实现这一操作。我们会将这个点以及从它到区域初始种子点的距离作为一个<strong>事件</strong>记录下来。同时，由于我们所有已完成扩张的种子区域和正在扩展的区域都只暴露出轴对齐的边，因此任何涉及已被占用的可达空间的情况都属于这一类。<br><img src="https://i.loli.net/2021/02/19/3AqpLCGJeXZiYfu.png" alt="情况2"><br>如上图所示，当分类边将与障碍物的一个角相遇时，就会出现一种稍微复杂的情况。在这种情况下，我们只能平行地扩展区域使这个角的顶点位于分类边上。我们不能改变分类边的斜率，因为这将可能覆盖到之前已完成的种子区域扩张占用的可达空间，这将违反被某一区域占用的空间必须始终保持被该区域占用这一原则。这种情况同样会存储被评估边上最近的顶点的位置以及该顶点到区域初始种子点的距离。<br><img src="https://i.loli.net/2021/02/19/iUxqoMIrWLyNPfc.png" alt="情况3"><br>接下来这种情况更为复杂，它可能会导致在扩大的区域中增加新的边。如上图所示，最近的障碍边中间的某点与扫描线相交。这是一种<strong>边分割</strong>的情况，为了计算这种分割应该发生在哪里，我们要找到正在被考虑的障碍物边上最接近区域初始种子点的点。然后，这个点和这个点与区域的初始种子点之间的距离一起被存储为事件点。此外，我们希望存储被考虑的边的两个端点（假设最近的点不是端点），这样我们将能为这个区域增加一条与交点到某一端点长度相同的新边。然而，我们将不计算这些端点与初始种子点之间的距离，而是将它们视为一种只比事件点离初始种子点稍远一些的特殊情况。这将防止这些点在过程中干扰其他计算。<br><img src="https://i.loli.net/2021/02/19/3pdqu8k5xTbtBgn.png" alt="情况4"><br>上图中可以看到一个更复杂的情况，有多个边分割事件。这样的事件应该根据扩张区域的初始种子点的距离来依次处理，通过考虑这些端点的距离，我们将确保区域在处理该点时，尽量将其中间的所有空间完全包含在内。<br>此时，我们已经有了一个潜在事件的集合，从而让我们的新区域向着这个空间扩展。但是，在开始扩展之前，我们需要做两件事。首先，如果世界的边界被定义为一些边界条件，而非不可达的空间，则需要插入事件以允许每个区域向外扩展到世界的边界。同时这个列表需要根据每个事件与区域的初始种子点之间的距离进行排序。从而先处理距离较近、更有可能到达的事件，因为更远的事件往往因为存在更直接的障碍物而无法到达。</p>
-<h3 id="边扩展"><a href="#边扩展" class="headerlink" title="边扩展"></a>边扩展</h3><p>有了某个区域的完整潜在事件列表，我们就可以进入波前算法的扩展阶段。首先，选择第一个（最接近的）未处理的扩展事件，并从潜在事件列表中删除。然后计算区域边必须移动的距离，以便它们到达这个扩展事件点。这是通过计算两个（三维中的三个）最接近的边的当前位置和目标扩展位置之间的距离来完成的。这个结果会被分解成几个分量（x, y, z），如果这些值是正数，边将直接扩张到事件点。扩张应该随着每个边迭代地向外移动而发生。所有的边都移动了之后，就可以执行碰撞和无效扩展的检查。之所以会发生这种情况，是因为有一些分割事件，如果只执行一半的事件（即允许一条边而不是两条边扩展），可能会出现各种问题。<br>区域完成扩展时，我们必须处理任何与其他区域或障碍物的碰撞。任何与障碍物碰撞的扩展区域的顶点处需要插入一条新的边来将该区域转换为一个高阶多边形/多面体。为了构造这个新边，我们可以取障碍边的相反法线，并将这个新边约束在障碍边的外延上。由于扩展事件是孤立计算的，并没有考虑其他区域，因此有可能发生碰撞，此时区域将不得不从潜在的膨胀事件中收缩。如果发生这种情况，发生碰撞的边应该停止进一步的扩张尝试；然后，算法将选择另一个扩张事件继续处理。重复这一过程，直到没有更多的事件或其所有边因碰撞而停止尝试扩张。</p>
-<h3 id="重新播种"><a href="#重新播种" class="headerlink" title="重新播种"></a>重新播种</h3><p>在所有种子完成扩展后，将按照前面的播种过程放置更多的种子。如果算法进入播种阶段，但无法放置任何新的区域，它就会终止。这样就会产生一个区域集合，即为所需的navimesh。</p>
-<h2 id="后处理步骤"><a href="#后处理步骤" class="headerlink" title="后处理步骤"></a>后处理步骤</h2><p>现有的基于增长的空间分解算法(如PASFV、VASFV和SFV)利用了一个后处理步骤来提高所得导航网格的质量。有时其中两个或更多的区域会成长为一个可以由单个凸区域填充的环境区域。这是同时放置和生长多个种子的自然结果，通常会通过合并区域来纠正。然而，这种组合需要花费时间和精力。波前算法的一个优点是它避免了大部分这种形式的后处理。由于两个区域永远不会同时生长，它们不能同时试图细分同一可达空间的凸形区域，从而产生更好的分解。</p>
-<h2 id="运行时间"><a href="#运行时间" class="headerlink" title="运行时间"></a>运行时间</h2><p>波前算法最坏情况下的运行时间受其执行的环境复杂度的限制，为O(n*m)。其中，n是世界中预设的障碍物的数量，每个障碍物都必须由算法播种的m个区域来评估。这个运行时间可能看起来比现有的基于生长的空间分解算法更差，但这些算法的运行时间会根据世界的大小而增加（由于必须执行额外的生长步骤以填充世界），而波前算法的运行时间只会随着环境的实际复杂程度而增加。一般来说，波前算法的平均运行时间在毫秒到秒的范围内，而相比之下，基于增长的实现的运行时间在几秒到几分钟的范围内。同时，波前算法的内存占用是线性增长的，因为每个新生成的区域只需要在任何给定的时间点上与现有的区域和障碍物进行交互和了解。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><img src="https://i.loli.net/2021/02/19/WQTL3A6wHXuFsPS.png" alt="截屏2021-02-19 上午2.52.29.png"></p>
-<p>以上即为一个波前算法的运行结果。<br>总的来说，波前算法通过基于四边形的扩展算法生成快速、高质量的分解。这种分解有较少的小区域和退化区域（一般是三角形），而这些区域会干扰角色的导航。这种算法通过执行较少的扩展步骤改进了以前基于生长的方法，从而减少了必须执行的碰撞测试的数量。它的运行时间随世界的复杂性而扩展，而不是像现有的基于生长的方法那样随世界的大小而扩展。此外，由于该算法每次只生长一个区域，减少了通常由多个区域竞争填充同一凸区域而引起的后处理。本算法产生的分解与现有流行算法（如Hertel-Melhlorn或梯形单元分解<del>两个奇怪的我没听说也搜不到的算法</del>）产生的分解相比，效果较好。</p>
-]]></content>
-        <categories>
-            <category>《Game AI Pro》</category>
-        </categories>
-        <tags>
-            <tag>AI</tag>
         </tags>
     </entry>
 </search>

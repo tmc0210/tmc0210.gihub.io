@@ -236,7 +236,21 @@
                 </span>
             </span>
 
-          
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
 
         </div>
       </header>
@@ -247,9 +261,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍</p>
-<a id="more"></a>
-<p>废话不多说先上成品  </p>
+        <p>这是关于使用 oh-my-zsh + iTerm2 + powerlevel10k 美化 Mac 平台 Terminal 的介绍<br><a id="more"></a><br>废话不多说先上成品  </p>
 <p><img src="https://i.loli.net/2020/05/10/xjOBwPSLnZYDF58.png" alt="成品.png">  </p>
 <p>虽然有点过于花里胡哨，不过把背景的二小姐去了改成单纯的高糊也不错，如下图所示</p>
 <p><img src="https://i.loli.net/2020/05/10/EtJnk4YwjFz9dW3.png" alt="成品2.png"><br>图中随便敲的一些命令是用来展示oh-my-zsh中代码高亮和自动补全功能的。</p>
@@ -268,45 +280,25 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c &quot;$(wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;robbyrussell&#x2F;oh-my-zsh&#x2F;master&#x2F;tools&#x2F;install.sh -O -)&quot;</span><br></pre></td></tr></table></figure>
 <p>我的电脑自带了curl，但是没有自带wget，你可以自行选择合适的方案安装<br>当然，很可能会出现类似连接失败之类的错误，而且尝试科学上网或终端科学上网可能均无效。这时我们可以注意到连接失败的是 <a href="https://raw.githubusercontent.com" target="_blank" rel="noopener">https://raw.githubusercontent.com</a> 这一网址，上网查询后可以得知这一网站常年被dns污染。于是可以按照如下步骤修改HOSTS文件解决。  </p>
 </li>
-<li><p>在终端中输入以下命令，使用vim修改hosts文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
-<li><p>按 i 键(英文输入法)进入编辑模式</p>
-</li>
-<li><p>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
-<li><p>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</p>
-</li>
-<li><p>重启终端重复下载步骤，dns污染的问题就解决了！  </p>
-</li>
+<li>在终端中输入以下命令，使用vim修改hosts文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim &#x2F;etc&#x2F;hosts</span><br></pre></td></tr></table></figure></li>
+<li>按 i 键(英文输入法)进入编辑模式</li>
+<li>使用方向键将光标移到文本尾部，添加如下文本。其中151.101.72.133 可能会发生变化，如距文章发表日期较久，不保证有效，可以搜索引擎查询较新的解决方案<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">151.101.72.133 raw.githubusercontent.com</span><br></pre></td></tr></table></figure></li>
+<li>按esc键退出编辑模式，然后输入 :wq! (需要输入冒号！),再按一下回车退出</li>
+<li>重启终端重复下载步骤，dns污染的问题就解决了！  </li>
 </ul>
-<p>下载成功界面大致如下</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure>
+<p>下载成功界面大致如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">  ____  &#x2F; &#x2F;_     ____ ___  __  __   ____  _____&#x2F; &#x2F;_  </span><br><span class="line"> &#x2F; __ \&#x2F; __ \   &#x2F; __ &#96;__ \&#x2F; &#x2F; &#x2F; &#x2F;  &#x2F;_  &#x2F; &#x2F; ___&#x2F; __ \ </span><br><span class="line">&#x2F; &#x2F;_&#x2F; &#x2F; &#x2F; &#x2F; &#x2F;  &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F; &#x2F;_&#x2F; &#x2F;    &#x2F; &#x2F;_(__  ) &#x2F; &#x2F; &#x2F; </span><br><span class="line">\____&#x2F;_&#x2F; &#x2F;_&#x2F;  &#x2F;_&#x2F; &#x2F;_&#x2F; &#x2F;_&#x2F;\__, &#x2F;    &#x2F;___&#x2F;____&#x2F;_&#x2F; &#x2F;_&#x2F;  </span><br><span class="line">                        &#x2F;____&#x2F;                       ....is now installed!</span><br><span class="line">Please look over the ~&#x2F;.zshrc file to select plugins, themes, and options.</span><br><span class="line"></span><br><span class="line">p.s. Follow us at https:&#x2F;&#x2F;twitter.com&#x2F;ohmyzsh.</span><br><span class="line"></span><br><span class="line">p.p.s. Get stickers and t-shirts at http:&#x2F;&#x2F;shop.planetargon.com.</span><br></pre></td></tr></table></figure></p>
 <h3 id="oh-my-zsh的主题"><a href="#oh-my-zsh的主题" class="headerlink" title="oh-my-zsh的主题"></a>oh-my-zsh的主题</h3><p>oh-my-zsh 有许多<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/themes" target="_blank" rel="noopener">官方主题</a>和<a href="https://github.com/ohmyzsh/ohmyzsh/wiki/External-themes" target="_blank" rel="noopener">第三方主题</a>，如果看中了某一款官方主题，就可以通过简单的设置切换成所需的主题，其中默认主题为robbyrussell。待会要提到的powerlevel10则是一款第三方主题。<br>例如，如果觉得下面这款agnoster主题不错,也是官方主题中和我的配置最相近的一款(虽然有字体相关的坑) ，便可以通过下列步骤设置为自己的主题。<br><img src="https://i.loli.net/2020/05/10/wvVj9NmXfcqPGyi.png" alt="agnoster.png"></p>
 <ul>
 <li>首先，vim打开配置文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure></li>
 <li>接下来使用上面讲过的vim操作找到ZSH_THEME项并改成主题名字”agnoster”，保存退出<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;agnoster&quot;</span><br></pre></td></tr></table></figure></li>
 <li>再使用以下命令使刚才更改的配置生效<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ source ~&#x2F;.zshrc</span><br></pre></td></tr></table></figure>
-重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，  </li>
+重启终端后，如果你较为幸运，就能看到类似上面的效果了。<br>如果你和我一样悲惨地出现了乱码（例如箭头显示为问号），<br>也可以尝试下载安装powerline字体并尝试修改上述.zshrd设置文件将字体改为powerline字体。如果幸运的话，你同样能看到类似上面的效果。<br>但是，如果你和我一样仍然悲惨地出现了乱码并且不愿意更换其他风格主题，<br><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </li>
 </ul>
-<p><strong><em>(注意：接下来介绍的powerlevel10k主题中如果选择使用复杂符号 (例如我的成品中的苹果符号) 或类似的彩色箭头 同样会出现这个问题)</em></strong><br>也可以采取我的邪道解决方案，也就是使用iterm2设置字体并将其作为新的终端，完全放弃自带的terminal。<br>具体的步骤稍后讲到iTerm2再说。<br>如果有人用其他方式解决了这一问题，也欢迎联系我。   </p>
-<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure>
-<p>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure>
-<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure>
-<p>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
-<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure>
-<p>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
-<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在<del>/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在</del>/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure>
-<p>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure>
-<p>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
-<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure>
-<p>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
+<p>除此之外，也可以使用随机主题，只需如下设置，即可在每次开启命令行时随机挑选一个默认主题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ZSH_THEME&#x3D;&quot;random&quot;</span><br></pre></td></tr></table></figure><br>如果在使用随机主题的过程中发现了不错的主题，想要得知它的名字，也可以调用如下命令获取<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $ZSH_THEME</span><br></pre></td></tr></table></figure></p>
+<h3 id="powerlevel10k主题的使用"><a href="#powerlevel10k主题的使用" class="headerlink" title="powerlevel10k主题的使用"></a>powerlevel10k主题的使用</h3><p>在成功尝试了agnoster或其他主题后，你可能觉得它们还算不错，但是自定义空间不够大/不够花里胡哨什么的，这时，就需要<a href="https://github.com/romkatv/powerlevel10k" target="_blank" rel="noopener">powerlevel10k</a>出场了。<br>powerlevel10k是一款优秀的第三方主题，也不仅仅是一款主题。事实上，它的个性化程度极高，仅需通过简单的配置即可达到其他主题的效果。安装了这一主题也就相当于安装了所有主题！<br><img src="https://i.loli.net/2020/05/10/aLBgSAGvD8MtKTC.png" alt="prompt-styles-high-contrast.png"><br>想要使用这一主题<br>只需从 github 下载该主题到 oh-my-zsh 目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;romkatv&#x2F;powerlevel10k.git $ZSH_CUSTOM&#x2F;themes&#x2F;powerlevel10k</span><br></pre></td></tr></table></figure><br>再类似地修改 ZSH_THEME 为 powerlevel10k 并使配置生效即可。</p>
+<p>重启终端之后，powerlevel10k的导航界面就会出现了。在这一阶段，powerlevel10k 先会询问一些问题以判断你的电脑是否安装了合适的字体。例如会展示一些符号，询问你是否出现乱码。再根据你的回答展示可用的个性化选项，只要简单的配置就能达成所需的个性主题。<br><img src="https://i.loli.net/2020/05/10/4rQYZpHnE1dL3zc.gif" alt="configuration-wizard.gif"><br>如果以后需要重新设置，也可以通过<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p10k configure</span><br></pre></td></tr></table></figure><br>命令再次进入这一导航。<br>当然，悲惨的我再次出现了大量乱码，使用了刚才介绍agnoster中提到的邪道方案才勉强能够使用。</p>
+<h3 id="oh-my-zsh的插件"><a href="#oh-my-zsh的插件" class="headerlink" title="oh-my-zsh的插件"></a>oh-my-zsh的插件</h3><p>oh-my-zsh不仅能让你的终端更加花哨，也能让它更加高效。类似主题，oh-my-zsh有许多增强终端功能的<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins" target="_blank" rel="noopener">官方插件</a>,也可以在~/.oh-my-zsh/plugins目录中查看插件列表。第三方插件由于我没有使用过，不加赘述。<br>插件的设置同样在~/.zshrc 文件中，为plugins项。默认情况下仅启用了git插件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git)</span><br></pre></td></tr></table></figure><br>如果想要使用更多插件可以在括号中添加，例如想要使用代码高亮插件zsh-syntax-highlighting和自动补全插件zsh-autosuggestions，就可以改成<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plugins&#x3D;(git zsh-autosuggestions zsh-syntax-highlighting)</span><br></pre></td></tr></table></figure><br>其中自动补全插件可以在输入时使用tab查找可能的命令或是右方向键直接键入灰色的提示命令。</p>
+<h2 id="iTerm2的安装与使用"><a href="#iTerm2的安装与使用" class="headerlink" title="iTerm2的安装与使用"></a>iTerm2的安装与使用</h2><p>虽然powerlevel10k的个性化程度很高，但是只是一个主题而已。如果想修改命令行的背景颜色/字体颜色等属性，或是想要在背景中添加图片/半透明/高斯模糊，实现终端分屏，添加快捷键等效果，就需要iTerm2了。<br>iTerm2是一个独立的app，可以完全替代终端的使用，具有丰富的个性化选项。<br>iTerm2的安装较为友好，直接在<a href="https://www.iterm2.com/downloads.html" target="_blank" rel="noopener">官网下载地址</a>下载安装包解压安装即可 .<br>也可以使用Homebrew安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew cask install iterm2</span><br></pre></td></tr></table></figure><br>安装iTerm2后你就可以放弃原本的Terminal了！<br>对于刚才的字体问题，邪道解决方案就是使用iTerm2方便的修改字体功能。</p>
 <ul>
 <li>下载合适的字体，这里可以选择<a href="https://www.nerdfonts.com/" target="_blank" rel="noopener">Nerd-Fonts</a>,官网download界面中选择一款字体下载安装即可。这里我使用的是其中的Hack字体。  </li>
 <li>使用command + ,键或上方菜单栏进入Preferences 配置界面</li>
@@ -486,6 +478,16 @@
     <i class="fa fa-user"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">tmc</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">45k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">41 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
