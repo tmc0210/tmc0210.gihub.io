@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/avatar.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/avatar.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Muse","version":"7.7.2","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="关于《Game AI Pro》 How to Catch a Ninja: NPC Awareness in a 2D Stealth Platformer 的学习笔记。主要涉及以2D潜行游戏《忍者之印》为例的敌人AI设计18年出了重置版还没有玩。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Game AI Pro》2D潜行游戏中的AI">
+<meta property="og:url" content="http://yoursite.com/%E3%80%8AGAP%E3%80%8B2D%E6%BD%9C%E8%A1%8C%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84AI/index.html">
+<meta property="og:site_name" content="tmc&#39;s blogs">
+<meta property="og:description" content="关于《Game AI Pro》 How to Catch a Ninja: NPC Awareness in a 2D Stealth Platformer 的学习笔记。主要涉及以2D潜行游戏《忍者之印》为例的敌人AI设计18年出了重置版还没有玩。">
+<meta property="article:published_time" content="2021-02-20T14:42:19.000Z">
+<meta property="article:modified_time" content="2021-02-22T20:35:55.897Z">
+<meta property="article:author" content="tmc">
+<meta property="article:tag" content="AI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/%E3%80%8AGAP%E3%80%8B2D%E6%BD%9C%E8%A1%8C%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84AI/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true
+  };
+</script>
+
+  <title>《Game AI Pro》2D潜行游戏中的AI | tmc's blogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">tmc's blogs</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/%E3%80%8AGAP%E3%80%8B2D%E6%BD%9C%E8%A1%8C%E6%B8%B8%E6%88%8F%E4%B8%AD%E7%9A%84AI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="tmc">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="tmc's blogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          《Game AI Pro》2D潜行游戏中的AI
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-20 22:42:19" itemprop="dateCreated datePublished" datetime="2021-02-20T22:42:19+08:00">2021-02-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-23 04:35:55" itemprop="dateModified" datetime="2021-02-23T04:35:55+08:00">2021-02-23</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E3%80%8AGame-AI-Pro%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《Game AI Pro》</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>关于《Game AI Pro》 How to Catch a Ninja: NPC Awareness in a 2D Stealth Platformer 的学习笔记。主要涉及以2D潜行游戏《忍者之印》为例的敌人AI设计<del>18年出了重置版还没有玩</del>。<br><a id="more"></a></p>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>《忍者之印（Mark of the Ninja）》是一款由Klei Entertainment发行的2D平台潜行游戏。玩家作为忍者，在阴影中潜行，并暗杀守卫与目标。为了解决AI角色对周围世界中的事件和物体有意识的需求，开发团队考虑的是数据驱动的兴趣系统，允许定义世界中的<strong>兴趣源</strong>（interest sources），并让智能体检测并对它们做出适当的反应。</p>
+<h2 id="兴趣点"><a href="#兴趣点" class="headerlink" title="兴趣点"></a>兴趣点</h2><p>智能体们最初被设计为具有注意<strong>兴趣点</strong>（points of interest）的能力。兴趣点简单来说就是关卡中的一个2D点，一个可以接近但不一定要射击的东西。<br>这些兴趣点是在每个智能体的更新循环中从声音、尸体等来源创建的。更新循环将收集和迭代每一种类型的游戏对象。在收集了潜在的兴趣列表后，会根据距离的远近，或其他硬编码的标准，选择一个作为当前的兴趣，然后智能体将响应并作出行动。这种思路在某些情况下是可行的，但也有一些问题。<br>首先，如果策划想让智能体对任何新的、以前未定义的对象或事件感兴趣，他们就需要要求程序员在智能体的循环中添加一组新的检查，并可能添加新的数据结构来跟踪任何被感知的东西。游戏中最终设计了大约60种不同类型的兴趣源，这一问题严重阻碍了开发。<br>其次，没有考虑到多个智能体对同一兴趣点的反应。如果你发出了巨大的声响，附近的所有人都会跑来，这有一定的意义。但如果你打破了一盏灯呢？一群警卫都走过去，傻傻地盯着灯看，每个人都分别自言自语说，真该有人对那盏破灯做点什么，这有意义吗？<br>如果一群站在一起的智能体侦测到了一个兴趣点，理想的情况是，其中的一两个 “小组”会被解散去检查它，而其余的人只是处于警戒状态，等待搜索结果。这不仅让人感觉更自然，也为玩家提供了更多有趣的游戏思路。他们可以将紧密聚集的守卫分开并在黑暗的角落里单独对付他们，而不是跑到一个明亮的房间里被五个拿着自动武器的家伙射杀。    </p>
+<h2 id="感知"><a href="#感知" class="headerlink" title="感知"></a>感知</h2><p>智能体需要在这个世界上检测两大类兴趣源，他们能看到的东西，和他们能听到的东西，这就有了两种感知：<strong>视觉</strong>和<strong>听觉</strong>。<br>视觉测试会检测以下问题：兴趣源是否在智能体的<strong>视锥</strong>范围内？与兴趣源相关联的游戏对象当前是否被光源照亮，或者智能体是否有夜视能力，从而取消了这一要求？智能体的眼睛位置和兴趣源的位置之间是否有任何物体阻挡视线？<br>视锥通常由一个偏移量和与智能体眼睛的方向、一个定义其视野宽度的角度和一个最大距离来定义，是一个三角形。其他的几何体也是可能的，例如根据需求，游戏中的视锥有的是一条射线，一个完整的圆，或者是一个正方形或梯形。<br>听觉检测是通过从兴趣源的位置到智能体的头部位置的路径查找来确定的。当策划从关卡编辑器中导出一个关卡时，其中一个步骤是从生成一个三角形网格（为了渲染地图也会生成关卡中所有实体碰撞的网格）。运行时便使用这个”声音网格”来执行A*路径查找。<br>与本作不同的另一种思路是采用兴趣源的位置到智能体的头部位置的欧几里得距离，这个方法的优点是直观且实现简单，声音的影响范围也能很好的以扩大的圆环（《这是我的战争》等作品）显示给玩家，但在真实感上略有欠缺。<br>出于性能和游戏性的原因，视觉和听觉的兴趣源定义了一个最大半径，只有在这个半径内的智能体才会被测试，以确定他们是否能检测到兴趣源。  </p>
+<h2 id="兴趣源的定义"><a href="#兴趣源的定义" class="headerlink" title="兴趣源的定义"></a>兴趣源的定义</h2><p>现在可以允许策划创建一个兴趣源来代表任何他们想要的对象或事件，只要它能通过视觉或听觉检测被检测到。策划可以指定”枪声”、”脚步声”、”尸体”、或者”嫌疑人”。智能体的行为脚本可以使用指定的兴趣源类型来确定任何特殊的行为，但后台只需要知道如何确定智能体是否能看到或听到兴趣源。<br>你也可以将”视觉”和”听觉”的定义进行一定程度的改进。在《忍者之印》中，有一种特殊情况的智能体是警犬，它们能够在黑暗中”闻到”玩家的气味，但出于游戏性的考虑，它们只能在很短的距离内闻到。在这种情况下，我们并不需要创建一个全新的嗅觉检测，而是可以简单地定义一个附着在玩家游戏对象上的视觉兴趣源，并要求任何注意到它的智能体有”狗”标签，这就有了一个”气味”兴趣。<br>当然，这两种只是兴趣源的定义，智能体的大脑中并非只有这两种兴趣。例如当一个智能体被飞镖击中时，可以在他的大脑中添加一个”触觉”的兴趣，或者当智能体的伙伴去调查一个声音而没有回来时，可以添加一个”失踪伙伴”的兴趣。  </p>
+<h2 id="智能体小队的处理"><a href="#智能体小队的处理" class="headerlink" title="智能体小队的处理"></a>智能体小队的处理</h2><p>另一个重要的问题是，当一群智能体同时检测到兴趣源时，他们应该如何反应。最开始的设计是每个人自己做自己的检测，当检测到一个兴趣源时就会做出反应，很可能是跑去调查它。这通常会导致整群智能体朝着最轻微的噪音跑去，或者集体向玩家汇聚。但优秀的潜行游戏中玩家能够操纵NPC，分散他们的注意力，并按照玩家自己的方式来戏弄他们。<br>于是我们需要寻找一种方法让智能体之间有某种程度的合作，但不至于明确地管理群体行为。发现状况后，一些人应该去调查，一个人可能会播放一行对话，告诉附近的另一个警卫去查看，其他人可能只是看了一眼，等待前面提到的警卫处理情况。<br>这里采取的方案是通过从兴趣源本身驱动来检测兴趣源，而不是从每个智能体单独驱动检测兴趣源，我们可以很容易地收集所有需要的信息，以确定谁应该做出反应，以及他们应该如何反应。<br>感官更新循环会根据所有可能的”检测候选者”来测试每个兴趣源。给定这个列表，它主要根据群体大小，但也可能根据位置或与兴趣源的距离做出一些决定。如果只有一个智能体能检测到兴趣，工作就完成了，智能体会得到通知，然后他去调查。如果有多个智能体可以检测到兴趣，我们可以给每个智能体分配角色，这些角色和兴趣记录一起存储在智能体的大脑中。角色只有在特定的兴趣范围内才有意义，当这个兴趣被遗忘或替换时，与之相关的角色也会消失。<br>如果有多个智能体能检测到兴趣，就会选择一个智能体作为”哨兵”或”组长”，他播放音频对话告诉附近的其他智能体去查看兴趣源，然后挂机在后面等待。一个或多个智能体会成为”调查者”，会去调查，似乎是听从”组长”的命令。其余的智能体会成为”旁观者”，可能会表示他们已经看到或听到了这个兴趣，但明智的做法是守住阵地，降低这个兴趣在他们心中的优先级，这样他们就更有可能注意到新的兴趣，也可能会被选为组长或调查员。<br>关键是，一旦角色分配完毕，感知更新完成，就没有”群体”需要管理了。每个智能体都是独立行动的，但由于被分配的角色不同，他们的行为方式也彼此不同，这使得群体显得协调一致。  </p>
+<h2 id="兴趣的优先级"><a href="#兴趣的优先级" class="headerlink" title="兴趣的优先级"></a>兴趣的优先级</h2><p>如果你正在调查一盏破损的灯泡，突然遇到一具尸体，你应该停下来调查尸体，还是继续看灯？如果你听到你的伙伴被忍者刺伤，然后在去帮助他的路上发现了一盏破灯，你该怎么办？你应该停下来调查吗？显然，某些类型的兴趣必须优先于其他类型的兴趣。<br>在实际的实现中，兴趣源都包含一个简单的优先级整数值，高优先级的兴趣可以取代低优先级或同等优先级的兴趣，智能体会相应地改变自己的关注点。如果智能体当前持有高优先级的兴趣，低优先级的兴趣就会被舍弃。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">INTEREST_PRIORITY_LOWEST &#x3D; 0</span><br><span class="line">INTEREST_PRIORITY_BROKEN &#x3D; 1</span><br><span class="line">INTEREST_PRIORITY_MISSING &#x3D; 2</span><br><span class="line">INTEREST_PRIORITY_SUSPECT &#x3D; 4</span><br><span class="line">INTEREST_PRIORITY_SMOKE &#x3D; 4</span><br><span class="line">INTEREST_PRIORITY_CORPSE &#x3D; 4</span><br><span class="line">INTEREST_PRIORITY_NOISE_QUIET &#x3D; 4</span><br><span class="line">INTEREST_PRIORITY_NOISE_LOUD &#x3D; 4</span><br><span class="line">INTEREST_PRIORITY_BOX &#x3D; 5</span><br><span class="line">INTEREST_PRIORITY_SPIKEMINE &#x3D; 5</span><br><span class="line">INTEREST_PRIORITY_DISTRACTIONFLARE &#x3D; 10</span><br><span class="line">INTEREST_PRIORITY_TERROR &#x3D; 20</span><br></pre></td></tr></table></figure><br>在整个开发过程中，平衡各种兴趣的优先级一直是一项具有挑战性的持续任务。上面的代码显示了在项目接近尾声时，各种类型的兴趣源的优先级是什么。<br>最初，开发团队假设寻找尸体将是游戏中最高优先级的兴趣之一，仅会被看到目标（玩家）所取代，但事实证明并不那么简单。如果你听到了一个声音，在调查声音的同时你发现了一具尸体，显然关注这个新发现是有意义的。但如果情况反过来呢？如果你正在调查一具尸体，而你又听到了声音，你应该忽略它吗？这有可能是非常不明智的，尤其是当声音是脚步声从后面迅速向你靠近的时候。<br>事实证明，尸体、噪音以及其他各种特定的兴趣类型都应该按照最新的优先原则来处理。你最后注意到的东西可能是最重要的东西。开发团队在这里的解决方案只是让这组兴趣都具有相同的优先级，且新的兴趣被视为更重要。<br>其他兴趣的优先级则和遇到的顺序无关。看到一个破损的罐子总是不如一个阴暗的人影或一声枪响来得有趣。看到你的伙伴被钉子陷阱刺穿，永远比远处的玻璃破碎声更重要。  </p>
+<h2 id="智能体的侦查能力"><a href="#智能体的侦查能力" class="headerlink" title="智能体的侦查能力"></a>智能体的侦查能力</h2><p>一旦智能体注意到一个兴趣源，智能体就可以”调查”它，这可能仅仅意味着看着一盏坏掉的灯，并评论说它应该被修复。或者是看到一个倒下的战友，跑过去检查一下脉搏，然后打电话报告上级。<br>一旦智能体确定一个兴趣源已经被处理了，并不应该每个走过的警卫都停下来注意，这将是重复而无意义的。当一个智能体完成了调查及后续的任务后，与该智能体的兴趣记录相关联的兴趣源就会被标记为已调查，然后将该兴趣源（但不是与之相关联的游戏对象）从世界中移除，再也不会被看到或听到。<br>不过这仍然不能完全解决我们的问题，以尸体为例，如果你吸引了一个正在调查尸体的警卫的注意力，他还没来得及彻底调查并发出警报，会发生什么？失去目标后，他可能会转身再看到尸体。他看到倒下的战友显然并不会像刚才那样惊讶。他自然会回来完成最初的调查。我个人认为这是合理的行为，但是《忍者之印》的开发团队认为其过于复杂。开发团队决定，每个智能体一次只处理一个兴趣，不会有兴趣的堆叠或队列。一旦最高优先级的兴趣在任何时候被处理，情况能自然地重置到默认状态，而不是让警卫继续重温他们在遭遇中可能遇到的每一个过去的兴趣来源。在我看来可能维持一个容量不高的堆可能能在代价不大的情况使智能体的行为更真实。<br>那么默认情况下，每个智能体只检测或注意到每个兴趣源一次。当智能体注意到兴趣时，记录这次发现的发生，并且该智能体将被排除在再次注意到兴趣源的范围之外。由于我们从兴趣源的方向驱动更新并寻找智能体发现它们，因此兴趣源会保留一个发现者的列表，不会导致自己被同一个智能体注意两次。<br>在极少数情况下，一个兴趣源确实能被同一个智能体多次注意到，主要的例子是附加在玩家身上的”嫌疑犯”兴趣源。这个兴趣源在较远的地方就能被检测到，比智能体把玩家看成目标的能力还要强，从而吸引他们去调查，但并不需要看到就射击玩家。我们希望每次智能体侦测到玩家时都能更新这一兴趣源，所以这个特殊的兴趣源被标记为可被重新发现，它也不会费心去保留一份过去谁见过它的名单。<br>但是在这一套实现思路下，那些正在感知到快速重复或交替的兴趣的智能体很难实现合理的行为。为了解决这个问题，可以做一些特殊的处理。具体来说，当获取一个新的兴趣时，智能体会将新的兴趣与当前的兴趣（如果有）进行比较。如果它的来源、类型、优先级相同，并且与之前的兴趣的位置比较接近，那么就不会作为新的兴趣来处理，但当前兴趣的计时器和位置会更新以反映新的信息。一个主要的例子就是玩家在跑步时创建了一系列的脚步兴趣。把每一个脚步都当作一个新的兴趣是不可取的。  </p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文主要介绍了《忍者之印》中基于兴趣的AI设计。虽然思路较为简单，但这个系统赋予了策划对游戏角色行为的更多控制权，同时减少了对特殊情况下硬编码脚本的需求。总的来说，在更新兴趣源时分配智能体行动的感知检测架构，加上数据驱动的带优先级兴趣源定义，形成了一个简单而灵活的系统，创造了可信的守卫意识，也以最小的额外复杂性提供了轻量级的群体行为。如果为了在自己的轻量潜行游戏中实现一套AI逻辑，不妨参考本文中的实现方案与细节。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+            <a href="/tags/AI/" rel="tag"><i class="fa fa-tag"></i> AI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E3%80%8AGAP%E3%80%8B%E9%AB%98%E6%95%88%E7%9A%84%E4%BA%BA%E7%BE%A4%E6%A8%A1%E6%8B%9F/" rel="prev" title="《Game AI Pro》高效的人群模拟">
+      <i class="fa fa-chevron-left"></i> 《Game AI Pro》高效的人群模拟
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣点"><span class="nav-number">2.</span> <span class="nav-text">兴趣点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#感知"><span class="nav-number">3.</span> <span class="nav-text">感知</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣源的定义"><span class="nav-number">4.</span> <span class="nav-text">兴趣源的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能体小队的处理"><span class="nav-number">5.</span> <span class="nav-text">智能体小队的处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣的优先级"><span class="nav-number">6.</span> <span class="nav-text">兴趣的优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能体的侦查能力"><span class="nav-number">7.</span> <span class="nav-text">智能体的侦查能力</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">8.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="tmc"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">tmc</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/tmc0210" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;tmc0210" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:494521535@qq.com" title="E-Mail → mailto:494521535@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      友链
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.holdice.club/" title="https:&#x2F;&#x2F;blog.holdice.club&#x2F;" rel="noopener" target="_blank">holdice's blogs</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://shiraha.cn/" title="https:&#x2F;&#x2F;shiraha.cn&#x2F;" rel="noopener" target="_blank">七海の参考書</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://blog.csdn.net/qq_39119496/article/details/103372437" title="https:&#x2F;&#x2F;blog.csdn.net&#x2F;qq_39119496&#x2F;article&#x2F;details&#x2F;103372437" rel="noopener" target="_blank">Ashmore</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=280 height=52 src="//music.163.com/outchain/player?type=1&id=3190522&auto=0&height=32"></iframe>
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">tmc</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v7.7.2
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

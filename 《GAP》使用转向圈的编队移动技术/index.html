@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://i.loli.net/2021/02/19/3gn9jUfHKaisWLA.png">
 <meta property="og:image" content="https://i.loli.net/2021/02/19/JFxn1iKpwImWGEP.png">
 <meta property="article:published_time" content="2021-02-19T11:22:12.000Z">
-<meta property="article:modified_time" content="2021-02-19T14:27:21.683Z">
+<meta property="article:modified_time" content="2021-02-22T20:32:09.696Z">
 <meta property="article:author" content="tmc">
 <meta property="article:tag" content="AI">
 <meta name="twitter:card" content="summary">
@@ -209,10 +209,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-02-19 19:22:12 / 修改时间：22:27:21" itemprop="dateCreated datePublished" datetime="2021-02-19T19:22:12+08:00">2021-02-19</time>
+              <time title="创建时间：2021-02-19 19:22:12" itemprop="dateCreated datePublished" datetime="2021-02-19T19:22:12+08:00">2021-02-19</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-02-23 04:32:09" itemprop="dateModified" datetime="2021-02-23T04:32:09+08:00">2021-02-23</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -229,7 +235,7 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4k</span>
+              <span>3.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -254,28 +260,28 @@
 <li>生成要遵循的路径</li>
 <li>沿着路径进行导航<br>这里值得注意的是，第一部分生成路径并不限于编队。它可以用于单个角色、车辆或任何其他可以定义转向圈的移动物体。第二部分是专门针对编队的，它描述了两种不同的沿路径移动编队的技术。</li>
 </ol>
-<h2 id="生成路径"><a href="#生成路径" class="headerlink" title="生成路径"></a>生成路径</h2><p><img src="https://i.loli.net/2021/02/19/H6ToSjQm2YnZv5V.png" alt="生成路径"><br>上图显示了我们所需的关键信息以及最终得到的路径。当我们开始生成路径时，我们从五个信息开始：编队的当前位置(formation.pos)、当前方向(formation.dir)、目标位置(target.pos)、目标方向(target.dir)和转向圈半径(或编队的转弯半径，r)。根据这些数据，我们需要计算四个额外的值。</p>
+<h2 id="生成路径"><a href="#生成路径" class="headerlink" title="生成路径"></a>生成路径</h2><p><img src="https://i.loli.net/2021/02/19/H6ToSjQm2YnZv5V.png" alt="生成路径"><br>上图显示了所需的关键信息以及最终得到的路径。当开始生成路径时，从五个信息开始：编队的当前位置(formation.pos)、当前方向(formation.dir)、目标位置(target.pos)、目标方向(target.dir)和转向圈半径(或编队的转弯半径，r)。根据这些数据需要计算四个额外的值。</p>
 <ul>
 <li>c1，起始转向圈的中心点。</li>
 <li>c1_exit，编队将脱离起始圆的点。</li>
 <li>c2，结束转向圈的中心点。</li>
 <li>c2_enter，编队与终点圆的连接点。</li>
 </ul>
-<h3 id="计算c1和c2"><a href="#计算c1和c2" class="headerlink" title="计算c1和c2"></a>计算c1和c2</h3><p>计算路径的第一步是生成将用于起点和终点的转向圈。为此，我们需要圆心c1和c2。注意到dir实际上是转向圈的切线，且通常情况下转向圈在dir靠近目标点一侧生成，我们可以简单地通过几何计算得到圆心。只需注意当c1和c2之间的距离小于2r时，需要进行特殊考虑，分别在dir的相反方向生成圆。具体计算过程如下：  </p>
+<h3 id="计算c1和c2"><a href="#计算c1和c2" class="headerlink" title="计算c1和c2"></a>计算c1和c2</h3><p>计算路径的第一步是生成将用于起点和终点的转向圈。为此需要圆心c1和c2。注意到dir实际上是转向圈的切线，且通常情况下转向圈在dir靠近目标点一侧生成，可以简单地通过几何计算得到圆心。只需注意当c1和c2之间的距离小于2r时，需要进行特殊考虑，分别在dir的相反方向生成圆。具体计算过程如下：  </p>
 <ol>
-<li>计算矢量target.pos-formation.pos，我们将其称为dirVec。  </li>
-<li>计算起始圆的中心点c1。为此，我们需要与dirVec方向相同的formation.dir的法向量，将其标记为 formation.perp。将 formation.perp 的长度比例等于 r，然后将其加到 formation.pos 中，得到 c1。  </li>
+<li>计算矢量target.pos-formation.pos，将其称为dirVec。  </li>
+<li>计算起始圆的中心点c1。为此，需要与dirVec方向相同的formation.dir的法向量，将其标记为 formation.perp。将 formation.perp 的长度比例等于 r，然后将其加到 formation.pos 中，得到 c1。  </li>
 <li>结尾圆的中心点 c2 用同样的方法计算，类似的半径向量将被称为target.perp。  </li>
 </ol>
-<p>唯一的例外是当c1和c2之间的距离小于2r时(即，转向圈是重叠的)。这种情况下的解决方案是反转 formation.perp 和 target.perp。这将导致编队向相反的方向转向，从而有足够的空间。例如，如果我们最初使用 formation.dir 的右侧垂直线，我们将使用左侧垂直线，基本上是将转向圈翻转到 formation.dir 的另一侧。</p>
+<p>唯一的例外是当c1和c2之间的距离小于2r时(即，转向圈是重叠的)。这种情况下的解决方案是反转 formation.perp 和 target.perp。这将导致编队向相反的方向转向，从而有足够的空间。例如，如果最初使用 formation.dir 的右侧垂直线，将使用左侧垂直线，基本上是将转向圈翻转到 formation.dir 的另一侧。</p>
 <h3 id="计算-c1-exit-和-c2-enter"><a href="#计算-c1-exit-和-c2-enter" class="headerlink" title="计算 c1_exit 和 c2_enter"></a>计算 c1_exit 和 c2_enter</h3><p><em>tldr：只需计算两个生成圆的公切线即可,此时这两点即为两个切点</em>    </p>
-<p>接下来是计算c1_exit和c2_enter，有两种不同的情况需要考虑。为了确定是哪种情况，我们首先需要看position.perp和target.perp是position.dir和target.dir的左垂直还是右垂直。为了简洁起见，我们说formation.perp如果是formation.dir的左手垂直线，则等于 “左”；否则就是 “右”。<br>第一种情况是针对formation.perp和target.perp相对的情况（例如，formation.perp等于右，target.perp等于左）。在这种情况下，我们的目标是计算c1_exit和c2_enter点在两个圆的圆周上相对于x轴的角度（也即下图中的a3和b3）。一旦我们有了这些角度，我们就可以计算出这两个点。<br>第二种情况是当formation.perp和target.perp在同一侧时。这种情况不需要我们计算任何角度，观察可知重要的角度都是90度。</p>
-<h4 id="相对"><a href="#相对" class="headerlink" title="相对"></a>相对</h4><p><img src="https://i.loli.net/2021/02/19/3gn9jUfHKaisWLA.png" alt="情况1"><br>在 formation.perp 和 target.perp 不在同一侧的情况下，我们的目标是计算角度 a3 和 b3。需要注意的是，根据 formation.perp 和 target.perp 在哪条边上，a3 和 b3 的计算会略有变化，这就是为什么下图中有两部分。<br>在开始计算之前，有几个基本性质。首先，从c1到c1_exit的线和从c2到c2_enter的线都垂直于c1_exit和c2_enter之间的线。第二，c1到c2和c1_exit到c2_enter这两条线的中点相交。第三，我们知道转向圆的半径，r。第四，我们能够计算出c1和c2之间的距离，标为d。这意味着我们可以首先计算出角a1：$a1=arccos(r/(1/2*d))$。我们还可以通过找出矢量c2-c1相对于x轴的角度来计算a2。<br>对于a3，我们需要使用的计算将取决于formation.perp和target.perp的值。如果 formation.perp 是 Right，那么我们可以参考图 A，a3 的计算是在 a2 上加上 a1。否则，如果 formation.perp 为左，我们参考图 B，a3 可以通过从 a2 中减去 a1 来计算。<br>c2_enter的计算与c1_exit的计算非常相似。角度b1的计算方法与我们用来计算a1的公式和数值完全相同。角度b2是矢量c1-c2相对于x轴的角度（不同于a2，它是c2-c1相对于x轴的角度）。b3的计算方法也和我们对a3的计算方法一样，只是b2-b1或b2+b1，这取决于formation.perp和target.perp的值。<br>最后，现在我们已经计算出了a3和b3，我们可以生成圆上的点，c1_exit和c2_enter。</p>
-<h4 id="同侧"><a href="#同侧" class="headerlink" title="同侧"></a>同侧</h4><p><img src="https://i.loli.net/2021/02/19/JFxn1iKpwImWGEP.png" alt="情况2"><br>在formation.perp和target.perp都落在同一侧的情况下(意味着它们都是右或左)，计算就比较简单了，在这里，我们首先计算出向量c2-c1，我们称之为d。如图21.3所示，如果formation.perp等于右，那么我们将使用d的左手垂直线，标记为d.perp。同样，如果formation.perp等于Left，那么d.perp将是d的右手垂直线。无论哪种情况，一旦我们有了d.perp，将它加到c1和c2上，就会得到c1_exit和c2_enter。<br>最后，我们可以生成沿路径的点，让编队导航。这些点将从formation.pos开始，绕着圆圈c1移动到c1_exit，再移动到c2_enter，最后绕着圆圈c2移动，直到到达target.pos。<br>绕圈移动的方向由formation.perp和target.perp决定。当它们等于 “右 “时，我们将在相应的圆上产生按顺时针方向绕行的点，当它们等于 “左 “时，我们将产生按逆时针方向绕行的点。  </p>
-<h3 id="生成沿路径的导航点"><a href="#生成沿路径的导航点" class="headerlink" title="生成沿路径的导航点"></a>生成沿路径的导航点</h3><p>最后，我们可以生成沿路径的点，让编队导航。这些点将从formation.pos开始，绕着圆圈c1移动到c1_exit，再移动到c2_enter，最后绕着圆圈c2移动，直到到达target.pos。<br>绕圈移动的方向由formation.perp和target.perp决定。当它们等于 “右 “时，我们将在相应的圆上产生按顺时针方向绕行的点，当它们等于 “左 “时，我们将产生按逆时针方向绕行的点。</p>
-<h2 id="为编队导航"><a href="#为编队导航" class="headerlink" title="为编队导航"></a>为编队导航</h2><p>我们需要以一种看起来合理的方式移动编队。下面的例子将使编队的第一排保持静止，后面的几排将以几种不同的方式跟随。在这里，我们将介绍两种样式：第一种样式是将编队内的每个单位向它前面的单位移动，第二种样式则要求每个单位保持它的行，紧挨着它左右的单位。<br>请注意，这里描述的编队内的点是为了作为寻路目标，而不一定是编队内单位的实际位置。这种灵活性可以让单位离开去做其他事情，比如对付进攻的敌人，收集附近的资源，或者绕过较小的障碍物。一旦单位完成了它的任何一个子任务，它就可以继续寻路到它在阵中的目标位置。</p>
-<h3 id="“列”式"><a href="#“列”式" class="headerlink" title="“列”式"></a>“列”式</h3><p>这种技术将编队中的每个单位向其前面的单位移动，同时保持一定的距离。虽然这将导致相当流畅的外观，并保持一列中每个单位之间的连接，但它不会保留行。<br>第一步是根据编队的速度和路径中的下一点，更新编队的位置和方向。为了使第一行的单位保持在一条直线上，我们需要计算它们的位置，使它们形成的直线与编队更新的方向垂直，并以编队的位置为中心。从第二行开始，计算每一个目标，和它前面同一列的目标之间的方向。然后，我们将目标向这个方向移动，直到它接触到前面的单位，对阵型中所有剩余行的单位重复这个过程。</p>
-<h3 id="“行”式"><a href="#“行”式" class="headerlink" title="“行”式"></a>“行”式</h3><p>对于这种运动形式，编队在拐角处转向时保留了行。第一行的计算方式与“列”样式相同。<br>接下来，我们需要根据第一行移动的方向，确定第二行是向左还是向右转。要做到这一点，首先计算从第二行的任何单位到第一行同列的单位的方向，然后取右侧的法向量，我们将其称为rPerpendicular。接下来，取第一行移动的方向与rPerpendicular的点积。如果该结果为正，则第二行将向右转，否则将向左转。<br>目前，我们假设第二行向左转。下一步将是把第二行中最左的单位向它前面同列的单位移动，直到它们相撞。接下来，从行中的第二个单元开始，将每个单元的位置设置为平齐它左边的单元，并向rPerpendicular的方向移动。<br>如果行是向右转，只有两个小的区别。最主要的是，我们要先计算最右边的单元的位置，将它向它前面的单元移动，直到它们相碰。另一个区别是，你将从右边的第二个单元开始，并将每个单元的位置设置为触及它右边的单元，向-1*rPerpendicular的方向移动。<br>无论哪种情况，一旦我们有了第二行所有单元的位置，我们就可以对阵中的其余行重复这个过程。</p>
+<p>接下来是计算c1_exit和c2_enter，有两种不同的情况需要考虑。为了确定是哪种情况，首先需要看position.perp和target.perp是position.dir和target.dir的左垂直还是右垂直。为了简洁起见，formation.perp如果是formation.dir的左手垂直线，则等于 “左”；否则就是 “右”。<br>第一种情况是针对formation.perp和target.perp相对的情况（例如，formation.perp等于右，target.perp等于左）。在这种情况下，我们的目标是计算c1_exit和c2_enter点在两个圆的圆周上相对于x轴的角度（也即下图中的a3和b3）。一旦有了这些角度，就可以计算出这两个点。<br>第二种情况是当formation.perp和target.perp在同一侧时。这种情况不需要计算任何角度，观察可知重要的角度都是90度。</p>
+<h4 id="相对"><a href="#相对" class="headerlink" title="相对"></a>相对</h4><p><img src="https://i.loli.net/2021/02/19/3gn9jUfHKaisWLA.png" alt="情况1"><br>在 formation.perp 和 target.perp 不在同一侧的情况下，我们的目标是计算角度 a3 和 b3。需要注意的是，根据 formation.perp 和 target.perp 在哪条边上，a3 和 b3 的计算会略有变化，这就是为什么下图中有两部分。<br>在开始计算之前，有几个基本性质。首先，从c1到c1_exit的线和从c2到c2_enter的线都垂直于c1_exit和c2_enter之间的线。第二，c1到c2和c1_exit到c2_enter这两条线的中点相交。第三，知道转向圆的半径，r。第四，能够计算出c1和c2之间的距离，标为d。这意味着可以首先计算出角a1：$a1=arccos(r/(1/2*d))$。还可以通过找出矢量c2-c1相对于x轴的角度来计算a2。<br>对于a3，需要使用的计算将取决于formation.perp和target.perp的值。如果 formation.perp 是 Right，那么可以参考图 A，a3 的计算是在 a2 上加上 a1。否则，如果 formation.perp 为左，参考图 B，a3 可以通过从 a2 中减去 a1 来计算。<br>c2_enter的计算与c1_exit的计算非常相似。角度b1的计算方法与用来计算a1的公式和数值完全相同。角度b2是矢量c1-c2相对于x轴的角度（不同于a2，它是c2-c1相对于x轴的角度）。b3的计算方法也和对a3的计算方法一样，只是b2-b1或b2+b1，这取决于formation.perp和target.perp的值。<br>最后，现在已经计算出了a3和b3，可以生成圆上的点，c1_exit和c2_enter。</p>
+<h4 id="同侧"><a href="#同侧" class="headerlink" title="同侧"></a>同侧</h4><p><img src="https://i.loli.net/2021/02/19/JFxn1iKpwImWGEP.png" alt="情况2"><br>在formation.perp和target.perp都落在同一侧的情况下(意味着它们都是右或左)，计算就比较简单了，在这里，首先计算出向量c2-c1，称之为d。如图21.3所示，如果formation.perp等于右，那么将使用d的左手垂直线，标记为d.perp。同样，如果formation.perp等于Left，那么d.perp将是d的右手垂直线。无论哪种情况，一旦有了d.perp，将它加到c1和c2上，就会得到c1_exit和c2_enter。<br>最后，可以生成沿路径的点，让编队导航。这些点将从formation.pos开始，绕着圆圈c1移动到c1_exit，再移动到c2_enter，最后绕着圆圈c2移动，直到到达target.pos。<br>绕圈移动的方向由formation.perp和target.perp决定。当它们等于 “右 “时，在相应的圆上产生按顺时针方向绕行的点，当它们等于 “左 “时，产生按逆时针方向绕行的点。  </p>
+<h3 id="生成沿路径的导航点"><a href="#生成沿路径的导航点" class="headerlink" title="生成沿路径的导航点"></a>生成沿路径的导航点</h3><p>最后，生成沿路径的点，让编队导航。这些点将从formation.pos开始，绕着圆圈c1移动到c1_exit，再移动到c2_enter，最后绕着圆圈c2移动，直到到达target.pos。<br>绕圈移动的方向由formation.perp和target.perp决定。当它们等于 “右 “时，在相应的圆上产生按顺时针方向绕行的点，当它们等于 “左 “时，产生按逆时针方向绕行的点。</p>
+<h2 id="为编队导航"><a href="#为编队导航" class="headerlink" title="为编队导航"></a>为编队导航</h2><p>我们需要以一种看起来合理的方式移动编队。下面的例子将使编队的第一排保持静止，后面的几排将以几种不同的方式跟随。在这里介绍两种样式：第一种样式是将编队内的每个单位向它前面的单位移动，第二种样式则要求每个单位保持它的行，紧挨着它左右的单位。<br>请注意，这里描述的编队内的点是为了作为寻路目标，而不一定是编队内单位的实际位置。这种灵活性可以让单位离开去做其他事情，比如对付进攻的敌人，收集附近的资源，或者绕过较小的障碍物。一旦单位完成了它的任何一个子任务，它就可以继续寻路到它在阵中的目标位置。</p>
+<h3 id="“列”式"><a href="#“列”式" class="headerlink" title="“列”式"></a>“列”式</h3><p>这种技术将编队中的每个单位向其前面的单位移动，同时保持一定的距离。虽然这将导致相当流畅的外观，并保持一列中每个单位之间的连接，但它不会保留行。<br>第一步是根据编队的速度和路径中的下一点，更新编队的位置和方向。为了使第一行的单位保持在一条直线上，需要计算它们的位置，使它们形成的直线与编队更新的方向垂直，并以编队的位置为中心。从第二行开始，计算每一个目标，和它前面同一列的目标之间的方向。然后，将目标向这个方向移动，直到它接触到前面的单位，对阵型中所有剩余行的单位重复这个过程。</p>
+<h3 id="“行”式"><a href="#“行”式" class="headerlink" title="“行”式"></a>“行”式</h3><p>对于这种运动形式，编队在拐角处转向时保留了行。第一行的计算方式与“列”样式相同。<br>接下来需要根据第一行移动的方向，确定第二行是向左还是向右转。要做到这一点，首先计算从第二行的任何单位到第一行同列的单位的方向，然后取右侧的法向量，将其称为rPerpendicular。接下来，取第一行移动的方向与rPerpendicular的点积。如果该结果为正，则第二行将向右转，否则将向左转。<br>目前，假设第二行向左转。下一步将是把第二行中最左的单位向它前面同列的单位移动，直到它们相撞。接下来，从行中的第二个单元开始，将每个单元的位置设置为平齐它左边的单元，并向rPerpendicular的方向移动。<br>如果行是向右转，只有两个小的区别。最主要的是要先计算最右边的单元的位置，将它向它前面的单元移动，直到它们相碰。另一个区别是，你将从右边的第二个单元开始，并将每个单元的位置设置为触及它右边的单元，向-1*rPerpendicular的方向移动。<br>无论哪种情况，一旦有了第二行所有单元的位置，就可以对阵中的其余行重复这个过程。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过根据编队的当前位置和目的地位置计算出两个转向圈，就可以为编队生成一条路径，以保证编队永远不需要进行超过其能力范围的急转弯。<br>这个概念的进一步发展可以包括让编队在大尺度和小尺度上考虑到障碍物的能力。对于较小的障碍物，意图是编队可以基本忽略它们。这是因为，编队内的寻路目标将负责寻找绕过任何小型障碍物的方法。大规模的障碍物需要单独处理，但可以通过考虑整个编队的大小，然后对整个编队进行寻路来处理。</p>
 
     </div>
@@ -377,7 +383,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -443,16 +449,6 @@
     <i class="fa fa-user"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">tmc</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">53k</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">48 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.0
   </div>
